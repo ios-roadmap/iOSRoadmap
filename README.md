@@ -1,3 +1,1 @@
 # iOSRoadmap
-
-ömer
