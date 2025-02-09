@@ -1,17 +1,26 @@
-name: Restrict PR to Master
+name: Restrict Direct PRs to Master
 
 on:
   pull_request:
     branches:
       - master
+      - feature-release/*
 
 jobs:
   check-branch:
     runs-on: ubuntu-latest
     steps:
-      - name: Check PR source branch
+      - name: Check PR Source Branch
         run: |
-          if [[ "${{ github.head_ref }}" == feature/* ]]; then
-            echo "PR feature/xxx branch'inden doğrudan master'a açıldı. Önce feature-release/xxx'e açılmalı."
+          SOURCE_BRANCH="${{ github.head_ref }}"
+          TARGET_BRANCH="${{ github.base_ref }}"
+
+          if [[ "$TARGET_BRANCH" == "master" && "$SOURCE_BRANCH" == feature/* ]]; then
+            echo "HATA: feature/xxx branch'inden doğrudan master'a PR açamazsınız! Önce feature-release/xxx'e açılmalıdır."
+            exit 1
+          fi
+
+          if [[ "$SOURCE_BRANCH" == "master" ]]; then
+            echo "HATA: master branch'inden PR açamazsınız!"
             exit 1
           fi
