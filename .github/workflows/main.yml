@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - master
-      - feature-release/*
 
 jobs:
   check-branch:
@@ -15,12 +14,14 @@ jobs:
           SOURCE_BRANCH="${{ github.head_ref }}"
           TARGET_BRANCH="${{ github.base_ref }}"
 
-          if [[ "$TARGET_BRANCH" == "master" && "$SOURCE_BRANCH" == feature/* ]]; then
-            echo "HATA: feature/xxx branch'inden doğrudan master'a PR açamazsınız! Önce feature-release/xxx'e açılmalıdır."
+          # Allow PRs to master **only** from feature-release/*
+          if [[ "$TARGET_BRANCH" == "master" && ! "$SOURCE_BRANCH" =~ ^feature-release/ ]]; then
+            echo "❌ ERROR: You can only open PRs to 'master' from 'feature-release/*' branches!"
             exit 1
           fi
 
+          # Prevent PRs from master to any branch
           if [[ "$SOURCE_BRANCH" == "master" ]]; then
-            echo "HATA: master branch'inden PR açamazsınız!"
+            echo "❌ ERROR: You cannot open PRs from the 'master' branch!"
             exit 1
           fi
