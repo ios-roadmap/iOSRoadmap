@@ -1,0 +1,17 @@
+name: Restrict PR to Master
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR source branch
+        run: |
+          if [[ "${{ github.head_ref }}" == feature/* ]]; then
+            echo "PR feature/xxx branch'inden doğrudan master'a açıldı. Önce feature-release/xxx'e açılmalı."
+            exit 1
+          fi
