@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		640ED52E2D63E46F00820794 /* IRLibraries */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = IRLibraries; sourceTree = "<group>"; };
 		64B7127D2D5E685000C09C09 /* iOSRoadmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSRoadmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -42,10 +43,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		640ED52F2D63E48100820794 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		64B712742D5E685000C09C09 = {
 			isa = PBXGroup;
 			children = (
+				640ED52E2D63E46F00820794 /* IRLibraries */,
 				64B7127F2D5E685000C09C09 /* iOSRoadmap */,
+				640ED52F2D63E48100820794 /* Frameworks */,
 				64B7127E2D5E685000C09C09 /* Products */,
 			);
 			sourceTree = "<group>";
