@@ -4,24 +4,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "IRLibraries",
+    name: "IRCore",
+    defaultLocalization: "en",
     products: [
         .library(
-            name: "IRLibraries",
-            targets: ["IRLibraries"]),
+            name: "IRCore",
+            targets: ["IRCore"]),
     ],
     dependencies: [
-        .package(
-            name: "IRDashboard",
-            path: "../../IRDashboard"
-        )
+        
     ],
     targets: [
         .target(
-            name: "IRLibraries",
+            name: "IRCore",
             dependencies: [
-                "IRDashboard",
-            ]
+                
+            ],
+            path: "IRCore"
         ),
     ]
 )

@@ -7,119 +7,117 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		643D42422D63CD7E0034B91C /* IRDashboard.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 643D42392D63CD7E0034B91C /* IRDashboard.framework */; };
-		643D42A32D63D20D0034B91C /* IRDashboardLibrary in Resources */ = {isa = PBXBuildFile; fileRef = 643D42A22D63D20D0034B91C /* IRDashboardLibrary */; };
-		64EF6D0E2D63D399002B3362 /* IRDashboardLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 64EF6D0D2D63D399002B3362 /* IRDashboardLibrary */; };
+		646E72312D646E72002CA668 /* IRCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 646E720C2D646E56002CA668 /* IRCore.framework */; };
+		646E72322D646E72002CA668 /* IRCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 646E720C2D646E56002CA668 /* IRCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		646E725D2D646ECC002CA668 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646E725C2D646ECC002CA668 /* Package.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		643D42432D63CD7E0034B91C /* PBXContainerItemProxy */ = {
+		646E72332D646E72002CA668 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 643D42302D63CD7E0034B91C /* Project object */;
+			containerPortal = 646E72032D646E56002CA668 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 643D42382D63CD7E0034B91C;
-			remoteInfo = IRDashboard;
+			remoteGlobalIDString = 646E720B2D646E56002CA668;
+			remoteInfo = IRCore;
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		646E72352D646E72002CA668 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				646E72322D646E72002CA668 /* IRCore.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		643D42392D63CD7E0034B91C /* IRDashboard.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRDashboard.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		643D42412D63CD7E0034B91C /* IRDashboardTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IRDashboardTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		643D42572D63CDA70034B91C /* IRDashboardDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRDashboardDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		643D42A22D63D20D0034B91C /* IRDashboardLibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = IRDashboardLibrary; sourceTree = "<group>"; };
+		646E720C2D646E56002CA668 /* IRCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		646E721B2D646E6B002CA668 /* IRCoreDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCoreDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		646E725C2D646ECC002CA668 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		643D42492D63CD7E0034B91C /* Exceptions for "IRDashboard" folder in "IRDashboard" target */ = {
+		646E72112D646E56002CA668 /* Exceptions for "IRCore" folder in "IRCore" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			publicHeaders = (
-				include/IRDashboard.h,
+				IRCore.h,
 			);
-			target = 643D42382D63CD7E0034B91C /* IRDashboard */;
+			target = 646E720B2D646E56002CA668 /* IRCore */;
 		};
-		643D42682D63CDA80034B91C /* Exceptions for "IRDashboardDemo" folder in "IRDashboardDemo" target */ = {
+		646E722C2D646E6C002CA668 /* Exceptions for "IRCoreDemo" folder in "IRCoreDemo" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 643D42562D63CDA70034B91C /* IRDashboardDemo */;
+			target = 646E721A2D646E6B002CA668 /* IRCoreDemo */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		643D423B2D63CD7E0034B91C /* IRDashboard */ = {
+		646E720E2D646E56002CA668 /* IRCore */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				643D42492D63CD7E0034B91C /* Exceptions for "IRDashboard" folder in "IRDashboard" target */,
+				646E72112D646E56002CA668 /* Exceptions for "IRCore" folder in "IRCore" target */,
 			);
-			path = IRDashboard;
+			path = IRCore;
 			sourceTree = "<group>";
 		};
-		643D42452D63CD7E0034B91C /* IRDashboardTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = IRDashboardTests;
-			sourceTree = "<group>";
-		};
-		643D42582D63CDA70034B91C /* IRDashboardDemo */ = {
+		646E721C2D646E6B002CA668 /* IRCoreDemo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				643D42682D63CDA80034B91C /* Exceptions for "IRDashboardDemo" folder in "IRDashboardDemo" target */,
+				646E722C2D646E6C002CA668 /* Exceptions for "IRCoreDemo" folder in "IRCoreDemo" target */,
 			);
-			path = IRDashboardDemo;
+			path = IRCoreDemo;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		643D42362D63CD7E0034B91C /* Frameworks */ = {
+		646E72092D646E56002CA668 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				64EF6D0E2D63D399002B3362 /* IRDashboardLibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		643D423E2D63CD7E0034B91C /* Frameworks */ = {
+		646E72182D646E6B002CA668 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				643D42422D63CD7E0034B91C /* IRDashboard.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		643D42542D63CDA70034B91C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				646E72312D646E72002CA668 /* IRCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		643D422F2D63CD7E0034B91C = {
+		646E72022D646E56002CA668 = {
 			isa = PBXGroup;
 			children = (
-				643D42A22D63D20D0034B91C /* IRDashboardLibrary */,
-				643D423B2D63CD7E0034B91C /* IRDashboard */,
-				643D42452D63CD7E0034B91C /* IRDashboardTests */,
-				643D42582D63CDA70034B91C /* IRDashboardDemo */,
-				64EF6D0C2D63D399002B3362 /* Frameworks */,
-				643D423A2D63CD7E0034B91C /* Products */,
+				646E725C2D646ECC002CA668 /* Package.swift */,
+				646E720E2D646E56002CA668 /* IRCore */,
+				646E721C2D646E6B002CA668 /* IRCoreDemo */,
+				646E72302D646E72002CA668 /* Frameworks */,
+				646E720D2D646E56002CA668 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		643D423A2D63CD7E0034B91C /* Products */ = {
+		646E720D2D646E56002CA668 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				643D42392D63CD7E0034B91C /* IRDashboard.framework */,
-				643D42412D63CD7E0034B91C /* IRDashboardTests.xctest */,
-				643D42572D63CDA70034B91C /* IRDashboardDemo.app */,
+				646E720C2D646E56002CA668 /* IRCore.framework */,
+				646E721B2D646E6B002CA668 /* IRCoreDemo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		64EF6D0C2D63D399002B3362 /* Frameworks */ = {
+		646E72302D646E72002CA668 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -129,7 +127,7 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		643D42342D63CD7E0034B91C /* Headers */ = {
+		646E72072D646E56002CA668 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -139,135 +137,101 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		643D42382D63CD7E0034B91C /* IRDashboard */ = {
+		646E720B2D646E56002CA668 /* IRCore */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 643D424A2D63CD7E0034B91C /* Build configuration list for PBXNativeTarget "IRDashboard" */;
+			buildConfigurationList = 646E72122D646E56002CA668 /* Build configuration list for PBXNativeTarget "IRCore" */;
 			buildPhases = (
-				643D42342D63CD7E0034B91C /* Headers */,
-				643D42352D63CD7E0034B91C /* Sources */,
-				643D42362D63CD7E0034B91C /* Frameworks */,
-				643D42372D63CD7E0034B91C /* Resources */,
+				646E72072D646E56002CA668 /* Headers */,
+				646E72082D646E56002CA668 /* Sources */,
+				646E72092D646E56002CA668 /* Frameworks */,
+				646E720A2D646E56002CA668 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				643D423B2D63CD7E0034B91C /* IRDashboard */,
+				646E720E2D646E56002CA668 /* IRCore */,
 			);
-			name = IRDashboard;
+			name = IRCore;
 			packageProductDependencies = (
-				64EF6D0D2D63D399002B3362 /* IRDashboardLibrary */,
 			);
-			productName = IRDashboard;
-			productReference = 643D42392D63CD7E0034B91C /* IRDashboard.framework */;
+			productName = IRCore;
+			productReference = 646E720C2D646E56002CA668 /* IRCore.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		643D42402D63CD7E0034B91C /* IRDashboardTests */ = {
+		646E721A2D646E6B002CA668 /* IRCoreDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 643D424F2D63CD7E0034B91C /* Build configuration list for PBXNativeTarget "IRDashboardTests" */;
+			buildConfigurationList = 646E722D2D646E6C002CA668 /* Build configuration list for PBXNativeTarget "IRCoreDemo" */;
 			buildPhases = (
-				643D423D2D63CD7E0034B91C /* Sources */,
-				643D423E2D63CD7E0034B91C /* Frameworks */,
-				643D423F2D63CD7E0034B91C /* Resources */,
+				646E72172D646E6B002CA668 /* Sources */,
+				646E72182D646E6B002CA668 /* Frameworks */,
+				646E72192D646E6B002CA668 /* Resources */,
+				646E72352D646E72002CA668 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				643D42442D63CD7E0034B91C /* PBXTargetDependency */,
+				646E72342D646E72002CA668 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				643D42452D63CD7E0034B91C /* IRDashboardTests */,
+				646E721C2D646E6B002CA668 /* IRCoreDemo */,
 			);
-			name = IRDashboardTests;
+			name = IRCoreDemo;
 			packageProductDependencies = (
 			);
-			productName = IRDashboardTests;
-			productReference = 643D42412D63CD7E0034B91C /* IRDashboardTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		643D42562D63CDA70034B91C /* IRDashboardDemo */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 643D42692D63CDA80034B91C /* Build configuration list for PBXNativeTarget "IRDashboardDemo" */;
-			buildPhases = (
-				643D42532D63CDA70034B91C /* Sources */,
-				643D42542D63CDA70034B91C /* Frameworks */,
-				643D42552D63CDA70034B91C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				643D42582D63CDA70034B91C /* IRDashboardDemo */,
-			);
-			name = IRDashboardDemo;
-			packageProductDependencies = (
-			);
-			productName = IRDashboardDemo;
-			productReference = 643D42572D63CDA70034B91C /* IRDashboardDemo.app */;
+			productName = IRCoreDemo;
+			productReference = 646E721B2D646E6B002CA668 /* IRCoreDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		643D42302D63CD7E0034B91C /* Project object */ = {
+		646E72032D646E56002CA668 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
-					643D42382D63CD7E0034B91C = {
+					646E720B2D646E56002CA668 = {
 						CreatedOnToolsVersion = 16.0;
 						LastSwiftMigration = 1600;
 					};
-					643D42402D63CD7E0034B91C = {
-						CreatedOnToolsVersion = 16.0;
-					};
-					643D42562D63CDA70034B91C = {
+					646E721A2D646E6B002CA668 = {
 						CreatedOnToolsVersion = 16.0;
 					};
 				};
 			};
-			buildConfigurationList = 643D42332D63CD7E0034B91C /* Build configuration list for PBXProject "IRDashboard" */;
+			buildConfigurationList = 646E72062D646E56002CA668 /* Build configuration list for PBXProject "IRCore" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 643D422F2D63CD7E0034B91C;
+			mainGroup = 646E72022D646E56002CA668;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 643D423A2D63CD7E0034B91C /* Products */;
+			productRefGroup = 646E720D2D646E56002CA668 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				643D42382D63CD7E0034B91C /* IRDashboard */,
-				643D42402D63CD7E0034B91C /* IRDashboardTests */,
-				643D42562D63CDA70034B91C /* IRDashboardDemo */,
+				646E720B2D646E56002CA668 /* IRCore */,
+				646E721A2D646E6B002CA668 /* IRCoreDemo */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		643D42372D63CD7E0034B91C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				643D42A32D63D20D0034B91C /* IRDashboardLibrary in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		643D423F2D63CD7E0034B91C /* Resources */ = {
+		646E720A2D646E56002CA668 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		643D42552D63CDA70034B91C /* Resources */ = {
+		646E72192D646E6B002CA668 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -277,21 +241,15 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		643D42352D63CD7E0034B91C /* Sources */ = {
+		646E72082D646E56002CA668 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				646E725D2D646ECC002CA668 /* Package.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		643D423D2D63CD7E0034B91C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		643D42532D63CDA70034B91C /* Sources */ = {
+		646E72172D646E6B002CA668 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -301,18 +259,18 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		643D42442D63CD7E0034B91C /* PBXTargetDependency */ = {
+		646E72342D646E72002CA668 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 643D42382D63CD7E0034B91C /* IRDashboard */;
-			targetProxy = 643D42432D63CD7E0034B91C /* PBXContainerItemProxy */;
+			target = 646E720B2D646E56002CA668 /* IRCore */;
+			targetProxy = 646E72332D646E72002CA668 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		643D424B2D63CD7E0034B91C /* Debug */ = {
+		646E72132D646E56002CA668 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -333,7 +291,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRDashboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRCore;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -344,10 +302,10 @@
 			};
 			name = Debug;
 		};
-		643D424C2D63CD7E0034B91C /* Release */ = {
+		646E72142D646E56002CA668 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -368,7 +326,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRDashboard;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRCore;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -378,7 +336,7 @@
 			};
 			name = Release;
 		};
-		643D424D2D63CD7E0034B91C /* Debug */ = {
+		646E72152D646E56002CA668 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -444,7 +402,7 @@
 			};
 			name = Debug;
 		};
-		643D424E2D63CD7E0034B91C /* Release */ = {
+		646E72162D646E56002CA668 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -503,39 +461,7 @@
 			};
 			name = Release;
 		};
-		643D42502D63CD7E0034B91C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRDashboardTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		643D42512D63CD7E0034B91C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRDashboardTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		643D426A2D63CDA80034B91C /* Debug */ = {
+		646E722E2D646E6C002CA668 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -544,7 +470,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IRDashboardDemo/Info.plist;
+				INFOPLIST_FILE = IRCoreDemo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -555,7 +481,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRDashboardDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRCoreDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -563,7 +489,7 @@
 			};
 			name = Debug;
 		};
-		643D426B2D63CDA80034B91C /* Release */ = {
+		646E722F2D646E6C002CA668 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -572,7 +498,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IRDashboardDemo/Info.plist;
+				INFOPLIST_FILE = IRCoreDemo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -583,7 +509,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRDashboardDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRCoreDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -594,50 +520,34 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		643D42332D63CD7E0034B91C /* Build configuration list for PBXProject "IRDashboard" */ = {
+		646E72062D646E56002CA668 /* Build configuration list for PBXProject "IRCore" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				643D424D2D63CD7E0034B91C /* Debug */,
-				643D424E2D63CD7E0034B91C /* Release */,
+				646E72152D646E56002CA668 /* Debug */,
+				646E72162D646E56002CA668 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		643D424A2D63CD7E0034B91C /* Build configuration list for PBXNativeTarget "IRDashboard" */ = {
+		646E72122D646E56002CA668 /* Build configuration list for PBXNativeTarget "IRCore" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				643D424B2D63CD7E0034B91C /* Debug */,
-				643D424C2D63CD7E0034B91C /* Release */,
+				646E72132D646E56002CA668 /* Debug */,
+				646E72142D646E56002CA668 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		643D424F2D63CD7E0034B91C /* Build configuration list for PBXNativeTarget "IRDashboardTests" */ = {
+		646E722D2D646E6C002CA668 /* Build configuration list for PBXNativeTarget "IRCoreDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				643D42502D63CD7E0034B91C /* Debug */,
-				643D42512D63CD7E0034B91C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		643D42692D63CDA80034B91C /* Build configuration list for PBXNativeTarget "IRDashboardDemo" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				643D426A2D63CDA80034B91C /* Debug */,
-				643D426B2D63CDA80034B91C /* Release */,
+				646E722E2D646E6C002CA668 /* Debug */,
+				646E722F2D646E6C002CA668 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		64EF6D0D2D63D399002B3362 /* IRDashboardLibrary */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = IRDashboardLibrary;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = 643D42302D63CD7E0034B91C /* Project object */;
+	rootObject = 646E72032D646E56002CA668 /* Project object */;
 }

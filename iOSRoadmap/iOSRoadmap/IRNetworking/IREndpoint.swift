@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import IRCore
 
 protocol IREndpointProtocol {
     var baseURL: String { get }
