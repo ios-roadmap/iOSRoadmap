@@ -6,6 +6,9 @@ import PackageDescription
 let package = Package(
     name: "IRDashboard",
     defaultLocalization: "en",
+    platforms: [
+        .iOS(.v18)
+    ],
     products: [
         .library(
             name: "IRDashboard",
