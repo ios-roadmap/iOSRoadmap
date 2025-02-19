@@ -1,14 +1,13 @@
 //
-//  IREndpoint.swift
-//  iOSRoadmap
+//  IREndpointProtocol.swift
+//  IRNetworking
 //
-//  Created by Ömer Faruk Öztürk on 13.02.2025.
+//  Created by Ömer Faruk Öztürk on 19.02.2025.
 //
 
 import Foundation
-import IRCore
 
-protocol IREndpointProtocol {
+public protocol IREndpointProtocol {
     var baseURL: String { get }
     var path: String { get }
     var method: IRHTTPMethod { get }
@@ -17,7 +16,7 @@ protocol IREndpointProtocol {
     var queryItems: [URLQueryItem]? { get }
 }
 
-extension IREndpointProtocol {
+public extension IREndpointProtocol {
     var headers: [String: String]? { nil }
     var body: Data? { nil }
     var queryItems: [URLQueryItem]? { nil }
@@ -34,30 +33,5 @@ extension IREndpointProtocol {
         request.httpBody = body
         
         return request
-    }
-}
-
-struct IREndpoint: IREndpointProtocol {
-    let baseURL: String
-    let path: String
-    let method: IRHTTPMethod
-    let headers: [String: String]?
-    let body: Data?
-    let queryItems: [URLQueryItem]?
-    
-    init(
-        baseURL: String,
-        path: String,
-        method: IRHTTPMethod,
-        headers: [String: String]? = nil,
-        body: Data? = nil,
-        queryItems: [URLQueryItem]? = nil
-    ) {
-        self.baseURL = baseURL
-        self.path = path
-        self.method = method
-        self.headers = headers
-        self.body = body
-        self.queryItems = queryItems
     }
 }

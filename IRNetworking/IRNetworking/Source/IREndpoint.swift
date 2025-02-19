@@ -1,25 +1,50 @@
 //
-//  IRNetworkingModels.swift
-//  iOSRoadmap
+//  IREndpoint.swift
+//  IRNetworking
 //
-//  Created by Ömer Faruk Öztürk on 13.02.2025.
+//  Created by Ömer Faruk Öztürk on 19.02.2025.
 //
 
 import Foundation
 
-enum IRHTTPMethod: String {
+public struct IREndpoint: IREndpointProtocol {
+    public let baseURL: String
+    public let path: String
+    public let method: IRHTTPMethod
+    public let headers: [String: String]?
+    public let body: Data?
+    public let queryItems: [URLQueryItem]?
+    
+    public init(
+        baseURL: String,
+        path: String,
+        method: IRHTTPMethod,
+        headers: [String: String]? = nil,
+        body: Data? = nil,
+        queryItems: [URLQueryItem]? = nil
+    ) {
+        self.baseURL = baseURL
+        self.path = path
+        self.method = method
+        self.headers = headers
+        self.body = body
+        self.queryItems = queryItems
+    }
+}
+
+public enum IRHTTPMethod: String {
     case get
     case post
 }
 
-enum IRError: Error {
+public enum IRError: Error {
     case invalidURL
     case requestFailed(Error)
     case invalidResponse(Int)
     case decodingFailed(Error)
 }
 
-enum IREndpointHeader {
+public enum IREndpointHeader {
     case contentType(String)
     case accept(String)
     case authorization(String)
@@ -35,7 +60,7 @@ enum IREndpointHeader {
     case origin(String)
     case acceptLanguage(String)
 
-    var key: String {
+    public var key: String {
         switch self {
         case .contentType: return "Content-Type"
         case .accept: return "Accept"
@@ -54,7 +79,7 @@ enum IREndpointHeader {
         }
     }
 
-    var value: String {
+    public var value: String {
         switch self {
         case .contentType(let value),
              .accept(let value),

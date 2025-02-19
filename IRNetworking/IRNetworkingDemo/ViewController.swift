@@ -12,11 +12,31 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        
-        IRService.helloworld()
+
+        Task {
+            await someRetrieveRequest()
+        }
     }
 
-
+    func someRetrieveRequest() async {
+        let retreive = IRNetworkService()
+        let result = await retreive.request(IREndpoints.RickAndMorty.character.endpoint, responseType: CharacterResponse.self)
+        switch result {
+        case .success(let response):
+            print(response)
+        case .failure(let error):
+            print("❌ Request Failed: \(error)")
+        }
+    }
 }
 
+struct CharacterResponse: Codable {
+    struct Info: Codable {
+        let count: Int
+        let pages: Int
+        let next: String?
+        let prev: String?
+    }
+
+    let info: Info
+}

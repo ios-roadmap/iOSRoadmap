@@ -1,26 +1,26 @@
 //
-//  IRService.swift
-//  iOSRoadmap
+//  IRNetworkService.swift
+//  IRNetworking
 //
-//  Created by Ömer Faruk Öztürk on 13.02.2025.
+//  Created by Ömer Faruk Öztürk on 19.02.2025.
 //
 
 import Foundation
 
-protocol IRNetworkSession {
+public protocol IRNetworkSession {
     func data(for request: URLRequest) async throws -> (Data, URLResponse)
 }
 
 extension URLSession: IRNetworkSession {}
 
-final class IRNetworkManager {
+public final class IRNetworkService {
     private let session: IRNetworkSession
     
-    init(session: IRNetworkSession = URLSession.shared) {
+    public init(session: IRNetworkSession = URLSession.shared) {
         self.session = session
     }
     
-    func request<T: Decodable>(_ endpoint: IREndpoint, responseType: T.Type) async -> Result<T, IRError> {
+    public func request<T: Decodable>(_ endpoint: IREndpoint, responseType: T.Type) async -> Result<T, IRError> {
         do {
             guard let request = try endpoint.asURLRequest() else {
                 return .failure(.invalidURL)
