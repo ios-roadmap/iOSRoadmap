@@ -6,6 +6,9 @@ import PackageDescription
 let package = Package(
     name: "IRDashboardLibrary",
     defaultLocalization: "en",
+    platforms: [
+        .iOS(.v18)
+    ],
     products: [
         .library(
             name: "IRDashboardLibrary",
@@ -15,13 +18,16 @@ let package = Package(
         )
     ],
     dependencies: [
-        
+        .package(
+            name: "IRDashboardInterface",
+            path: "../IRDashboardInterface"
+        )
     ],
     targets: [
         .target(
             name: "IRDashboardLibrary",
             dependencies: [
-                
+                "IRDashboardInterface"
             ]
         )
     ]

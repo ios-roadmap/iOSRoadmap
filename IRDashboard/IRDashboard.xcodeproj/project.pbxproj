@@ -9,7 +9,8 @@
 /* Begin PBXBuildFile section */
 		643D42422D63CD7E0034B91C /* IRDashboard.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 643D42392D63CD7E0034B91C /* IRDashboard.framework */; };
 		643D42A32D63D20D0034B91C /* IRDashboardLibrary in Resources */ = {isa = PBXBuildFile; fileRef = 643D42A22D63D20D0034B91C /* IRDashboardLibrary */; };
-		64DBE4252D64963500C37E82 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64DBE4242D64963500C37E82 /* Package.swift */; };
+		64B110F02D6B836F005E0DB0 /* IRDashboard.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 643D42392D63CD7E0034B91C /* IRDashboard.framework */; };
+		64B110F12D6B836F005E0DB0 /* IRDashboard.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 643D42392D63CD7E0034B91C /* IRDashboard.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		64EF6D0E2D63D399002B3362 /* IRDashboardLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 64EF6D0D2D63D399002B3362 /* IRDashboardLibrary */; };
 /* End PBXBuildFile section */
 
@@ -21,14 +22,34 @@
 			remoteGlobalIDString = 643D42382D63CD7E0034B91C;
 			remoteInfo = IRDashboard;
 		};
+		64B110F22D6B836F005E0DB0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 643D42302D63CD7E0034B91C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 643D42382D63CD7E0034B91C;
+			remoteInfo = IRDashboard;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		64B110F42D6B836F005E0DB0 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				64B110F12D6B836F005E0DB0 /* IRDashboard.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		643D42392D63CD7E0034B91C /* IRDashboard.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRDashboard.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		643D42412D63CD7E0034B91C /* IRDashboardTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IRDashboardTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		643D42572D63CDA70034B91C /* IRDashboardDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRDashboardDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		643D42A22D63D20D0034B91C /* IRDashboardLibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = IRDashboardLibrary; sourceTree = "<group>"; };
-		64DBE4242D64963500C37E82 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -93,6 +114,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				64B110F02D6B836F005E0DB0 /* IRDashboard.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,7 +124,6 @@
 		643D422F2D63CD7E0034B91C = {
 			isa = PBXGroup;
 			children = (
-				64DBE4242D64963500C37E82 /* Package.swift */,
 				643D42A22D63D20D0034B91C /* IRDashboardLibrary */,
 				643D423B2D63CD7E0034B91C /* IRDashboard */,
 				643D42452D63CD7E0034B91C /* IRDashboardTests */,
@@ -196,10 +217,12 @@
 				643D42532D63CDA70034B91C /* Sources */,
 				643D42542D63CDA70034B91C /* Frameworks */,
 				643D42552D63CDA70034B91C /* Resources */,
+				64B110F42D6B836F005E0DB0 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				64B110F32D6B836F005E0DB0 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				643D42582D63CDA70034B91C /* IRDashboardDemo */,
@@ -284,7 +307,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				64DBE4252D64963500C37E82 /* Package.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,6 +332,11 @@
 			target = 643D42382D63CD7E0034B91C /* IRDashboard */;
 			targetProxy = 643D42432D63CD7E0034B91C /* PBXContainerItemProxy */;
 		};
+		64B110F32D6B836F005E0DB0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 643D42382D63CD7E0034B91C /* IRDashboard */;
+			targetProxy = 64B110F22D6B836F005E0DB0 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -329,6 +356,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -343,6 +371,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -364,6 +393,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -377,6 +407,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

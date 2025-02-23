@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		648E23762D65CBA90094B9B9 /* IRCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64A109C42D65CA5400C00DEF /* IRCommon.framework */; };
 		648E23772D65CBA90094B9B9 /* IRCommon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 64A109C42D65CA5400C00DEF /* IRCommon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		64A109FB2D65CA7E00C00DEF /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A109FA2D65CA7E00C00DEF /* Package.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,14 +38,13 @@
 /* Begin PBXFileReference section */
 		64A109C42D65CA5400C00DEF /* IRCommon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRCommon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		64A109D32D65CA6000C00DEF /* IRCommonDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCommonDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		64A109FA2D65CA7E00C00DEF /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		64A109C92D65CA5400C00DEF /* Exceptions for "IRCommon" folder in "IRCommon" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			publicHeaders = (
-				IRCommon.h,
+				include/IRCommon.h,
 			);
 			target = 64A109C32D65CA5400C00DEF /* IRCommon */;
 		};
@@ -107,7 +105,6 @@
 		64A109BA2D65CA5400C00DEF = {
 			isa = PBXGroup;
 			children = (
-				64A109FA2D65CA7E00C00DEF /* Package.swift */,
 				64A109C62D65CA5400C00DEF /* IRCommon */,
 				64A109D42D65CA6000C00DEF /* IRCommonDemo */,
 				648E23752D65CBA90094B9B9 /* Frameworks */,
@@ -245,7 +242,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				64A109FB2D65CA7E00C00DEF /* Package.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -466,6 +462,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
@@ -494,6 +491,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8W2QVSMGJ3;

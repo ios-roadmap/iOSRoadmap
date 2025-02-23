@@ -5,7 +5,6 @@ import PackageDescription
 
 let package = Package(
     name: "IRCommon",
-    defaultLocalization: "en",
     platforms: [
         .iOS(.v18)
     ],
@@ -14,23 +13,9 @@ let package = Package(
             name: "IRCommon",
             targets: ["IRCommon"]),
     ],
-    dependencies: [
-        .package(
-            name: "IRNetworking",
-            path: "../IRNetworking"
-        ),
-        .package(
-            name: "IRCore",
-            path: "../IRCore"
-        ),
-    ],
     targets: [
         .target(
             name: "IRCommon",
-            dependencies: [
-                "IRNetworking",
-                "IRCore",
-            ],
             path: "IRCommon"
         ),
     ]

@@ -7,11 +7,12 @@
 
 import UIKit
 import IRDashboard
+import IRDashboardInterface
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
+    var dashboardCoordinator: (any IRDashboardInterface)?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -20,10 +21,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         
-        let dashboardVC = IRDashboardRouter.createModule()
-        
-        window?.rootViewController = UINavigationController(rootViewController: dashboardVC)
-        window?.makeKeyAndVisible()
+        dashboardCoordinator = IRDashboardFactory().create()
+        dashboardCoordinator?.start(with: window)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

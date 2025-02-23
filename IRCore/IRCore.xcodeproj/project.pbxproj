@@ -9,11 +9,18 @@
 /* Begin PBXBuildFile section */
 		646E72312D646E72002CA668 /* IRCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 646E720C2D646E56002CA668 /* IRCore.framework */; };
 		646E72322D646E72002CA668 /* IRCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 646E720C2D646E56002CA668 /* IRCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		646E725D2D646ECC002CA668 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646E725C2D646ECC002CA668 /* Package.swift */; };
+		64ED06852D6BAD00003964EB /* IRCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 646E720C2D646E56002CA668 /* IRCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		646E72332D646E72002CA668 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 646E72032D646E56002CA668 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 646E720B2D646E56002CA668;
+			remoteInfo = IRCore;
+		};
+		64ED06862D6BAD00003964EB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 646E72032D646E56002CA668 /* Project object */;
 			proxyType = 1;
@@ -39,7 +46,6 @@
 /* Begin PBXFileReference section */
 		646E720C2D646E56002CA668 /* IRCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		646E721B2D646E6B002CA668 /* IRCoreDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCoreDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		646E725C2D646ECC002CA668 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -90,6 +96,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				64ED06852D6BAD00003964EB /* IRCore.framework in Frameworks */,
 				646E72312D646E72002CA668 /* IRCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -100,7 +107,6 @@
 		646E72022D646E56002CA668 = {
 			isa = PBXGroup;
 			children = (
-				646E725C2D646ECC002CA668 /* Package.swift */,
 				646E720E2D646E56002CA668 /* IRCore */,
 				646E721C2D646E6B002CA668 /* IRCoreDemo */,
 				646E72302D646E72002CA668 /* Frameworks */,
@@ -173,6 +179,7 @@
 			);
 			dependencies = (
 				646E72342D646E72002CA668 /* PBXTargetDependency */,
+				64ED06872D6BAD00003964EB /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				646E721C2D646E6B002CA668 /* IRCoreDemo */,
@@ -245,7 +252,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				646E725D2D646ECC002CA668 /* Package.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,6 +269,11 @@
 			isa = PBXTargetDependency;
 			target = 646E720B2D646E56002CA668 /* IRCore */;
 			targetProxy = 646E72332D646E72002CA668 /* PBXContainerItemProxy */;
+		};
+		64ED06872D6BAD00003964EB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 646E720B2D646E56002CA668 /* IRCore */;
+			targetProxy = 64ED06862D6BAD00003964EB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -473,7 +484,6 @@
 				INFOPLIST_FILE = IRCoreDemo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -501,7 +511,6 @@
 				INFOPLIST_FILE = IRCoreDemo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
