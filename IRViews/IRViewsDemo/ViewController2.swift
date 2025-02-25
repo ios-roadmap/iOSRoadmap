@@ -1,61 +1,41 @@
 //import UIKit
 //
-//class ViewController: UIViewController {
+//class ViewController: UIViewController, UITextFieldDelegate {
 //    
-//    let cardTextField: UITextField = {
-//        let textField = UITextField()
-//        textField.borderStyle = .roundedRect
-//        textField.keyboardType = .numberPad
-//        textField.translatesAutoresizingMaskIntoConstraints = false
-//        return textField
+//    private let textField: UITextField = {
+//        let tf = UITextField()
+//        tf.placeholder = "Enter text"
+//        tf.borderStyle = .roundedRect
+//        tf.text = String(repeating: " ", count: 20) // 20 karakterlik boşluk
+//        tf.translatesAutoresizingMaskIntoConstraints = false
+//        tf.tintColor = .clear
+//        return tf
 //    }()
-//    
-//    let secureFormatter = SecureCardFormatter()
-//    
+//
 //    override func viewDidLoad() {
 //        super.viewDidLoad()
 //        view.backgroundColor = .white
-//
-//        view.addSubview(cardTextField)
-//        cardTextField.delegate = secureFormatter
-//
-//        NSLayoutConstraint.activate([
-//            cardTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//            cardTextField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-//            cardTextField.widthAnchor.constraint(equalToConstant: 250)
-//        ])
+//        setupTextField()
+//        textField.addTarget(self, action: #selector(moveCursorToBeginning), for: .editingDidBegin)
 //    }
-//}
-//
-//import UIKit
-//
-//class SecureCardFormatter: NSObject, UITextFieldDelegate {
 //    
-//    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-//        guard let text = textField.text else { return true }
-//        
-//        let newText = (text as NSString).replacingCharacters(in: range, with: string)
-//        
-//        let digits = newText.replacingOccurrences(of: "\\D", with: "", options: .regularExpression)
-//        
-//        let trimmed = String(digits.prefix(10))
-//        
-//        var formatted = ""
-//        
-//        if trimmed.count <= 4 {
-//            formatted = trimmed
-//        } else if trimmed.count <= 6 {
-//            let first4 = trimmed.prefix(4)
-//            let lastPart = trimmed.suffix(trimmed.count - 4)
-//            formatted = "\(first4) \(lastPart)"
-//        } else if trimmed.count <= 10 {
-//            let first4 = trimmed.prefix(4)
-//            let middle2 = trimmed.dropFirst(4).prefix(2)
-//            let lastPart = trimmed.dropFirst(6).prefix(trimmed.count - 6)
-//            formatted = "\(first4) \(middle2)** **** \(lastPart)"
+//    @objc private func moveCursorToBeginning() {
+//        DispatchQueue.main.async {
+//            if let startPosition = self.textField.position(from: self.textField.beginningOfDocument, offset: 0) {
+//                self.textField.selectedTextRange = self.textField.textRange(from: startPosition, to: startPosition)
+//            }
+//            self.textField.tintColor = .tintColor
 //        }
+//    }
+//    
+//    private func setupTextField() {
+//        view.addSubview(textField)
 //        
-//        textField.text = formatted
-//        return false
+//        NSLayoutConstraint.activate([
+//            textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+//            textField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+//            textField.widthAnchor.constraint(equalToConstant: 250),
+//            textField.heightAnchor.constraint(equalToConstant: 40)
+//        ])
 //    }
 //}
