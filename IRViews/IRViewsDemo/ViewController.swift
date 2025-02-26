@@ -2,10 +2,10 @@ import UIKit
 
 struct PartialSecuredItem {
     let inputFormat: String
-    let emptyCharacter: String
-    let disabledCharacter: String
+    let emptyCharacter: Character
+    let disabledCharacter: Character
     
-    init(inputFormat: String, emptyCharacter: String, disabledCharacter: String) {
+    init(inputFormat: String, emptyCharacter: Character, disabledCharacter: Character) {
         self.inputFormat = inputFormat
         self.emptyCharacter = emptyCharacter
         self.disabledCharacter = disabledCharacter
@@ -37,11 +37,11 @@ class PartialSecuredMaskFormatter: MaskFormatter {
                     formattedText.append(cleanText[index])
                     digitIndex += 1
                 } else {
-                    formattedText.append(item.emptyCharacter) // Ensure empty placeholder
+                    formattedText.append(item.emptyCharacter)
                 }
-            } else if char == "*" {
+            } else if char == item.disabledCharacter {
                 formattedText.append(item.disabledCharacter)
-            } else {
+            } else { 
                 formattedText.append(char)
             }
         }
@@ -66,6 +66,8 @@ class MaskedCardTextFieldListener: NSObject, UITextFieldDelegate {
     let maskFormatter: MaskFormatter
     let item: PartialSecuredItem
     
+    var lastCursorOffset: Int = 0
+    
     init(maskFormatter: MaskFormatter, item: PartialSecuredItem) {
         self.maskFormatter = maskFormatter
         self.item = item
@@ -82,7 +84,7 @@ class MaskedCardTextFieldListener: NSObject, UITextFieldDelegate {
             textField.tintColor = .label
         }
     }
-    
+
     // Karakter ekleme/silme işlemlerini ele alır.
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let currentText = textField.text else { return false }
@@ -106,9 +108,20 @@ class MaskedCardTextFieldListener: NSObject, UITextFieldDelegate {
         // Güncellenmiş metni al ve dışarıdan sağlanan formatter ile formatla
         let updatedText = (currentText as NSString).replacingCharacters(in: range, with: string)
         textField.text = maskFormatter.format(text: updatedText, with: item)
+        
         moveCursorToCorrectPosition(textField, in: range, replacementString: string)
         
+        if let position = textField.position(from: textField.beginningOfDocument, offset: lastCursorOffset) {
+            textField.selectedTextRange = textField.textRange(from: position, to: position)
+        }
+        
         return false
+    }
+    
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        if let position = textField.position(from: textField.beginningOfDocument, offset: lastCursorOffset) {
+            textField.selectedTextRange = textField.textRange(from: position, to: position)
+        }
     }
     
     private func handleBackspace(_ textField: UITextField, range: NSRange) -> Bool {
@@ -137,14 +150,13 @@ class MaskedCardTextFieldListener: NSObject, UITextFieldDelegate {
         textField.text = maskFormatter.format(text: text, with: item)
         
         // İmleci doğru konuma yerleştir
-        let cursorPosition = min(indexToRemove, textField.text?.count ?? 0)
-        if let position = textField.position(from: textField.beginningOfDocument, offset: cursorPosition) {
+        lastCursorOffset = min(indexToRemove, textField.text?.count ?? 0)
+        if let position = textField.position(from: textField.beginningOfDocument, offset: lastCursorOffset) {
             textField.selectedTextRange = textField.textRange(from: position, to: position)
         }
-
+        
         return false
     }
-
     
     private func moveCursorToCorrectPosition(_ textField: UITextField, in range: NSRange, replacementString string: String) {
         let formatPattern = item.inputFormat
@@ -168,18 +180,17 @@ class MaskedCardTextFieldListener: NSObject, UITextFieldDelegate {
             }
         }
         
-        if let position = textField.position(from: textField.beginningOfDocument, offset: newOffset) {
-            textField.selectedTextRange = textField.textRange(from: position, to: position)
-        }
+        lastCursorOffset = newOffset
     }
 }
+
 import UIKit
 
 class ViewController: UIViewController {
     // Listener'ı property olarak saklayarak güçlü referans tutuyoruz.
     private let listener: MaskedCardTextFieldListener = {
         let partialSecuredItem = PartialSecuredItem(
-            inputFormat: "--***-- **--",
+            inputFormat: "---- --** **** ----",
             emptyCharacter: " ",
             disabledCharacter: "*"
         )
@@ -200,3 +211,50 @@ class ViewController: UIViewController {
         view.addSubview(cardTextField)
     }
 }
+
+
+//import UIKit
+//
+//class ViewController: UIViewController, UITextFieldDelegate {
+//    
+//    private let textField: UITextField = {
+//        let tf = UITextField()
+//        tf.borderStyle = .roundedRect
+//        tf.translatesAutoresizingMaskIntoConstraints = false
+//        return tf
+//    }()
+//    
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//        
+//        view.backgroundColor = .white
+//        setupTextField()
+//    }
+//    
+//    private func setupTextField() {
+//        view.addSubview(textField)
+//        
+//        NSLayoutConstraint.activate([
+//            textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+//            textField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+//            textField.widthAnchor.constraint(equalToConstant: 250),
+//            textField.heightAnchor.constraint(equalToConstant: 40)
+//        ])
+//        
+//        textField.delegate = self
+//    }
+//    
+//    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+//        let currentText = textField.text ?? ""
+//        let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
+//        
+//        DispatchQueue.main.async {
+//            textField.text = newText
+//            if let position = textField.position(from: textField.beginningOfDocument, offset: 0) {
+//                textField.selectedTextRange = textField.textRange(from: position, to: position)
+//            }
+//        }
+//        
+//        return false
+//    }
+//}
