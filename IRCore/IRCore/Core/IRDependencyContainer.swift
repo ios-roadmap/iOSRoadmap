@@ -7,8 +7,9 @@
 
 import Foundation
 
+@MainActor
 public class IRDependencyContainer {
-    @MainActor public static let shared = IRDependencyContainer()
+    public static let shared = IRDependencyContainer()
     
     private var services = [String: Any]()
     private var factories = [String: (isSingleton: Bool, factory: () -> Any)]()

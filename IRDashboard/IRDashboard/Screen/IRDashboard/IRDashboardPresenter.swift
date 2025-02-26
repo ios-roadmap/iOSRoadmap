@@ -7,10 +7,6 @@
 
 import Foundation
 
-public protocol IRDashboardPresenterProtocol: AnyObject {
-    func viewDidLoad()
-}
-
 public class IRDashboardPresenter: IRDashboardPresenterProtocol {
     
     public weak var view: IRDashboardViewProtocol?
@@ -25,7 +21,7 @@ public class IRDashboardPresenter: IRDashboardPresenterProtocol {
 }
 
 extension IRDashboardPresenter: IRDashboardInteractorOutputProtocol {
-    public func dashboardDataFetched(_ data: [IRDashboardItem]) {
+     public func dashboardDataFetched(_ data: [IRDashboardItem]) {
         view?.showDashboardData(data)
     }
 }

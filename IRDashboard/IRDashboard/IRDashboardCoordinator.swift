@@ -13,8 +13,7 @@ protocol IRDashboardNavigationLogic {
     
 }
 
-@MainActor
-public class IRDashboardCoordinator: IRBaseCoordinator, @unchecked Sendable, IRDashboardInterface {
+public class IRDashboardCoordinator: IRBaseCoordinator, IRDashboardInterface {
     
     public override init() {
         super.init()

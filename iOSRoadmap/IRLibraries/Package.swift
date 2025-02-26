@@ -15,10 +15,6 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            name: "IRCommon",
-            path: "../../IRCommon"
-        ),
-        .package(
             name: "IRDashboard",
             path: "../../IRDashboard"
         )
@@ -27,7 +23,6 @@ let package = Package(
         .target(
             name: "IRLibraries",
             dependencies: [
-                "IRCommon",
                 "IRDashboard",
             ]
         ),

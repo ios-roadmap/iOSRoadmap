@@ -7,14 +7,6 @@
 
 import Foundation
 
-public protocol IRDashboardInteractorOutputProtocol: AnyObject {
-    func dashboardDataFetched(_ data: [IRDashboardItem])
-}
-
-public protocol IRDashboardInteractorProtocol: AnyObject {
-    func fetchDashboardData()
-}
-
 public class IRDashboardInteractor: IRDashboardInteractorProtocol {
     
     public weak var presenter: IRDashboardInteractorOutputProtocol?

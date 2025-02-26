@@ -8,10 +8,11 @@
 import Foundation
 import IRDashboardInterface
 
+@MainActor
 public class IRDashboardFactory: @preconcurrency IRDashboardFactoryProtocol {
     public init() {}
     
-    @MainActor public func create() -> IRDashboardInterface {
+    public func create() -> IRDashboardInterface {
         return IRDashboardCoordinator()
     }
 }

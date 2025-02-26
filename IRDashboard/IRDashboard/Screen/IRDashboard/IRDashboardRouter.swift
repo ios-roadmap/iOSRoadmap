@@ -7,11 +7,7 @@
 
 import UIKit
 
-public protocol IRDashboardRouterProtocol: AnyObject {
-    static func createModule() -> UIViewController
-}
-
-public class IRDashboardRouter: @preconcurrency IRDashboardRouterProtocol {
+public class IRDashboardRouter: IRDashboardRouterProtocol {
     
     @MainActor public static func createModule() -> UIViewController {
         let view = IRDashboardView()

@@ -8,7 +8,7 @@
 import UIKit
 
 @MainActor
-open class IRBaseCoordinator: IRCoordinatorProtocol, @unchecked Sendable {
+open class IRBaseCoordinator: IRCoordinatorProtocol {
     public weak var navigationController: UINavigationController?
     public weak var parentCoordinator: (any IRCoordinatorProtocol)?
     public var children: [any IRCoordinatorProtocol] = []

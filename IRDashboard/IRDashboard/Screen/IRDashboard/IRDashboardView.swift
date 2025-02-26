@@ -7,10 +7,6 @@
  
 import UIKit
 
-public protocol IRDashboardViewProtocol: AnyObject {
-    func showDashboardData(_ data: [IRDashboardItem])
-}
-
 public class IRDashboardView: UIViewController {
     
     public var presenter: IRDashboardPresenterProtocol?
@@ -36,8 +32,7 @@ public class IRDashboardView: UIViewController {
     }
 }
 
-extension IRDashboardView: @preconcurrency IRDashboardViewProtocol {
-    @MainActor
+extension IRDashboardView: IRDashboardViewProtocol {
     public func showDashboardData(_ data: [IRDashboardItem]) {
         self.dashboardItems = data
         tableView.reloadData()
