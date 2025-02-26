@@ -41,7 +41,7 @@ class PartialSecuredMaskFormatter: MaskFormatter {
                 }
             } else if char == item.disabledCharacter {
                 formattedText.append(item.disabledCharacter)
-            } else { 
+            } else {
                 formattedText.append(char)
             }
         }
@@ -211,50 +211,3 @@ class ViewController: UIViewController {
         view.addSubview(cardTextField)
     }
 }
-
-
-//import UIKit
-//
-//class ViewController: UIViewController, UITextFieldDelegate {
-//    
-//    private let textField: UITextField = {
-//        let tf = UITextField()
-//        tf.borderStyle = .roundedRect
-//        tf.translatesAutoresizingMaskIntoConstraints = false
-//        return tf
-//    }()
-//    
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        
-//        view.backgroundColor = .white
-//        setupTextField()
-//    }
-//    
-//    private func setupTextField() {
-//        view.addSubview(textField)
-//        
-//        NSLayoutConstraint.activate([
-//            textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//            textField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-//            textField.widthAnchor.constraint(equalToConstant: 250),
-//            textField.heightAnchor.constraint(equalToConstant: 40)
-//        ])
-//        
-//        textField.delegate = self
-//    }
-//    
-//    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-//        let currentText = textField.text ?? ""
-//        let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
-//        
-//        DispatchQueue.main.async {
-//            textField.text = newText
-//            if let position = textField.position(from: textField.beginningOfDocument, offset: 0) {
-//                textField.selectedTextRange = textField.textRange(from: position, to: position)
-//            }
-//        }
-//        
-//        return false
-//    }
-//}
