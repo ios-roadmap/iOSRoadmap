@@ -1,203 +1,263 @@
 import UIKit
 
-struct PartialSecuredItem {
-    let inputFormat: String
+// MARK: - Mask Definition
+
+/// Represents the configuration for a text mask.
+/// - Parameters:
+///   - pattern: The pattern used for formatting (e.g., "---- --** **** ----").
+///   - emptyCharacter: The character to display when input is missing.
+///   - disabledCharacter: The character that represents fixed sections.
+///   - editablePlaceholder: The placeholder indicating an editable section.
+struct MaskDefinition {
+    let pattern: String
     let emptyCharacter: Character
     let disabledCharacter: Character
-    
-    init(inputFormat: String, emptyCharacter: Character, disabledCharacter: Character) {
-        self.inputFormat = inputFormat
+    let editablePlaceholder: Character
+
+    /// Initializes a new MaskDefinition.
+    /// - Parameters:
+    ///   - pattern: The format pattern.
+    ///   - emptyCharacter: Character shown when no input is present.
+    ///   - disabledCharacter: Character for fixed (non-editable) positions.
+    ///   - editablePlaceholder: Placeholder for editable positions (default is "-").
+    init(pattern: String,
+         emptyCharacter: Character,
+         disabledCharacter: Character,
+         editablePlaceholder: Character = "-") {
+        self.pattern = pattern
         self.emptyCharacter = emptyCharacter
         self.disabledCharacter = disabledCharacter
+        self.editablePlaceholder = editablePlaceholder
     }
 }
 
-import Foundation
+// MARK: - Mask Formatter Protocol
 
+/// Protocol defining methods for formatting text based on a mask.
 protocol MaskFormatter {
-    /// Verilen ham metni, PartialSecuredItem içindeki kurallara göre formatlar.
-    func format(text: String, with item: PartialSecuredItem) -> String
+    /// Formats the input text according to the specified mask definition.
+    /// - Parameters:
+    ///   - text: The raw text input.
+    ///   - definition: The mask definition to apply.
+    /// - Returns: A formatted string.
+    func format(text: String, with definition: MaskDefinition) -> String
     
-    /// Format içerisindeki düzenlenebilir (editable) indexleri döner.
-    func allowedInputIndexes(for format: String) -> [Int]
+    /// Returns the indices within the pattern that are editable.
+    /// - Parameters:
+    ///   - pattern: The mask pattern.
+    ///   - editablePlaceholder: The character representing editable positions.
+    /// - Returns: An array of editable index positions.
+    func allowedInputIndexes(for pattern: String, editablePlaceholder: Character) -> [Int]
 }
 
-import Foundation
+// MARK: - Generic Mask Formatter
 
-class PartialSecuredMaskFormatter: MaskFormatter {
-    func format(text: String, with item: PartialSecuredItem) -> String {
-        let cleanText = text.filter { $0.isNumber }
+/// A generic implementation of the MaskFormatter protocol.
+class GenericMaskFormatter: MaskFormatter {
+    /// Formats the given text based on the provided mask definition.
+    func format(text: String, with definition: MaskDefinition) -> String {
+        let cleanDigits = text.filter { $0.isNumber }
         var formattedText = ""
         var digitIndex = 0
         
-        for char in item.inputFormat {
-            if char == "-" {
-                if digitIndex < cleanText.count {
-                    let index = cleanText.index(cleanText.startIndex, offsetBy: digitIndex)
-                    formattedText.append(cleanText[index])
+        for maskChar in definition.pattern {
+            if maskChar == definition.editablePlaceholder {
+                if digitIndex < cleanDigits.count {
+                    let index = cleanDigits.index(cleanDigits.startIndex, offsetBy: digitIndex)
+                    formattedText.append(cleanDigits[index])
                     digitIndex += 1
                 } else {
-                    formattedText.append(item.emptyCharacter)
+                    formattedText.append(definition.emptyCharacter)
                 }
-            } else if char == item.disabledCharacter {
-                formattedText.append(item.disabledCharacter)
+            } else if maskChar == definition.disabledCharacter {
+                formattedText.append(definition.disabledCharacter)
             } else {
-                formattedText.append(char)
+                formattedText.append(maskChar)
             }
         }
-        
         return formattedText
     }
     
-    func allowedInputIndexes(for format: String) -> [Int] {
-        var indexes: [Int] = []
-        for (index, char) in format.enumerated() {
-            if char == "-" {
-                indexes.append(index)
-            }
-        }
-        return indexes
+    /// Returns an array of indices that are marked as editable in the pattern.
+    func allowedInputIndexes(for pattern: String, editablePlaceholder: Character) -> [Int] {
+        pattern.enumerated().compactMap { $1 == editablePlaceholder ? $0 : nil }
     }
 }
 
-import UIKit
+// MARK: - UITextField Extension (Cursor Positioning)
 
-class MaskedCardTextFieldListener: NSObject, UITextFieldDelegate {
-    let maskFormatter: MaskFormatter
-    let item: PartialSecuredItem
-    
-    var lastCursorOffset: Int = 0
-    
-    init(maskFormatter: MaskFormatter, item: PartialSecuredItem) {
-        self.maskFormatter = maskFormatter
-        self.item = item
+extension UITextField {
+    /// Sets the cursor position at the specified offset.
+    /// - Parameter offset: The offset from the beginning of the document.
+    func setCursorPosition(offset: Int) {
+        guard let pos = position(from: beginningOfDocument, offset: offset) else { return }
+        selectedTextRange = textRange(from: pos, to: pos)
+    }
+}
+
+// MARK: - String Extension (Digit Utilities)
+
+extension String {
+    /// A computed property that returns a string containing only the digits.
+    var digits: String {
+        filter { $0.isNumber }
     }
     
-    // Editing başladığında, cursor’u ilk düzenlenebilir index’e konumlandırır.
+    /// Finds the index of the last digit in the string.
+    /// - Returns: The index of the last digit, or nil if no digit is found.
+    func lastDigitIndex() -> Int? {
+        for i in stride(from: count - 1, through: 0, by: -1) {
+            let idx = index(startIndex, offsetBy: i)
+            if self[idx].isNumber {
+                return i
+            }
+        }
+        return nil
+    }
+}
+
+// MARK: - MaskedTextFieldDelegate
+
+/// A UITextFieldDelegate that applies a mask formatter to user input.
+class MaskedTextFieldDelegate: NSObject, UITextFieldDelegate {
+    private let formatter: MaskFormatter
+    private let maskDefinition: MaskDefinition
+    private var lastCursorOffset: Int = 0
+    
+    /// Initializes a new MaskedTextFieldDelegate.
+    /// - Parameters:
+    ///   - formatter: An instance conforming to MaskFormatter.
+    ///   - maskDefinition: The mask definition to use.
+    init(formatter: MaskFormatter, maskDefinition: MaskDefinition) {
+        self.formatter = formatter
+        self.maskDefinition = maskDefinition
+    }
+    
+    // MARK: - UITextFieldDelegate Methods
+    
+    /// Called when text field editing begins. Positions the cursor at the first editable index.
     func textFieldDidBeginEditing(_ textField: UITextField) {
         textField.tintColor = .clear
-        DispatchQueue.main.async {
-            let allowedIndexes = self.maskFormatter.allowedInputIndexes(for: self.item.inputFormat)
-            if let position = textField.position(from: textField.beginningOfDocument, offset: allowedIndexes.first ?? 0) {
-                textField.selectedTextRange = textField.textRange(from: position, to: position)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let allowedIndexes = self.formatter.allowedInputIndexes(
+                for: self.maskDefinition.pattern,
+                editablePlaceholder: self.maskDefinition.editablePlaceholder
+            )
+            if let firstIndex = allowedIndexes.first {
+                textField.setCursorPosition(offset: firstIndex)
             }
             textField.tintColor = .label
         }
     }
-
-    // Karakter ekleme/silme işlemlerini ele alır.
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    
+    /// Handles character changes in the text field, enforcing mask rules.
+    /// - Parameters:
+    ///   - textField: The UITextField being edited.
+    ///   - range: The range of characters to be replaced.
+    ///   - string: The replacement string.
+    /// - Returns: A Boolean value indicating whether the change should be made.
+    func textField(_ textField: UITextField,
+                   shouldChangeCharactersIn range: NSRange,
+                   replacementString string: String) -> Bool {
         guard let currentText = textField.text else { return false }
         
         if string.isEmpty {
-            return handleBackspace(textField, range: range)
+            return handleBackspace(in: textField, range: range)
         }
         
-        // Sadece numerik girişe izin ver
+        // Allow only numeric input.
         guard CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: string)) else {
             return false
         }
         
-        // Girdideki rakamları say ve formattaki "-" karakterlerinin sayısıyla sınırla
-        let cleanText = currentText.replacingOccurrences(of: " ", with: "").filter { $0.isNumber }
-        let maxDigits = self.item.inputFormat.filter { $0 == "-" }.count
-        if cleanText.count >= maxDigits {
-            return false
-        }
+        let cleanDigits = currentText.digits
+        let maxDigits = maskDefinition.pattern.filter { $0 == maskDefinition.editablePlaceholder }.count
+        if cleanDigits.count >= maxDigits { return false }
         
-        // Güncellenmiş metni al ve dışarıdan sağlanan formatter ile formatla
         let updatedText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        textField.text = maskFormatter.format(text: updatedText, with: item)
-        
-        moveCursorToCorrectPosition(textField, in: range, replacementString: string)
-        
-        if let position = textField.position(from: textField.beginningOfDocument, offset: lastCursorOffset) {
-            textField.selectedTextRange = textField.textRange(from: position, to: position)
-        }
+        textField.text = formatter.format(text: updatedText, with: maskDefinition)
+        updateCursorPosition(in: textField, range: range, replacementString: string)
+        textField.setCursorPosition(offset: lastCursorOffset)
         
         return false
     }
     
+    /// Ensures the cursor remains at the correct position after selection changes.
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        if let position = textField.position(from: textField.beginningOfDocument, offset: lastCursorOffset) {
-            textField.selectedTextRange = textField.textRange(from: position, to: position)
-        }
+        textField.setCursorPosition(offset: lastCursorOffset)
     }
-    
-    private func handleBackspace(_ textField: UITextField, range: NSRange) -> Bool {
-        guard var text = textField.text else { return false }
+}
+
+// MARK: - MaskedTextFieldDelegate Helpers
+
+private extension MaskedTextFieldDelegate {
+    /// Handles the backspace (deletion) action in the text field.
+    /// - Parameters:
+    ///   - textField: The UITextField being edited.
+    ///   - range: The range of characters to be removed.
+    /// - Returns: A Boolean value indicating whether the change should be made.
+    func handleBackspace(in textField: UITextField, range: NSRange) -> Bool {
+        guard var text = textField.text, !text.digits.isEmpty else { return false }
+        guard let indexToRemove = text.lastDigitIndex() else { return false }
         
-        let cleanText = text.filter { $0.isNumber }
-        if cleanText.isEmpty { return false } // Eğer hiç rakam yoksa işlem yapma
-        
-        // Silinecek en son rakamı bul
-        var lastDigitIndex: Int?
-        for i in stride(from: text.count - 1, through: 0, by: -1) {
-            let index = text.index(text.startIndex, offsetBy: i)
-            if text[index].isNumber {
-                lastDigitIndex = i
-                break
-            }
-        }
-        
-        // Eğer hiç rakam yoksa geri çık
-        guard let indexToRemove = lastDigitIndex else { return false }
-        
-        // Metinden rakamı çıkar
         text.remove(at: text.index(text.startIndex, offsetBy: indexToRemove))
-        
-        // Yeni formatlanmış metni uygula
-        textField.text = maskFormatter.format(text: text, with: item)
-        
-        // İmleci doğru konuma yerleştir
+        textField.text = formatter.format(text: text, with: maskDefinition)
         lastCursorOffset = min(indexToRemove, textField.text?.count ?? 0)
-        if let position = textField.position(from: textField.beginningOfDocument, offset: lastCursorOffset) {
-            textField.selectedTextRange = textField.textRange(from: position, to: position)
-        }
-        
+        textField.setCursorPosition(offset: lastCursorOffset)
         return false
     }
     
-    private func moveCursorToCorrectPosition(_ textField: UITextField, in range: NSRange, replacementString string: String) {
-        let formatPattern = item.inputFormat
-        let allowedIndexes = maskFormatter.allowedInputIndexes(for: formatPattern)
+    /// Updates the cursor position to the next valid editable index.
+    /// - Parameters:
+    ///   - textField: The UITextField being edited.
+    ///   - range: The range of the current change.
+    ///   - string: The replacement string.
+    func updateCursorPosition(in textField: UITextField,
+                              range: NSRange,
+                              replacementString string: String) {
+        let pattern = maskDefinition.pattern
+        let allowedIndexes = formatter.allowedInputIndexes(
+            for: pattern,
+            editablePlaceholder: maskDefinition.editablePlaceholder
+        )
         var newOffset = range.location + string.count
         
-        if string.isEmpty { // Silme işlemi için
+        if string.isEmpty {
+            // For deletion, move left until an editable index is found.
             while newOffset > 0 {
-                let prevIndex = newOffset - 1
-                if allowedIndexes.contains(prevIndex) {
-                    break
-                }
+                if allowedIndexes.contains(newOffset - 1) { break }
                 newOffset -= 1
             }
-        } else { // Ekleme işlemi için
-            while newOffset < formatPattern.count {
-                if allowedIndexes.contains(newOffset) {
-                    break
-                }
+        } else {
+            // For insertion, move right until an editable index is found.
+            while newOffset < pattern.count {
+                if allowedIndexes.contains(newOffset) { break }
                 newOffset += 1
             }
         }
-        
         lastCursorOffset = newOffset
     }
 }
 
-import UIKit
+// MARK: - Example ViewController
 
+/// A view controller demonstrating the use of MaskedTextFieldDelegate.
 class ViewController: UIViewController {
-    // Listener'ı property olarak saklayarak güçlü referans tutuyoruz.
-    private let listener: MaskedCardTextFieldListener = {
-        let partialSecuredItem = PartialSecuredItem(
-            inputFormat: "---- --** **** ----",
-            emptyCharacter: " ",
-            disabledCharacter: "*"
-        )
-        let formatter = PartialSecuredMaskFormatter()
-        return MaskedCardTextFieldListener(maskFormatter: formatter, item: partialSecuredItem)
+    private let maskDefinition = MaskDefinition(
+        pattern: "---- --** **** ----",
+        emptyCharacter: " ",
+        disabledCharacter: "*",
+        editablePlaceholder: "-"
+    )
+    
+    private let formatter: MaskFormatter = GenericMaskFormatter()
+    
+    private lazy var maskedDelegate: MaskedTextFieldDelegate = {
+        MaskedTextFieldDelegate(formatter: formatter, maskDefinition: maskDefinition)
     }()
     
+    /// Configures the view and adds a masked text field.
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -205,8 +265,8 @@ class ViewController: UIViewController {
         let cardTextField = UITextField(frame: CGRect(x: 20, y: 100, width: 300, height: 40))
         cardTextField.borderStyle = .roundedRect
         cardTextField.keyboardType = .numberPad
-        cardTextField.text = listener.maskFormatter.format(text: "", with: listener.item)
-        cardTextField.delegate = listener
+        cardTextField.text = formatter.format(text: "", with: maskDefinition)
+        cardTextField.delegate = maskedDelegate
         
         view.addSubview(cardTextField)
     }

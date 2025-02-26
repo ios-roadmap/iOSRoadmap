@@ -1,5 +1,17 @@
 import UIKit
 
+struct PartialSecuredItem {
+    let inputFormat: String
+    let emptyCharacter: Character
+    let disabledCharacter: Character
+    
+    init(inputFormat: String, emptyCharacter: Character, disabledCharacter: Character) {
+        self.inputFormat = inputFormat
+        self.emptyCharacter = emptyCharacter
+        self.disabledCharacter = disabledCharacter
+    }
+}
+
 class MaskedCardTextField: UITextField, UITextFieldDelegate {
 
     override init(frame: CGRect) {
