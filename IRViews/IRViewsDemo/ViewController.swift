@@ -200,42 +200,8 @@ import UIKit
 
 class ViewController: UIViewController, UITextFieldDelegate {
     
-    let textField = UITextField()
-    var mask: Mask!
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Kredi kartı için maske oluştur
-        do {
-            mask = try Mask(format: "[0000] [0000] [0000] [0000]")
-        } catch {
-            print("Mask creation failed:", error)
-        }
-        
-        // TextField Ayarları
-        textField.frame = CGRect(x: 20, y: 100, width: 300, height: 40)
-        textField.borderStyle = .roundedRect
-        textField.placeholder = "Enter card number"
-        textField.keyboardType = .numberPad
-        textField.delegate = self
-        
-        view.addSubview(textField)
-    }
-    
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let text = textField.text else { return false }
-        
-        let fullText = (text as NSString).replacingCharacters(in: range, with: string)
-        let caretString = CaretString(
-            string: fullText,
-            caretPosition: fullText.endIndex,
-            caretGravity: .forward(autocomplete: true)
-        )
-        
-        let result = mask.apply(toText: caretString)
-        textField.text = result.formattedText.string
-        
-        return false // Değişiklikleri biz yönettiğimiz için `false` döndürüyoruz
     }
 }
