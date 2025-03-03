@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		64286A292D6C82D400F9394A /* IRViews.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 642869EB2D6C82AC00F9394A /* IRViews.framework */; };
 		64286A2A2D6C82D400F9394A /* IRViews.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 642869EB2D6C82AC00F9394A /* IRViews.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6446CF142D71F0190097FCA4 /* IRViews.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 642869EB2D6C82AC00F9394A /* IRViews.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -18,6 +19,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 642869EA2D6C82AC00F9394A;
 			remoteInfo = IRViews;
+		};
+		6446CF152D71F0190097FCA4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 642869E22D6C82AC00F9394A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 642869EA2D6C82AC00F9394A;
+			remoteInfo = IRViews;
+		};
+		6446CF1D2D71F1BA0097FCA4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 642869E22D6C82AC00F9394A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 64286A122D6C82CD00F9394A;
+			remoteInfo = IRViewsDemo;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -38,6 +53,7 @@
 /* Begin PBXFileReference section */
 		642869EB2D6C82AC00F9394A /* IRViews.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRViews.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		64286A132D6C82CD00F9394A /* IRViewsDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRViewsDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6446CF102D71F0190097FCA4 /* IRViewsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IRViewsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -66,17 +82,17 @@
 			path = IRViews;
 			sourceTree = "<group>";
 		};
-		642869FB2D6C82BF00F9394A /* IRViewDemo */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = IRViewDemo;
-			sourceTree = "<group>";
-		};
 		64286A142D6C82CD00F9394A /* IRViewsDemo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				64286A242D6C82CE00F9394A /* Exceptions for "IRViewsDemo" folder in "IRViewsDemo" target */,
 			);
 			path = IRViewsDemo;
+			sourceTree = "<group>";
+		};
+		6446CF112D71F0190097FCA4 /* IRViewsTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = IRViewsTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -97,6 +113,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6446CF0D2D71F0190097FCA4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6446CF142D71F0190097FCA4 /* IRViews.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -104,8 +128,8 @@
 			isa = PBXGroup;
 			children = (
 				642869ED2D6C82AC00F9394A /* IRViews */,
-				642869FB2D6C82BF00F9394A /* IRViewDemo */,
 				64286A142D6C82CD00F9394A /* IRViewsDemo */,
+				6446CF112D71F0190097FCA4 /* IRViewsTests */,
 				64286A282D6C82D400F9394A /* Frameworks */,
 				642869EC2D6C82AC00F9394A /* Products */,
 			);
@@ -116,6 +140,7 @@
 			children = (
 				642869EB2D6C82AC00F9394A /* IRViews.framework */,
 				64286A132D6C82CD00F9394A /* IRViewsDemo.app */,
+				6446CF102D71F0190097FCA4 /* IRViewsTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -187,6 +212,30 @@
 			productReference = 64286A132D6C82CD00F9394A /* IRViewsDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
+		6446CF0F2D71F0190097FCA4 /* IRViewsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6446CF172D71F0190097FCA4 /* Build configuration list for PBXNativeTarget "IRViewsTests" */;
+			buildPhases = (
+				6446CF0C2D71F0190097FCA4 /* Sources */,
+				6446CF0D2D71F0190097FCA4 /* Frameworks */,
+				6446CF0E2D71F0190097FCA4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6446CF162D71F0190097FCA4 /* PBXTargetDependency */,
+				6446CF1E2D71F1BA0097FCA4 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6446CF112D71F0190097FCA4 /* IRViewsTests */,
+			);
+			name = IRViewsTests;
+			packageProductDependencies = (
+			);
+			productName = IRViewsTests;
+			productReference = 6446CF102D71F0190097FCA4 /* IRViewsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -199,9 +248,14 @@
 				TargetAttributes = {
 					642869EA2D6C82AC00F9394A = {
 						CreatedOnToolsVersion = 16.0;
+						LastSwiftMigration = 1600;
 					};
 					64286A122D6C82CD00F9394A = {
 						CreatedOnToolsVersion = 16.0;
+					};
+					6446CF0F2D71F0190097FCA4 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 64286A122D6C82CD00F9394A;
 					};
 				};
 			};
@@ -223,6 +277,7 @@
 			targets = (
 				642869EA2D6C82AC00F9394A /* IRViews */,
 				64286A122D6C82CD00F9394A /* IRViewsDemo */,
+				6446CF0F2D71F0190097FCA4 /* IRViewsTests */,
 			);
 		};
 /* End PBXProject section */
@@ -236,6 +291,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		64286A112D6C82CD00F9394A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6446CF0E2D71F0190097FCA4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -259,6 +321,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6446CF0C2D71F0190097FCA4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -267,6 +336,16 @@
 			target = 642869EA2D6C82AC00F9394A /* IRViews */;
 			targetProxy = 64286A2B2D6C82D400F9394A /* PBXContainerItemProxy */;
 		};
+		6446CF162D71F0190097FCA4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 642869EA2D6C82AC00F9394A /* IRViews */;
+			targetProxy = 6446CF152D71F0190097FCA4 /* PBXContainerItemProxy */;
+		};
+		6446CF1E2D71F1BA0097FCA4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 64286A122D6C82CD00F9394A /* IRViewsDemo */;
+			targetProxy = 6446CF1D2D71F1BA0097FCA4 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -274,6 +353,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -298,6 +378,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -307,6 +388,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -515,6 +597,42 @@
 			};
 			name = Release;
 		};
+		6446CF182D71F0190097FCA4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRViewsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IRViewsDemo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IRViewsDemo";
+			};
+			name = Debug;
+		};
+		6446CF192D71F0190097FCA4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRViewsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IRViewsDemo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IRViewsDemo";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -541,6 +659,15 @@
 			buildConfigurations = (
 				64286A262D6C82CE00F9394A /* Debug */,
 				64286A272D6C82CE00F9394A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6446CF172D71F0190097FCA4 /* Build configuration list for PBXNativeTarget "IRViewsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6446CF182D71F0190097FCA4 /* Debug */,
+				6446CF192D71F0190097FCA4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
