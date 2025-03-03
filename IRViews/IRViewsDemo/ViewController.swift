@@ -6,8 +6,9 @@ class ViewController: UIViewController {
         formatter: .generic,
         maskDefinition: IRMaskDefinition(
             patternType: .custom("nnnn nn** nn** nnnn")
-        )
-    )
+        )) { state in
+            print(state)
+        }
     
     override func viewDidLoad() {
         super.viewDidLoad()

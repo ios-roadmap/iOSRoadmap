@@ -12,6 +12,8 @@ public class IRMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
     private let maskDefinition: IRMaskDefinition
     private var lastCursorOffset: Int = 0
     
+    public var onCompletionStateChanged: ((IRMaskCompletionState) -> Void)?
+
     public var placeholder: String {
         return formatter.instance.format(text: "", with: maskDefinition)
     }
@@ -20,9 +22,14 @@ public class IRMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
         return maskDefinition.patternType.format.indices(for: "n")
     }
     
-    public init(formatter: IRMaskFormatterType, maskDefinition: IRMaskDefinition) {
+    public init(
+        formatter: IRMaskFormatterType,
+        maskDefinition: IRMaskDefinition,
+        onCompletionStateChanged: ((IRMaskCompletionState) -> Void)? = nil
+    ) {
         self.formatter = formatter
         self.maskDefinition = maskDefinition
+        self.onCompletionStateChanged = onCompletionStateChanged
     }
     
     // MARK: - UITextFieldDelegate Methods
@@ -68,6 +75,8 @@ public class IRMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
         
         textField.setCursorPosition(offset: lastCursorOffset)
         
+        notifyCompletionState(text: textField.text ?? "")
+        
         return false
     }
 
@@ -80,13 +89,19 @@ public class IRMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
 
 extension IRMaskedInputFieldDelegate {
     func handleBackspace(in textField: UITextField, range: NSRange) -> Bool {
-        guard var text = textField.text, !text.onlyDigits().isEmpty else { return false }
+        guard var text = textField.text, !text.onlyDigits().isEmpty else {
+            notifyCompletionState(text: textField.text ?? "")
+            return false
+        }
         guard let indexToRemove = text.lastDigitIndex() else { return false }
         
         text.remove(at: text.index(text.startIndex, offsetBy: indexToRemove))
         textField.text = formatter.instance.format(text: text, with: maskDefinition)
         lastCursorOffset = min(indexToRemove, textField.text?.count ?? 0)
         textField.setCursorPosition(offset: lastCursorOffset)
+        
+        notifyCompletionState(text: textField.text ?? "")
+        
         return false
     }
     
@@ -111,7 +126,6 @@ extension IRMaskedInputFieldDelegate {
     }
     
     private func lastInsertedNIndex(in text: String) -> Int {
-        let pattern = maskDefinition.patternType.format
         let digitIndexes = allowedIndexes.filter { $0 < text.count }
         
         for index in digitIndexes.reversed() {
@@ -122,4 +136,20 @@ extension IRMaskedInputFieldDelegate {
         
         return allowedIndexes.first ?? text.count
     }
-}
+
+    private func notifyCompletionState(text: String) {
+        let digitCount = text.onlyDigits().count
+        let requiredDigits = maskDefinition.patternType.format.filter { $0 == "n" }.count
+        
+        let state: IRMaskCompletionState
+        if digitCount == 0 {
+            state = .empty
+        } else if digitCount < requiredDigits {
+            state = .incomplete
+        } else {
+            state = .complete
+        }
+        
+        onCompletionStateChanged?(state)
+    }
+} 
