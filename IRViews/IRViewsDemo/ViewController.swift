@@ -5,7 +5,7 @@ class ViewController: UIViewController {
     private let presenter = IRMaskedInputFieldDelegate(
         formatter: .generic,
         maskDefinition: IRMaskDefinition(
-            patternType: .iban
+            patternType: .custom("nnnn nn** nn** nnnn")
         )
     )
     
