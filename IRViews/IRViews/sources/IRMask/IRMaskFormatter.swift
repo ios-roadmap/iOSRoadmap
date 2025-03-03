@@ -20,7 +20,6 @@ public enum IRMaskFormatterType {
 
 protocol IRMaskFormatter {
     func format(text: String, with definition: IRMaskDefinition) -> String
-    func allowedInputIndexes(for pattern: String, editablePlaceholder: Character) -> [Int]
 }
 
 final class GenericMaskFormatter: IRMaskFormatter {
@@ -44,9 +43,5 @@ final class GenericMaskFormatter: IRMaskFormatter {
             }
         }
         return formattedText
-    }
-    
-    func allowedInputIndexes(for pattern: String, editablePlaceholder: Character) -> [Int] {
-        pattern.enumerated().compactMap { $1 == editablePlaceholder ? $0 : nil }
     }
 }

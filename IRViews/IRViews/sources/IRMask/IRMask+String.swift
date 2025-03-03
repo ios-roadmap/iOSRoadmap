@@ -26,4 +26,8 @@ public extension String {
         }
         return nil
     }
+    
+    func indices(for character: Character) -> [Int] {
+        enumerated().compactMap { $1 == character ? $0 : nil }
+    }
 }

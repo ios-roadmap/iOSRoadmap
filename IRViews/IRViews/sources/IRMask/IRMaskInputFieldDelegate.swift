@@ -16,6 +16,10 @@ public class IRMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
         return formatter.instance.format(text: "", with: maskDefinition)
     }
     
+    private var allowedIndexes: [Int] {
+        return maskDefinition.patternType.format.indices(for: "n")
+    }
+    
     public init(formatter: IRMaskFormatterType, maskDefinition: IRMaskDefinition) {
         self.formatter = formatter
         self.maskDefinition = maskDefinition
@@ -26,10 +30,6 @@ public class IRMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
         textField.tintColor = .clear
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            let allowedIndexes = self.formatter.instance.allowedInputIndexes(
-                for: self.maskDefinition.patternType.format,
-                editablePlaceholder: "n"
-            )
             if let firstIndex = allowedIndexes.first {
                 lastCursorOffset = firstIndex
                 textField.setCursorPosition(offset: firstIndex)
@@ -39,10 +39,10 @@ public class IRMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
     }
 
     public func textField(_ textField: UITextField,
-                   shouldChangeCharactersIn range: NSRange,
-                   replacementString string: String) -> Bool {
+                          shouldChangeCharactersIn range: NSRange,
+                          replacementString string: String) -> Bool {
         guard let currentText = textField.text else { return false }
-        
+
         if string.isEmpty {
             return handleBackspace(in: textField, range: range)
         }
@@ -59,12 +59,18 @@ public class IRMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
         
         let updatedText = (currentText as NSString).replacingCharacters(in: range, with: string)
         textField.text = formatter.instance.format(text: updatedText, with: maskDefinition)
-        updateCursorPosition(in: textField, range: range, replacementString: string)
+
+        if string.count > 1 {
+            lastCursorOffset = lastInsertedNIndex(in: textField.text ?? "")
+        } else {
+            updateCursorPosition(in: textField, range: range, replacementString: string)
+        }
+        
         textField.setCursorPosition(offset: lastCursorOffset)
         
         return false
     }
-    
+
     public func textFieldDidChangeSelection(_ textField: UITextField) {
         textField.setCursorPosition(offset: lastCursorOffset)
     }
@@ -88,10 +94,6 @@ extension IRMaskedInputFieldDelegate {
                               range: NSRange,
                               replacementString string: String) {
         let pattern = maskDefinition.patternType.format
-        let allowedIndexes = formatter.instance.allowedInputIndexes(
-            for: pattern,
-            editablePlaceholder: "n"
-        )
         var newOffset = range.location + string.count
         
         if string.isEmpty {
@@ -106,5 +108,18 @@ extension IRMaskedInputFieldDelegate {
             }
         }
         lastCursorOffset = newOffset
+    }
+    
+    private func lastInsertedNIndex(in text: String) -> Int {
+        let pattern = maskDefinition.patternType.format
+        let digitIndexes = allowedIndexes.filter { $0 < text.count }
+        
+        for index in digitIndexes.reversed() {
+            if text[text.index(text.startIndex, offsetBy: index)].isNumber {
+                return index + 1
+            }
+        }
+        
+        return allowedIndexes.first ?? text.count
     }
 }
