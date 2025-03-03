@@ -152,4 +152,4 @@ extension IRMaskedInputFieldDelegate {
         
         onCompletionStateChanged?(state)
     }
-}
+} 
