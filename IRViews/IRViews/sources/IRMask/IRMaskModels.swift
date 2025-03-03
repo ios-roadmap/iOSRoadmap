@@ -31,3 +31,9 @@ public enum IRMaskPatternType {
         }
     }
 }
+
+public enum IRMaskCompletionState {
+    case empty
+    case incomplete
+    case complete
+}
