@@ -6,8 +6,7 @@
 //
 
 import UIKit
-
-import UIKit
+import IRCommon
 
 public extension UINavigationController {
     

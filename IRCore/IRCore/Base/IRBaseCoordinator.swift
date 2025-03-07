@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import IRCommon
 
 @MainActor
 open class IRBaseCoordinator: IRCoordinatorProtocol {

@@ -21,13 +21,18 @@ let package = Package(
         .package(
             name: "IRDashboardInterface",
             path: "../IRDashboardInterface"
+        ),
+        .package(
+            name: "IRViews",
+            path: "../../IRViews"
         )
     ],
     targets: [
         .target(
             name: "IRDashboardLibrary",
             dependencies: [
-                "IRDashboardInterface"
+                "IRDashboardInterface",
+                "IRViews"
             ]
         )
     ]

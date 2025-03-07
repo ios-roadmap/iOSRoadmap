@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import IRCommon
 
 @MainActor
 public protocol IRCoordinatorProtocol: AnyObject, Sendable {

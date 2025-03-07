@@ -19,9 +19,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         self.window = UIWindow(windowScene: windowScene)
         
-        let userListVC = UserListRouter.createModule()
+//        let userListVC = UserListRouter.createModule()
         
-        window?.rootViewController = userListVC
+        window?.rootViewController = ViewController()
         window?.makeKeyAndVisible()
     }
 

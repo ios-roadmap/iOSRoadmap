@@ -1,25 +1,49 @@
 import UIKit
 import IRViews
+import IRCommon
 
-class ViewController: UIViewController {
-    private let presenter = IRMaskedInputFieldDelegate(
-        formatter: .generic,
-        maskDefinition: IRMaskDefinition(
-            patternType: .custom("nnnn nn** nn** nnnn")
-        )) { state in
-            print(state)
-        }
-    
+class ViewController: IRBaseTableView< {
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         
-        let cardTextField = UITextField(frame: CGRect(x: 20, y: 100, width: 400, height: 40))
-        cardTextField.borderStyle = .roundedRect
-        cardTextField.keyboardType = .numberPad
-        cardTextField.text = presenter.placeholder
-        cardTextField.delegate = presenter
+        let section = IRTableViewSection(header: "", items: [
+            KeyValueRow(systemName: "image1", value: "asd"),
+        ])
         
-        view.addSubview(cardTextField)
+        tableViewSections = [
+            section
+        ]
     }
+}
+
+struct KeyValueRow: IRTableViewItemProtocol {
+    var systemName: String
+    var value: String
+    var tapHandler: IRVoidHandler?
+
+    var cellType: UITableViewCell.Type { IRHorizontalCollectionTableCell.self }
+
+    func configure(cell: UITableViewCell) {
+        guard let keyValueCell = cell as? IRHorizontalCollectionTableCell else {
+            assertionFailure("Cell is not of type KeyValueCell")
+            return
+        }
+        
+        let builder = IRSquareCollectionCellBuilder()
+            .setImage("image1")
+            .setName("Name")
+            .build()
+        
+        keyValueCell.configure(with: [
+            builder,
+            builder,
+            builder,
+            builder,
+            builder,
+            builder
+        ])
+    }
+
 }

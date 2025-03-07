@@ -4,20 +4,26 @@
 import PackageDescription
 
 let package = Package(
-    name: "IRCommon",
+    name: "IRViews",
     defaultLocalization: "en",
     platforms: [
         .iOS(.v18)
     ],
     products: [
         .library(
-            name: "IRCommon",
-            targets: ["IRCommon"]),
+            name: "IRViews",
+            targets: ["IRViews"]),
+    ],
+    dependencies: [
+        
     ],
     targets: [
         .target(
-            name: "IRCommon",
-            path: "IRCommon"
+            name: "IRViews",
+            dependencies: [
+                
+            ],
+            path: "IRViews"
         ),
     ]
 )
