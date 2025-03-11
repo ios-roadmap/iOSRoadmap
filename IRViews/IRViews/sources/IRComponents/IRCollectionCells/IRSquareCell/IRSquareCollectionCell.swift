@@ -8,54 +8,62 @@
 import UIKit
 import SnapKit
 
-public final class IRSquareCollectionCell: IRBaseCollectionViewCell {
+public class SquareImageCell: IRViewsBaseTableViewCell {
     
-    private lazy var imageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.backgroundColor = .blue
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
-    }()
+    private let imageViewContainer = UIImageView()
+    private let titleLabel = UILabel()
     
-    private lazy var nameLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .black
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    public override func setupViews() {
-        super.setupViews()
-        contentView.addSubview(imageView)
-        contentView.addSubview(nameLabel)
-        setupConstraints()
+    public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupViews()
     }
     
-    public override func setupConstraints() {
-        NSLayoutConstraint.activate([
-            // imageView Constraints
-            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor), // Kare olması için
-            
-            // nameLabel Constraints
-            nameLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 8),
-            nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-            nameLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8),
-            nameLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 30) // Min 30 pt yükseklik
-        ])
+    required public init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupViews()
+    }
+    
+    private func setupViews() {
+        imageViewContainer.contentMode = .scaleAspectFit
+        imageViewContainer.layer.cornerRadius = 8
+        imageViewContainer.clipsToBounds = true
         
-        nameLabel.setContentHuggingPriority(.required, for: .vertical)
-        nameLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        titleLabel.textAlignment = .center
+        titleLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        
+        contentView.addSubviews(imageViewContainer, titleLabel)
+        
+        imageViewContainer.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(8)
+            make.centerX.equalToSuperview()
+            make.width.height.equalTo(80)
+        }
+        
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(imageViewContainer.snp.bottom).offset(8)
+            make.centerX.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-8)
+        }
     }
     
-    func configure(image: String?, name: String?) {
-        imageView.image = UIImage(named: "image1")
-        nameLabel.text = "ÖMER"
+    public func configure(with viewModel: SquareImageCellViewModel) {
+        imageViewContainer.image = viewModel.image
+        titleLabel.text = viewModel.title
+    }
+}
+
+public struct SquareImageCellViewModel: IRViewsBaseTableViewModelCellProtocol {
+    public typealias CellType = SquareImageCell
+    
+    let title: String
+    let image: UIImage?
+    
+    public init(title: String, image: UIImage? = nil) {
+        self.title = title
+        self.image = image
+    }
+    
+    public func configure(_ cell: SquareImageCell) {
+        cell.configure(with: self)
     }
 }
