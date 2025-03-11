@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-public class SquareImageCell: IRViewsBaseTableViewCell {
+public class IRViewsImageTitleCell: IRViewsBaseTableViewCell {
     
     private let imageViewContainer = UIImageView()
     private let titleLabel = UILabel()
@@ -46,14 +46,14 @@ public class SquareImageCell: IRViewsBaseTableViewCell {
         }
     }
     
-    public func configure(with viewModel: SquareImageCellViewModel) {
+    public func configure(with viewModel: IRViewsImageTitleCellViewModel) {
         imageViewContainer.image = viewModel.image
         titleLabel.text = viewModel.title
     }
 }
 
-public struct SquareImageCellViewModel: IRViewsBaseTableViewModelCellProtocol {
-    public typealias CellType = SquareImageCell
+public struct IRViewsImageTitleCellViewModel: IRViewsBaseTableViewModelCellProtocol {
+    public typealias CellType = IRViewsImageTitleCell
     
     let title: String
     let image: UIImage?
@@ -63,7 +63,7 @@ public struct SquareImageCellViewModel: IRViewsBaseTableViewModelCellProtocol {
         self.image = image
     }
     
-    public func configure(_ cell: SquareImageCell) {
+    public func configure(_ cell: IRViewsImageTitleCell) {
         cell.configure(with: self)
     }
 }

@@ -11,10 +11,10 @@ class ViewController: IRViewsBaseTableViewController {
     private func setupSections() {
         sections = [
             IRViewsBaseTableSectionBuilder()
-                .add(SquareImageCellViewModel(title: "Omer"))
-                .add(SquareImageCellViewModel(title: "Omer"))
-                .add(SquareImageCellViewModel(title: "Omer"))
-                .add(SquareImageCellViewModel(title: "Omer"))
+                .add(IRViewsImageTitleCellViewModel(title: "Omer"))
+                .add(IRViewsImageTitleCellViewModel(title: "Omer"))
+                .add(IRViewsImageTitleCellViewModel(title: "Omer"))
+                .add(IRViewsImageTitleCellViewModel(title: "Omer"))
                 .build()
         ]
     }
