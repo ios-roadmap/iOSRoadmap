@@ -10,8 +10,8 @@ import SnapKit
 
 public class IRViewsImageTitleCell: IRViewsBaseTableViewCell {
     
-    private let imageViewContainer = UIImageView()
-    private let titleLabel = UILabel()
+    private lazy var imageViewContainer = UIImageView()
+    private lazy var titleLabel = UILabel()
     
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
