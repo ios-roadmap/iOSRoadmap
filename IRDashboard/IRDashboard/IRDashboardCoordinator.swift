@@ -20,18 +20,7 @@ public class IRDashboardCoordinator: IRBaseCoordinator, IRDashboardInterface {
     }
     
     public override func start() -> UIViewController {
-        let view = IRDashboardView()
-        let presenter = IRDashboardPresenter()
-        let interactor = IRDashboardInteractor()
-        let router = IRDashboardRouter()
-
-        view.presenter = presenter
-        presenter.view = view
-        presenter.interactor = interactor
-        presenter.router = router
-        interactor.presenter = presenter
-
-        return view
+        IRDashboardRouter.createModule()
     }
 }
 

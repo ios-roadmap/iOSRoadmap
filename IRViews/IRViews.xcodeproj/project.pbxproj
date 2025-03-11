@@ -10,6 +10,8 @@
 		64286A292D6C82D400F9394A /* IRViews.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 642869EB2D6C82AC00F9394A /* IRViews.framework */; };
 		64286A2A2D6C82D400F9394A /* IRViews.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 642869EB2D6C82AC00F9394A /* IRViews.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6446CF142D71F0190097FCA4 /* IRViews.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 642869EB2D6C82AC00F9394A /* IRViews.framework */; };
+		64AD150E2D7AB2960092E381 /* IRViewsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 64AD150D2D7AB2960092E381 /* IRViewsLibrary */; };
+		64AD161A2D7AC6A20092E381 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 64AD16192D7AC6A20092E381 /* SnapKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +56,7 @@
 		642869EB2D6C82AC00F9394A /* IRViews.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRViews.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		64286A132D6C82CD00F9394A /* IRViewsDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRViewsDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6446CF102D71F0190097FCA4 /* IRViewsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IRViewsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		64AD150C2D7AB22F0092E381 /* IRViewsLibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = IRViewsLibrary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -102,6 +105,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				64AD150E2D7AB2960092E381 /* IRViewsLibrary in Frameworks */,
+				64AD161A2D7AC6A20092E381 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,6 +132,7 @@
 		642869E12D6C82AC00F9394A = {
 			isa = PBXGroup;
 			children = (
+				64AD150C2D7AB22F0092E381 /* IRViewsLibrary */,
 				642869ED2D6C82AC00F9394A /* IRViews */,
 				64286A142D6C82CD00F9394A /* IRViewsDemo */,
 				6446CF112D71F0190097FCA4 /* IRViewsTests */,
@@ -183,6 +189,8 @@
 			);
 			name = IRViews;
 			packageProductDependencies = (
+				64AD150D2D7AB2960092E381 /* IRViewsLibrary */,
+				64AD16192D7AC6A20092E381 /* SnapKit */,
 			);
 			productName = IRViews;
 			productReference = 642869EB2D6C82AC00F9394A /* IRViews.framework */;
@@ -269,6 +277,7 @@
 			mainGroup = 642869E12D6C82AC00F9394A;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				64AD16182D7AC6A20092E381 /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 642869EC2D6C82AC00F9394A /* Products */;
@@ -352,7 +361,7 @@
 		642869F22D6C82AC00F9394A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -387,7 +396,7 @@
 		642869F32D6C82AC00F9394A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -673,6 +682,29 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		64AD16182D7AC6A20092E381 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		64AD150D2D7AB2960092E381 /* IRViewsLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = IRViewsLibrary;
+		};
+		64AD16192D7AC6A20092E381 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64AD16182D7AC6A20092E381 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 642869E22D6C82AC00F9394A /* Project object */;
 }
