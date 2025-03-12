@@ -10,23 +10,26 @@ let package = Package(
         .iOS(.v18)
     ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "IRViewsLibrary",
-            targets: ["IRViewsLibrary"]),
+            targets: ["IRViewsLibrary"]
+        ),
     ],
     dependencies: [
         .package(
             name: "IRCommon",
             path: "../../IRCommon"
-        )
+        ),
+        .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.6.0")
     ],
     targets: [
         .target(
             name: "IRViewsLibrary",
             dependencies: [
-                "IRCommon"
+                "IRCommon",
+                "SnapKit"
             ]
         ),
     ]
 )
+

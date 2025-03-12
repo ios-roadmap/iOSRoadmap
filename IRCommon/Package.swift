@@ -14,9 +14,15 @@ let package = Package(
             name: "IRCommon",
             targets: ["IRCommon"]),
     ],
+    dependencies: [
+        
+    ],
     targets: [
         .target(
             name: "IRCommon",
+            dependencies: [
+                
+            ],
             path: "IRCommon"
         ),
     ]

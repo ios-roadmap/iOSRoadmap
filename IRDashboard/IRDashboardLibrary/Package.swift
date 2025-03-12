@@ -25,6 +25,10 @@ let package = Package(
         .package(
             name: "IRViews",
             path: "../../IRViews"
+        ),
+        .package(
+            name: "IRCommon",
+            path: "../../IRCommon"
         )
     ],
     targets: [
@@ -32,7 +36,8 @@ let package = Package(
             name: "IRDashboardLibrary",
             dependencies: [
                 "IRDashboardInterface",
-                "IRViews"
+                "IRViews",
+                "IRCommon"
             ]
         )
     ]
