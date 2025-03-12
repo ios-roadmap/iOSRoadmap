@@ -1,5 +1,5 @@
 //
-//  IRDashboardView.swift
+//  IRDashboardViewController.swift
 //  IRDashboard
 //
 //  Created by Ömer Faruk Öztürk on 18.02.2025.
@@ -7,7 +7,7 @@
  
 import UIKit
 
-public class IRDashboardView: UIViewController {
+public class IRDashboardViewController: UIViewController {
     
     public var presenter: IRDashboardPresenterProtocol?
 
@@ -32,7 +32,7 @@ public class IRDashboardView: UIViewController {
     }
 }
 
-extension IRDashboardView: IRDashboardViewProtocol {
+extension IRDashboardViewController: IRDashboardViewProtocol {
     public func showDashboardData(_ data: [IRDashboardItem]) {
         self.dashboardItems = data
         tableView.reloadData()
@@ -40,7 +40,7 @@ extension IRDashboardView: IRDashboardViewProtocol {
 }
 
 // MARK: - UITableViewDataSource
-extension IRDashboardView: UITableViewDataSource {
+extension IRDashboardViewController: UITableViewDataSource {
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dashboardItems.count
     }

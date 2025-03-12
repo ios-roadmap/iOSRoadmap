@@ -1,5 +1,5 @@
 //
-//  IRSquareView.swift
+//  IRViewsImageTitleTableCell.swift
 //  IRViews
 //
 //  Created by Ömer Faruk Öztürk on 7.03.2025.
@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-public class IRViewsImageTitleCell: IRViewsBaseTableViewCell {
+public final class IRViewsImageTitleTableCell: IRViewsBaseTableCell {
     
     private lazy var imageViewContainer = UIImageView()
     private lazy var titleLabel = UILabel()
@@ -52,8 +52,8 @@ public class IRViewsImageTitleCell: IRViewsBaseTableViewCell {
     }
 }
 
-public struct IRViewsImageTitleCellViewModel: IRViewsBaseTableViewModelCellProtocol {
-    public typealias CellType = IRViewsImageTitleCell
+public final class IRViewsImageTitleCellViewModel: IRViewsBaseTableCellViewModelProtocol {
+    public typealias CellType = IRViewsImageTitleTableCell
     
     let title: String
     let image: UIImage?
@@ -63,7 +63,7 @@ public struct IRViewsImageTitleCellViewModel: IRViewsBaseTableViewModelCellProto
         self.image = image
     }
     
-    public func configure(_ cell: IRViewsImageTitleCell) {
+    public func configure(_ cell: IRViewsImageTitleTableCell) {
         cell.configure(with: self)
     }
 }

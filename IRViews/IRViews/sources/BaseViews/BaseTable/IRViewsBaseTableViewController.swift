@@ -63,7 +63,7 @@ extension IRViewsBaseTableViewController: UITableViewDataSource {
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let item = sections[indexPath.section].items[indexPath.row]
         let identifier = String(describing: item.cellClass)
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? IRViewsBaseTableViewCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? IRViewsBaseTableCell else {
             fatalError("Cell of type \(identifier) not registered or incorrect type.")
         }
         item.configureCell(cell)
