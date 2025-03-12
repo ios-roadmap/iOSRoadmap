@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 public protocol IRViewsBaseTableSectionProtocol {
     var headerView: UIView? { get }
     var headerTitle: String? { get }
@@ -25,6 +26,7 @@ public struct IRViewsBaseTableSection: IRViewsBaseTableSectionProtocol {
     }
 }
 
+@MainActor
 public class IRViewsBaseTableSectionBuilder {
     private var headerTitle: String?
     private var items: [IRViewsBaseTableItemProtocol] = []

@@ -15,13 +15,16 @@ let package = Package(
             targets: ["IRViews"]),
     ],
     dependencies: [
-        
+        .package(
+            url: "https://github.com/SnapKit/SnapKit.git",
+            from: "5.6.0"
+        ),
     ],
     targets: [
         .target(
             name: "IRViews",
             dependencies: [
-                
+                .product(name: "SnapKit", package: "SnapKit")
             ],
             path: "IRViews"
         ),

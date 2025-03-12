@@ -11,11 +11,13 @@ open class IRViewsBaseTableCell: UITableViewCell {
     open func configure(with item: IRViewsBaseTableItemProtocol) {}
 }
 
+@MainActor
 public protocol IRViewsBaseTableCellViewModelProtocol {
     associatedtype CellType: IRViewsBaseTableCell
     func configure(_ cell: CellType)
 }
 
+@MainActor
 public protocol IRViewsBaseTableItemProtocol {
     var cellClass: IRViewsBaseTableCell.Type { get }
     func configureCell(_ cell: IRViewsBaseTableCell)
