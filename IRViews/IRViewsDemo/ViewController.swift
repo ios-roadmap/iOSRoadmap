@@ -11,10 +11,7 @@ class ViewController: IRViewsBaseTableViewController {
     private func setupSections() {
         sections = [
             IRViewsBaseTableSectionBuilder()
-                .add(IRViewsImageTitleCellViewModel(title: "Omer"))
-                .add(IRViewsImageTitleCellViewModel(title: "Omer"))
-                .add(IRViewsImageTitleCellViewModel(title: "Omer"))
-                .add(IRViewsImageTitleCellViewModel(title: "Omer"))
+                .add(IRViewsHorizontalTitlesCellViewModel(titles: ["Omer","Omer","Omer","Omer","Omer","Omer","Omer","Omer","Omer","Omer","Omer","Omer"]))
                 .build()
         ]
     }

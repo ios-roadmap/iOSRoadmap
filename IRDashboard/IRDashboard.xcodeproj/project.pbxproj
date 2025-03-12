@@ -22,6 +22,13 @@
 			remoteGlobalIDString = 643D42382D63CD7E0034B91C;
 			remoteInfo = IRDashboard;
 		};
+		64524F582D81B60800E4F866 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 643D42302D63CD7E0034B91C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 643D42562D63CDA70034B91C;
+			remoteInfo = IRDashboardDemo;
+		};
 		64B110F22D6B836F005E0DB0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 643D42302D63CD7E0034B91C /* Project object */;
@@ -199,6 +206,7 @@
 			);
 			dependencies = (
 				643D42442D63CD7E0034B91C /* PBXTargetDependency */,
+				64524F592D81B60800E4F866 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				643D42452D63CD7E0034B91C /* IRDashboardTests */,
@@ -250,6 +258,7 @@
 					};
 					643D42402D63CD7E0034B91C = {
 						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 643D42562D63CDA70034B91C;
 					};
 					643D42562D63CDA70034B91C = {
 						CreatedOnToolsVersion = 16.0;
@@ -331,6 +340,11 @@
 			isa = PBXTargetDependency;
 			target = 643D42382D63CD7E0034B91C /* IRDashboard */;
 			targetProxy = 643D42432D63CD7E0034B91C /* PBXContainerItemProxy */;
+		};
+		64524F592D81B60800E4F866 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 643D42562D63CDA70034B91C /* IRDashboardDemo */;
+			targetProxy = 64524F582D81B60800E4F866 /* PBXContainerItemProxy */;
 		};
 		64B110F32D6B836F005E0DB0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -551,6 +565,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IRDashboardDemo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IRDashboardDemo";
 			};
 			name = Debug;
 		};
@@ -567,6 +582,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IRDashboardDemo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IRDashboardDemo";
 			};
 			name = Release;
 		};

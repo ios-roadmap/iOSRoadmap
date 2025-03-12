@@ -33,13 +33,13 @@ public class IRViewsBaseTableSectionBuilder {
         self.headerTitle = headerTitle
     }
 
-    public func add<T: IRViewsBaseTableViewModelCellProtocol>(_ viewModel: T) -> Self {
+    public func add<T: IRViewsBaseTableCellViewModelProtocol>(_ viewModel: T) -> Self {
         let item = IRViewsBaseTableItem<T.CellType, T>(viewModel: viewModel)
         items.append(item)
         return self
     }
 
     public func build() -> IRViewsBaseTableSection {
-        return IRViewsBaseTableSection(headerTitle: headerTitle, items: items)
+        IRViewsBaseTableSection(headerTitle: headerTitle, items: items)
     }
 }

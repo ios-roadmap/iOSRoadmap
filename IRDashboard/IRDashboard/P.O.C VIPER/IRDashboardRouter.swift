@@ -10,7 +10,7 @@ import UIKit
 public class IRDashboardRouter: IRDashboardRouterProtocol {
     
     public static func createModule() -> UIViewController {
-        let view = IRDashboardView()
+        let view = IRDashboardViewController()
         let presenter = IRDashboardPresenter()
         let interactor = IRDashboardInteractor()
         let router = IRDashboardRouter()
