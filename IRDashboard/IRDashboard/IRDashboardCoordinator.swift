@@ -21,7 +21,7 @@ public class IRDashboardCoordinator: IRBaseCoordinator, IRDashboardInterface {
     
     public override func start() -> UIViewController {
 //        IRDashboardRouter.createModule()
-        UIViewController()
+        IRDashboardController()
     }
 }
 

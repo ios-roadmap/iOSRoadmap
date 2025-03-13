@@ -29,17 +29,7 @@ public final class IRViewsHorizontalTitlesCell: IRViewsBaseTableCell {
         return stackView
     }()
     
-    public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setupViews()
-    }
-    
-    required public init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setupViews()
-    }
-    
-    private func setupViews() {
+    public override func setupViews() {
         contentView.addSubview(scrollView)
         scrollView.addSubview(horizontalStackView)
         
@@ -50,8 +40,8 @@ public final class IRViewsHorizontalTitlesCell: IRViewsBaseTableCell {
         
         horizontalStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.height.equalToSuperview() // StackView'in yükseklik açısından ScrollView'e eşit olması önemli
-            make.width.greaterThanOrEqualTo(scrollView) // İçerik en az ScrollView kadar geniş olmalı
+            make.height.equalToSuperview()
+            make.width.greaterThanOrEqualTo(scrollView)
         }
     }
     
@@ -66,7 +56,9 @@ public final class IRViewsHorizontalTitlesCell: IRViewsBaseTableCell {
         return CGSize(width: UIView.noIntrinsicMetric, height: max(totalHeight, 70))
     }
     
-    public func configure(with viewModel: IRViewsHorizontalTitlesCellViewModel) {
+    public override func configure(with item: any IRViewsBaseTableCellViewModelProtocol) {
+        guard let viewModel = item as? IRViewsHorizontalTitlesCellViewModel else { return }
+        
         horizontalStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
         viewModel.titles.forEach { title in
