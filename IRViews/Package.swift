@@ -12,18 +12,18 @@ let package = Package(
     products: [
         .library(
             name: "IRViews",
-            targets: ["IRViews"]),
+            targets: ["IRViews"]
+        ),
     ],
     dependencies: [
-        .package(
-            url: "https://github.com/SnapKit/SnapKit.git",
-            from: "5.6.0"
-        ),
+        .package(path: "../IRCommon"),
+        .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.6.0")
     ],
     targets: [
         .target(
             name: "IRViews",
             dependencies: [
+                "IRCommon",
                 .product(name: "SnapKit", package: "SnapKit")
             ],
             path: "IRViews"

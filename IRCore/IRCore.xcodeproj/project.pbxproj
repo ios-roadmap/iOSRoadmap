@@ -51,13 +51,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		646E72112D646E56002CA668 /* Exceptions for "IRCore" folder in "IRCore" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			publicHeaders = (
-				IRCore.h,
-			);
-			target = 646E720B2D646E56002CA668 /* IRCore */;
-		};
 		646E722C2D646E6C002CA668 /* Exceptions for "IRCoreDemo" folder in "IRCoreDemo" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -70,9 +63,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		646E720E2D646E56002CA668 /* IRCore */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				646E72112D646E56002CA668 /* Exceptions for "IRCore" folder in "IRCore" target */,
-			);
 			path = IRCore;
 			sourceTree = "<group>";
 		};

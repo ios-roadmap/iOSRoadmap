@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		640CCF922D82BD0F00FAD39D /* IRDashboardLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 640CCF912D82BD0F00FAD39D /* IRDashboardLibrary */; };
 		643D42422D63CD7E0034B91C /* IRDashboard.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 643D42392D63CD7E0034B91C /* IRDashboard.framework */; };
 		643D42A32D63D20D0034B91C /* IRDashboardLibrary in Resources */ = {isa = PBXBuildFile; fileRef = 643D42A22D63D20D0034B91C /* IRDashboardLibrary */; };
 		64B110F02D6B836F005E0DB0 /* IRDashboard.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 643D42392D63CD7E0034B91C /* IRDashboard.framework */; };
 		64B110F12D6B836F005E0DB0 /* IRDashboard.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 643D42392D63CD7E0034B91C /* IRDashboard.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		64EF6D0E2D63D399002B3362 /* IRDashboardLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 64EF6D0D2D63D399002B3362 /* IRDashboardLibrary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,7 +105,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				64EF6D0E2D63D399002B3362 /* IRDashboardLibrary in Frameworks */,
+				640CCF922D82BD0F00FAD39D /* IRDashboardLibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,7 +188,7 @@
 			);
 			name = IRDashboard;
 			packageProductDependencies = (
-				64EF6D0D2D63D399002B3362 /* IRDashboardLibrary */,
+				640CCF912D82BD0F00FAD39D /* IRDashboardLibrary */,
 			);
 			productName = IRDashboard;
 			productReference = 643D42392D63CD7E0034B91C /* IRDashboard.framework */;
@@ -684,7 +684,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		64EF6D0D2D63D399002B3362 /* IRDashboardLibrary */ = {
+		640CCF912D82BD0F00FAD39D /* IRDashboardLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = IRDashboardLibrary;
 		};

@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		640BB39C2D82BC3B0022361B /* IRViewsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 640BB39B2D82BC3B0022361B /* IRViewsLibrary */; };
 		64286A292D6C82D400F9394A /* IRViews.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 642869EB2D6C82AC00F9394A /* IRViews.framework */; };
 		64286A2A2D6C82D400F9394A /* IRViews.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 642869EB2D6C82AC00F9394A /* IRViews.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6446CF142D71F0190097FCA4 /* IRViews.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 642869EB2D6C82AC00F9394A /* IRViews.framework */; };
-		64AD150E2D7AB2960092E381 /* IRViewsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 64AD150D2D7AB2960092E381 /* IRViewsLibrary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,13 +59,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		642869F02D6C82AC00F9394A /* Exceptions for "IRViews" folder in "IRViews" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			publicHeaders = (
-				IRViews.h,
-			);
-			target = 642869EA2D6C82AC00F9394A /* IRViews */;
-		};
 		64286A242D6C82CE00F9394A /* Exceptions for "IRViewsDemo" folder in "IRViewsDemo" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -78,9 +71,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		642869ED2D6C82AC00F9394A /* IRViews */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				642869F02D6C82AC00F9394A /* Exceptions for "IRViews" folder in "IRViews" target */,
-			);
 			path = IRViews;
 			sourceTree = "<group>";
 		};
@@ -104,7 +94,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				64AD150E2D7AB2960092E381 /* IRViewsLibrary in Frameworks */,
+				640BB39C2D82BC3B0022361B /* IRViewsLibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -187,7 +177,7 @@
 			);
 			name = IRViews;
 			packageProductDependencies = (
-				64AD150D2D7AB2960092E381 /* IRViewsLibrary */,
+				640BB39B2D82BC3B0022361B /* IRViewsLibrary */,
 			);
 			productName = IRViews;
 			productReference = 642869EB2D6C82AC00F9394A /* IRViews.framework */;
@@ -680,7 +670,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		64AD150D2D7AB2960092E381 /* IRViewsLibrary */ = {
+		640BB39B2D82BC3B0022361B /* IRViewsLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = IRViewsLibrary;
 		};

@@ -16,10 +16,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(
-            name: "IRCommon",
-            path: "../../IRCommon"
-        ),
+        .package(path: "../../IRCommon"),
         .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.6.0")
     ],
     targets: [
@@ -27,9 +24,8 @@ let package = Package(
             name: "IRViewsLibrary",
             dependencies: [
                 "IRCommon",
-                "SnapKit"
+                .product(name: "SnapKit", package: "SnapKit")
             ]
         ),
     ]
 )
-

@@ -14,10 +14,7 @@ let package = Package(
             targets: ["IRDashboardInterface"]),
     ],
     dependencies: [
-        .package(
-            name: "IRCore",
-            path: "../../IRCore"
-        )
+        .package(name: "IRCore", path: "../../IRCore")
     ],
     targets: [
         .target(
