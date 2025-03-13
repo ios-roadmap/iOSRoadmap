@@ -7,8 +7,42 @@
 
 import UIKit
 
-open class IRViewsBaseTableCell: UITableViewCell {
-    open func configure(with item: IRViewsBaseTableItemProtocol) {}
+@MainActor
+public protocol IRViewsBaseTableSectionProtocol {
+    var headerView: UIView? { get }
+    var headerTitle: String? { get }
+    var items: [IRViewsBaseTableItemProtocol] { get set }
+}
+
+public struct IRViewsBaseTableSection: IRViewsBaseTableSectionProtocol {
+    public var headerView: UIView?
+    public var headerTitle: String?
+    public var items: [IRViewsBaseTableItemProtocol]
+    
+    public init(headerTitle: String? = nil, headerView: UIView? = nil, items: [IRViewsBaseTableItemProtocol]) {
+        self.headerTitle = headerTitle
+        self.headerView = headerView
+        self.items = items
+    }
+}
+
+@MainActor
+public class IRViewsBaseTableSectionBuilder {
+    private var headerTitle: String?
+    private var items: [IRViewsBaseTableItemProtocol] = []
+
+    public init(_ headerTitle: String? = nil) {
+        self.headerTitle = headerTitle
+    }
+    
+    public func add(_ item: IRViewsTableSectionItem) -> Self {
+        items.append(item.toItem())
+        return self
+    }
+    
+    public func build() -> IRViewsBaseTableSection {
+        IRViewsBaseTableSection(headerTitle: headerTitle, items: items)
+    }
 }
 
 @MainActor
@@ -23,9 +57,7 @@ public protocol IRViewsBaseTableItemProtocol {
     func configureCell(_ cell: IRViewsBaseTableCell)
 }
 
-struct IRViewsBaseTableItem<Cell: IRViewsBaseTableCell,
-                            ViewModel: IRViewsBaseTableCellViewModelProtocol>: IRViewsBaseTableItemProtocol where ViewModel.CellType == Cell {
-    
+public struct IRViewsBaseTableItem<Cell: IRViewsBaseTableCell, ViewModel: IRViewsBaseTableCellViewModelProtocol>: IRViewsBaseTableItemProtocol where ViewModel.CellType == Cell {
     public let viewModel: ViewModel
     public var cellClass: IRViewsBaseTableCell.Type { Cell.self }
     
