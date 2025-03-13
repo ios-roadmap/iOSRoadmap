@@ -17,7 +17,7 @@ let package = Package(
     dependencies: [
         .package(
             name: "IRCommon",
-            path: "../../IRCommon"
+            path: "../IRCommon"
         )
     ],
     targets: [
@@ -25,7 +25,8 @@ let package = Package(
             name: "IRCore",
             dependencies: [
                 "IRCommon"
-            ]
+            ],
+            path: "IRCore"
         ),
     ]
 )
