@@ -1,5 +1,6 @@
 // Kullanım
 import IRViews
+import IRAssets
 
 class ViewController: IRViewsBaseTableViewController {
     override func viewDidLoad() {
@@ -12,9 +13,15 @@ class ViewController: IRViewsBaseTableViewController {
         
         sections = [
             IRViewsBaseTableSectionBuilder()
-                .add(.horizontalTitles(["Omer", "Omer", "Omer", "Omer", "Omer"]))
                 .add(.spacer(250))
-                .add(.horizontalTitles(["Omer", "Omer", "Omer", "Omer", "Omer"]))
+                .add(.imageButtonViews(
+                    [
+                        .init(
+                            image: IRAssetsImages.Dashboard.rickAndMortyApp,
+                            title: "Rick And Morty App")
+                    ]
+                ))
+                .add(.spacer(250))
                 .build()
         ]
     }

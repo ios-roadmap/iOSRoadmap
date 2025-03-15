@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		648E23762D65CBA90094B9B9 /* IRCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64A109C42D65CA5400C00DEF /* IRCommon.framework */; };
 		648E23772D65CBA90094B9B9 /* IRCommon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 64A109C42D65CA5400C00DEF /* IRCommon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		64A480E02D85F47C00731601 /* IRCommonLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 64A480DF2D85F47C00731601 /* IRCommonLibrary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,7 @@
 /* Begin PBXFileReference section */
 		64A109C42D65CA5400C00DEF /* IRCommon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRCommon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		64A109D32D65CA6000C00DEF /* IRCommonDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCommonDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		64A480DE2D85F46A00731601 /* IRCommonLibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = IRCommonLibrary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -81,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				64A480E02D85F47C00731601 /* IRCommonLibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,6 +108,7 @@
 		64A109BA2D65CA5400C00DEF = {
 			isa = PBXGroup;
 			children = (
+				64A480DE2D85F46A00731601 /* IRCommonLibrary */,
 				64A109C62D65CA5400C00DEF /* IRCommon */,
 				64A109D42D65CA6000C00DEF /* IRCommonDemo */,
 				648E23752D65CBA90094B9B9 /* Frameworks */,
@@ -152,6 +156,7 @@
 			);
 			name = IRCommon;
 			packageProductDependencies = (
+				64A480DF2D85F47C00731601 /* IRCommonLibrary */,
 			);
 			productName = IRCommon;
 			productReference = 64A109C42D65CA5400C00DEF /* IRCommon.framework */;
@@ -546,6 +551,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		64A480DF2D85F47C00731601 /* IRCommonLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = IRCommonLibrary;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 64A109BB2D65CA5400C00DEF /* Project object */;
 }

@@ -29,7 +29,7 @@ public final class IRViewsSpacerCell: IRViewsBaseTableCell {
 }
 
 public final class IRViewsSpacerCellViewModel: IRViewsBaseTableCellViewModelProtocol {
-    public typealias CellType = IRViewsHorizontalTitlesCell
+    public typealias CellType = IRViewsSpacerCell
     
     let height: CGFloat
     
@@ -37,7 +37,7 @@ public final class IRViewsSpacerCellViewModel: IRViewsBaseTableCellViewModelProt
         self.height = height
     }
     
-    public func configure(_ cell: IRViewsHorizontalTitlesCell) {
+    public func configure(_ cell: IRViewsSpacerCell) {
         cell.configure(with: self)
     }
 }

@@ -9,13 +9,13 @@ import UIKit
 
 @MainActor
 public enum IRViewsTableSectionItem {
-    case horizontalTitles([String])
+    case imageButtonViews([IRViewsImageButtonViewModel])
     case spacer(CGFloat)
     
     func toItem() -> IRViewsBaseTableItemProtocol {
         switch self {
-        case .horizontalTitles(let titles):
-            return IRViewsBaseTableItem(viewModel: IRViewsHorizontalTitlesCellViewModel(titles: titles))
+        case .imageButtonViews(let items):
+            return IRViewsBaseTableItem(viewModel: IRViewsImageButtonViewsCellViewModel(items: items))
         case .spacer(let height):
             return IRViewsBaseTableItem(viewModel: IRViewsSpacerCellViewModel(height: height))
         }

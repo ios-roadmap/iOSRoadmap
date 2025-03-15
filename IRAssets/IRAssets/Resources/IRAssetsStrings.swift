@@ -7,6 +7,14 @@
 
 import Foundation
 
-enum IRAssetsStrings {
-    static let welcomeMessage = NSLocalizedString("welcome_message", comment: "Welcome message for the user")
+public enum IRAssetsStrings {
+    
+    public enum Main {
+        public static let app = "iOSRoadmap"
+    }
+    
+    public enum Dashboard {
+        public static let rickAndMorty = "Rick And Morty"
+        public static let jsonPlaceHolder = "Json Place Holder"
+    }
 }

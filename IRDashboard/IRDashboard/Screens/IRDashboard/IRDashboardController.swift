@@ -7,6 +7,7 @@
 
 import UIKit
 import IRViews
+import IRAssets
 
 final class IRDashboardController: IRViewsBaseTableViewController {
     
@@ -14,5 +15,24 @@ final class IRDashboardController: IRViewsBaseTableViewController {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         
+        sections = [
+            IRViewsBaseTableSectionBuilder()
+                .add(.imageButtonViews(
+                    [
+                        .init(image: IRAssetsImages.Dashboard.jsonPlaceHolder, title: IRAssetsStrings.Dashboard.jsonPlaceHolder) {
+                            print("Tapped")
+                        },
+                        .init(image: IRAssetsImages.Dashboard.rickAndMorty, title: IRAssetsStrings.Dashboard.rickAndMorty) {
+                            print("Tapped Rick And Morty")
+                        }
+                    ]
+                ))
+                .add(.imageButtonViews([
+                    .init(image: IRAssetsImages.Main.appIcon, title: "asd") {
+                        print("asd")
+                    }
+                ]))
+                .build()
+        ]
     }
 }

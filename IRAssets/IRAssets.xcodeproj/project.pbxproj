@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		640661EC2D83F5B900F29416 /* IRAssets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 640661E32D83F5B900F29416 /* IRAssets.framework */; };
+		645F94802D8443CE0045B3CA /* IRAssets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 640661E32D83F5B900F29416 /* IRAssets.framework */; };
+		645F94812D8443CE0045B3CA /* IRAssets.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 640661E32D83F5B900F29416 /* IRAssets.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,7 +27,28 @@
 			remoteGlobalIDString = 640661FF2D83F5D000F29416;
 			remoteInfo = IRAssetsDemo;
 		};
+		645F94822D8443CE0045B3CA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 640661DA2D83F5B900F29416 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 640661E22D83F5B900F29416;
+			remoteInfo = IRAssets;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		645F94842D8443CE0045B3CA /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				645F94812D8443CE0045B3CA /* IRAssets.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		640661E32D83F5B900F29416 /* IRAssets.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRAssets.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +117,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				645F94802D8443CE0045B3CA /* IRAssets.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,6 +130,7 @@
 				640661E52D83F5B900F29416 /* IRAssets */,
 				640661EF2D83F5B900F29416 /* IRAssetsTests */,
 				640662012D83F5D000F29416 /* IRAssetsDemo */,
+				645F947F2D8443CE0045B3CA /* Frameworks */,
 				640661E42D83F5B900F29416 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -118,6 +143,13 @@
 				640662002D83F5D000F29416 /* IRAssetsDemo.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		645F947F2D8443CE0045B3CA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -187,10 +219,12 @@
 				640661FC2D83F5D000F29416 /* Sources */,
 				640661FD2D83F5D000F29416 /* Frameworks */,
 				640661FE2D83F5D000F29416 /* Resources */,
+				645F94842D8443CE0045B3CA /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				645F94832D8443CE0045B3CA /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				640662012D83F5D000F29416 /* IRAssetsDemo */,
@@ -304,6 +338,11 @@
 			isa = PBXTargetDependency;
 			target = 640661FF2D83F5D000F29416 /* IRAssetsDemo */;
 			targetProxy = 640662152D83F5DA00F29416 /* PBXContainerItemProxy */;
+		};
+		645F94832D8443CE0045B3CA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 640661E22D83F5B900F29416 /* IRAssets */;
+			targetProxy = 645F94822D8443CE0045B3CA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -539,7 +578,6 @@
 		640662132D83F5D100F29416 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -547,7 +585,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IRAssetsDemo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UILaunchStoryboardName = "";
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -567,7 +605,6 @@
 		640662142D83F5D100F29416 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -575,7 +612,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IRAssetsDemo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UILaunchStoryboardName = "";
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
