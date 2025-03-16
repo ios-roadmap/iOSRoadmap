@@ -19,8 +19,6 @@ typealias NavigationLogic = IRDashboardNavigationLogic
 
 public class IRDashboardCoordinator: IRBaseCoordinator, IRDashboardInterface {
     
-//    private let navigationDelegate = CustomNavigationControllerDelegate() // Delegate burada tutuluyor
-    
     public override init() {
         super.init()
     }
@@ -35,38 +33,6 @@ public class IRDashboardCoordinator: IRBaseCoordinator, IRDashboardInterface {
 extension IRDashboardCoordinator: IRDashboardNavigationLogic {
     func navigationToJPHApp() {
         let viewController = IRJPHViewController()
-//        navigationController?.delegate = navigationDelegate  Delegate burada set ediliyor
-        navigationController?.pushViewController(viewController, animated: true)
+        navigationController?.pushViewController(viewController, with: .zoom)
     }
 }
-
-//class CustomPushAnimator: NSObject, UIViewControllerAnimatedTransitioning {
-//    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-//        return 0.5 // Animasyon süresi
-//    }
-//    
-//    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-//        guard let toView = transitionContext.view(forKey: .to) else { return }
-//        
-//        let containerView = transitionContext.containerView
-//        toView.alpha = 0.0
-//        containerView.addSubview(toView)
-//        
-//        UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
-//            toView.alpha = 1.0
-//        }) { finished in
-//            transitionContext.completeTransition(finished)
-//        }
-//    }
-//}
-//
-//class CustomNavigationControllerDelegate: NSObject, UINavigationControllerDelegate {
-//    func navigationController(
-//        _ navigationController: UINavigationController,
-//        animationControllerFor operation: UINavigationController.Operation,
-//        from fromVC: UIViewController,
-//        to toVC: UIViewController
-//    ) -> UIViewControllerAnimatedTransitioning? {
-//        return CustomPushAnimator()
-//    }
-//}
