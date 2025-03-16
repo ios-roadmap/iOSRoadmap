@@ -7,128 +7,88 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		648E23762D65CBA90094B9B9 /* IRCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64A109C42D65CA5400C00DEF /* IRCommon.framework */; };
-		648E23772D65CBA90094B9B9 /* IRCommon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 64A109C42D65CA5400C00DEF /* IRCommon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		64A480E02D85F47C00731601 /* IRCommonLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 64A480DF2D85F47C00731601 /* IRCommonLibrary */; };
+		640661EC2D83F5B900F29416 /* IRAssets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 640661E32D83F5B900F29416 /* IRAssets.framework */; };
+		64BAB1F92D861F26001C539C /* IRAssetsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 64BAB1F82D861F26001C539C /* IRAssetsLibrary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		648E23782D65CBA90094B9B9 /* PBXContainerItemProxy */ = {
+		640661ED2D83F5B900F29416 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 64A109BB2D65CA5400C00DEF /* Project object */;
+			containerPortal = 640661DA2D83F5B900F29416 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 64A109C32D65CA5400C00DEF;
-			remoteInfo = IRCommon;
+			remoteGlobalIDString = 640661E22D83F5B900F29416;
+			remoteInfo = IRAssets;
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		648E237A2D65CBA90094B9B9 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				648E23772D65CBA90094B9B9 /* IRCommon.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		64A109C42D65CA5400C00DEF /* IRCommon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRCommon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		64A109D32D65CA6000C00DEF /* IRCommonDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCommonDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		64A480DE2D85F46A00731601 /* IRCommonLibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = IRCommonLibrary; sourceTree = "<group>"; };
+		640661E32D83F5B900F29416 /* IRAssets.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRAssets.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		640661EB2D83F5B900F29416 /* IRAssetsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IRAssetsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		64A109C92D65CA5400C00DEF /* Exceptions for "IRCommon" folder in "IRCommon" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			publicHeaders = (
-				include/IRCommon.h,
-			);
-			target = 64A109C32D65CA5400C00DEF /* IRCommon */;
-		};
-		64A109E42D65CA6100C00DEF /* Exceptions for "IRCommonDemo" folder in "IRCommonDemo" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 64A109D22D65CA6000C00DEF /* IRCommonDemo */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		64A109C62D65CA5400C00DEF /* IRCommon */ = {
+		640661E52D83F5B900F29416 /* IRAssets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				64A109C92D65CA5400C00DEF /* Exceptions for "IRCommon" folder in "IRCommon" target */,
-			);
-			path = IRCommon;
+			path = IRAssets;
 			sourceTree = "<group>";
 		};
-		64A109D42D65CA6000C00DEF /* IRCommonDemo */ = {
+		640661EF2D83F5B900F29416 /* IRAssetsTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				64A109E42D65CA6100C00DEF /* Exceptions for "IRCommonDemo" folder in "IRCommonDemo" target */,
-			);
-			path = IRCommonDemo;
+			path = IRAssetsTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		64A109C12D65CA5400C00DEF /* Frameworks */ = {
+		640661E02D83F5B900F29416 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				64A480E02D85F47C00731601 /* IRCommonLibrary in Frameworks */,
+				64BAB1F92D861F26001C539C /* IRAssetsLibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		64A109D02D65CA6000C00DEF /* Frameworks */ = {
+		640661E82D83F5B900F29416 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				648E23762D65CBA90094B9B9 /* IRCommon.framework in Frameworks */,
+				640661EC2D83F5B900F29416 /* IRAssets.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		648E23752D65CBA90094B9B9 /* Frameworks */ = {
+		640661D92D83F5B900F29416 = {
+			isa = PBXGroup;
+			children = (
+				640661E52D83F5B900F29416 /* IRAssets */,
+				640661EF2D83F5B900F29416 /* IRAssetsTests */,
+				645F947F2D8443CE0045B3CA /* Frameworks */,
+				640661E42D83F5B900F29416 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		640661E42D83F5B900F29416 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				640661E32D83F5B900F29416 /* IRAssets.framework */,
+				640661EB2D83F5B900F29416 /* IRAssetsTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		645F947F2D8443CE0045B3CA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		64A109BA2D65CA5400C00DEF = {
-			isa = PBXGroup;
-			children = (
-				64A480DE2D85F46A00731601 /* IRCommonLibrary */,
-				64A109C62D65CA5400C00DEF /* IRCommon */,
-				64A109D42D65CA6000C00DEF /* IRCommonDemo */,
-				648E23752D65CBA90094B9B9 /* Frameworks */,
-				64A109C52D65CA5400C00DEF /* Products */,
-			);
-			sourceTree = "<group>";
-		};
-		64A109C52D65CA5400C00DEF /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				64A109C42D65CA5400C00DEF /* IRCommon.framework */,
-				64A109D32D65CA6000C00DEF /* IRCommonDemo.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		64A109BF2D65CA5400C00DEF /* Headers */ = {
+		640661DE2D83F5B900F29416 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -138,102 +98,102 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		64A109C32D65CA5400C00DEF /* IRCommon */ = {
+		640661E22D83F5B900F29416 /* IRAssets */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 64A109CA2D65CA5400C00DEF /* Build configuration list for PBXNativeTarget "IRCommon" */;
+			buildConfigurationList = 640661F42D83F5B900F29416 /* Build configuration list for PBXNativeTarget "IRAssets" */;
 			buildPhases = (
-				64A109BF2D65CA5400C00DEF /* Headers */,
-				64A109C02D65CA5400C00DEF /* Sources */,
-				64A109C12D65CA5400C00DEF /* Frameworks */,
-				64A109C22D65CA5400C00DEF /* Resources */,
+				640661DE2D83F5B900F29416 /* Headers */,
+				640661DF2D83F5B900F29416 /* Sources */,
+				640661E02D83F5B900F29416 /* Frameworks */,
+				640661E12D83F5B900F29416 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				64A109C62D65CA5400C00DEF /* IRCommon */,
+				640661E52D83F5B900F29416 /* IRAssets */,
 			);
-			name = IRCommon;
+			name = IRAssets;
 			packageProductDependencies = (
-				64A480DF2D85F47C00731601 /* IRCommonLibrary */,
+				64BAB1F82D861F26001C539C /* IRAssetsLibrary */,
 			);
-			productName = IRCommon;
-			productReference = 64A109C42D65CA5400C00DEF /* IRCommon.framework */;
+			productName = IRAssets;
+			productReference = 640661E32D83F5B900F29416 /* IRAssets.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		64A109D22D65CA6000C00DEF /* IRCommonDemo */ = {
+		640661EA2D83F5B900F29416 /* IRAssetsTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 64A109E52D65CA6100C00DEF /* Build configuration list for PBXNativeTarget "IRCommonDemo" */;
+			buildConfigurationList = 640661F92D83F5B900F29416 /* Build configuration list for PBXNativeTarget "IRAssetsTests" */;
 			buildPhases = (
-				64A109CF2D65CA6000C00DEF /* Sources */,
-				64A109D02D65CA6000C00DEF /* Frameworks */,
-				64A109D12D65CA6000C00DEF /* Resources */,
-				648E237A2D65CBA90094B9B9 /* Embed Frameworks */,
+				640661E72D83F5B900F29416 /* Sources */,
+				640661E82D83F5B900F29416 /* Frameworks */,
+				640661E92D83F5B900F29416 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				648E23792D65CBA90094B9B9 /* PBXTargetDependency */,
+				640661EE2D83F5B900F29416 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				64A109D42D65CA6000C00DEF /* IRCommonDemo */,
+				640661EF2D83F5B900F29416 /* IRAssetsTests */,
 			);
-			name = IRCommonDemo;
+			name = IRAssetsTests;
 			packageProductDependencies = (
 			);
-			productName = IRCommonDemo;
-			productReference = 64A109D32D65CA6000C00DEF /* IRCommonDemo.app */;
-			productType = "com.apple.product-type.application";
+			productName = IRAssetsTests;
+			productReference = 640661EB2D83F5B900F29416 /* IRAssetsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		64A109BB2D65CA5400C00DEF /* Project object */ = {
+		640661DA2D83F5B900F29416 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
-					64A109C32D65CA5400C00DEF = {
+					640661E22D83F5B900F29416 = {
 						CreatedOnToolsVersion = 16.0;
 						LastSwiftMigration = 1600;
 					};
-					64A109D22D65CA6000C00DEF = {
+					640661EA2D83F5B900F29416 = {
 						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 640661FF2D83F5D000F29416;
 					};
 				};
 			};
-			buildConfigurationList = 64A109BE2D65CA5400C00DEF /* Build configuration list for PBXProject "IRCommon" */;
+			buildConfigurationList = 640661DD2D83F5B900F29416 /* Build configuration list for PBXProject "IRAssets" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 64A109BA2D65CA5400C00DEF;
+			mainGroup = 640661D92D83F5B900F29416;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 64A109C52D65CA5400C00DEF /* Products */;
+			productRefGroup = 640661E42D83F5B900F29416 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				64A109C32D65CA5400C00DEF /* IRCommon */,
-				64A109D22D65CA6000C00DEF /* IRCommonDemo */,
+				640661E22D83F5B900F29416 /* IRAssets */,
+				640661EA2D83F5B900F29416 /* IRAssetsTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		64A109C22D65CA5400C00DEF /* Resources */ = {
+		640661E12D83F5B900F29416 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		64A109D12D65CA6000C00DEF /* Resources */ = {
+		640661E92D83F5B900F29416 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -243,14 +203,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		64A109C02D65CA5400C00DEF /* Sources */ = {
+		640661DF2D83F5B900F29416 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		64A109CF2D65CA6000C00DEF /* Sources */ = {
+		640661E72D83F5B900F29416 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -260,15 +220,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		648E23792D65CBA90094B9B9 /* PBXTargetDependency */ = {
+		640661EE2D83F5B900F29416 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 64A109C32D65CA5400C00DEF /* IRCommon */;
-			targetProxy = 648E23782D65CBA90094B9B9 /* PBXContainerItemProxy */;
+			target = 640661E22D83F5B900F29416 /* IRAssets */;
+			targetProxy = 640661ED2D83F5B900F29416 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		64A109CB2D65CA5400C00DEF /* Debug */ = {
+		640661F52D83F5B900F29416 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
@@ -276,6 +236,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -292,7 +253,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRCommon;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRAssets;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -303,7 +264,7 @@
 			};
 			name = Debug;
 		};
-		64A109CC2D65CA5400C00DEF /* Release */ = {
+		640661F62D83F5B900F29416 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
@@ -311,6 +272,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -327,7 +289,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRCommon;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRAssets;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -337,7 +299,7 @@
 			};
 			name = Release;
 		};
-		64A109CD2D65CA5400C00DEF /* Debug */ = {
+		640661F72D83F5B900F29416 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -403,7 +365,7 @@
 			};
 			name = Debug;
 		};
-		64A109CE2D65CA5400C00DEF /* Release */ = {
+		640661F82D83F5B900F29416 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -462,90 +424,66 @@
 			};
 			name = Release;
 		};
-		64A109E62D65CA6100C00DEF /* Debug */ = {
+		640661FA2D83F5B900F29416 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IRCommonDemo/Info.plist;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRCommonDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRAssetsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IRAssetsDemo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IRAssetsDemo";
 			};
 			name = Debug;
 		};
-		64A109E72D65CA6100C00DEF /* Release */ = {
+		640661FB2D83F5B900F29416 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IRCommonDemo/Info.plist;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRCommonDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRAssetsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IRAssetsDemo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IRAssetsDemo";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		64A109BE2D65CA5400C00DEF /* Build configuration list for PBXProject "IRCommon" */ = {
+		640661DD2D83F5B900F29416 /* Build configuration list for PBXProject "IRAssets" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				64A109CD2D65CA5400C00DEF /* Debug */,
-				64A109CE2D65CA5400C00DEF /* Release */,
+				640661F72D83F5B900F29416 /* Debug */,
+				640661F82D83F5B900F29416 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		64A109CA2D65CA5400C00DEF /* Build configuration list for PBXNativeTarget "IRCommon" */ = {
+		640661F42D83F5B900F29416 /* Build configuration list for PBXNativeTarget "IRAssets" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				64A109CB2D65CA5400C00DEF /* Debug */,
-				64A109CC2D65CA5400C00DEF /* Release */,
+				640661F52D83F5B900F29416 /* Debug */,
+				640661F62D83F5B900F29416 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		64A109E52D65CA6100C00DEF /* Build configuration list for PBXNativeTarget "IRCommonDemo" */ = {
+		640661F92D83F5B900F29416 /* Build configuration list for PBXNativeTarget "IRAssetsTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				64A109E62D65CA6100C00DEF /* Debug */,
-				64A109E72D65CA6100C00DEF /* Release */,
+				640661FA2D83F5B900F29416 /* Debug */,
+				640661FB2D83F5B900F29416 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -553,11 +491,11 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		64A480DF2D85F47C00731601 /* IRCommonLibrary */ = {
+		64BAB1F82D861F26001C539C /* IRAssetsLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = IRCommonLibrary;
+			productName = IRAssetsLibrary;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = 64A109BB2D65CA5400C00DEF /* Project object */;
+	rootObject = 640661DA2D83F5B900F29416 /* Project object */;
 }

@@ -4,26 +4,29 @@
 import PackageDescription
 
 let package = Package(
-    name: "IRCommon",
+    name: "IRAssets",
     defaultLocalization: "en",
     platforms: [
         .iOS(.v18)
     ],
     products: [
         .library(
-            name: "IRCommon",
-            targets: ["IRCommon"]),
+            name: "IRAssets",
+            targets: ["IRAssets"]),
     ],
     dependencies: [
-        .package(name: "IRAssets", path: "../IRAssets")
+        
     ],
     targets: [
         .target(
-            name: "IRCommon",
+            name: "IRAssets",
             dependencies: [
-                "IRAssets"
+                
             ],
-            path: "IRCommon"
+            path: "IRAssets",
+            resources: [
+                .process("Resources/IRMedia.xcassets")
+            ]
         ),
     ]
 )

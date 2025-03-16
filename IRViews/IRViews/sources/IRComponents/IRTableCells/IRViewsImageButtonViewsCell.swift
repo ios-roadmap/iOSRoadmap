@@ -1,5 +1,5 @@
 //
-//  IRViewsHorizontalTitlesCell.swift
+//  IRViewsImageButtonViewsCell.swift
 //  IRViews
 //
 //  Created by Ömer Faruk Öztürk on 12.03.2025.
@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-public final class IRViewsHorizontalTitlesCell: IRViewsBaseTableCell {
+public final class IRViewsImageButtonViewsCell: IRViewsBaseTableCell {
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -25,9 +25,10 @@ public final class IRViewsHorizontalTitlesCell: IRViewsBaseTableCell {
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.alignment = .center
-        stackView.distribution = .equalSpacing
+        stackView.distribution = .fillEqually // Değiştirildi
         return stackView
     }()
+
     
     public override func setupViews() {
         contentView.addSubview(scrollView)
@@ -57,15 +58,16 @@ public final class IRViewsHorizontalTitlesCell: IRViewsBaseTableCell {
     }
     
     public override func configure(with item: any IRViewsBaseTableCellViewModelProtocol) {
-        guard let viewModel = item as? IRViewsHorizontalTitlesCellViewModel else { return }
+        guard let viewModel = item as? IRViewsImageButtonViewsCellViewModel else { return }
         
         horizontalStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-
-        viewModel.titles.forEach { title in
+        
+        viewModel.items.forEach { model in
             let buttonView = IRViewsImageButtonView()
+            buttonView.configure(viewModel: model)
             horizontalStackView.addArrangedSubview(buttonView)
         }
-
+        
         if let lastView = horizontalStackView.arrangedSubviews.last {
             lastView.snp.makeConstraints { make in
                 make.trailing.equalToSuperview()
@@ -74,16 +76,16 @@ public final class IRViewsHorizontalTitlesCell: IRViewsBaseTableCell {
     }
 }
 
-public final class IRViewsHorizontalTitlesCellViewModel: IRViewsBaseTableCellViewModelProtocol {
-    public typealias CellType = IRViewsHorizontalTitlesCell
+public final class IRViewsImageButtonViewsCellViewModel: IRViewsBaseTableCellViewModelProtocol {
+    public typealias CellType = IRViewsImageButtonViewsCell
     
-    let titles: [String]
+    let items: [IRViewsImageButtonViewModel]
     
-    public init(titles: [String]) {
-        self.titles = titles
+    public init(items: [IRViewsImageButtonViewModel]) {
+        self.items = items
     }
     
-    public func configure(_ cell: IRViewsHorizontalTitlesCell) {
+    public func configure(_ cell: IRViewsImageButtonViewsCell) {
         cell.configure(with: self)
     }
 }
