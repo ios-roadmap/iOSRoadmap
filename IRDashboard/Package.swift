@@ -22,14 +22,16 @@ let package = Package(
         .package(
             name: "IRCommon",
             path: "../IRCommon"
-        )
+        ),
+        .package(name: "IRViews", path: "../IRViews")
     ],
     targets: [
         .target(
             name: "IRDashboard",
             dependencies: [
                 "IRDashboardInterface",
-                "IRCommon"
+                "IRCommon",
+                "IRViews"
             ],
             path: "IRDashboard"
         ),

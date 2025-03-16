@@ -30,7 +30,7 @@ final class IRDashboardController: IRViewsBaseTableViewController {
                             assetsImage: IRAssets.Dashboard.jsonPlaceHolder,
                             assetsTitle: IRAssets.Dashboard.jsonPlaceHolder,
                             handler: {
-                                print("Tapped Rick And Morty")
+                                print("Tapped Json Place Holder")
                             }
                         ),
                     ]

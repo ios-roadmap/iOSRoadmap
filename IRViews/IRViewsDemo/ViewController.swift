@@ -1,4 +1,3 @@
-// Kullanım
 import IRViews
 import IRAssets
 
@@ -17,8 +16,9 @@ class ViewController: IRViewsBaseTableViewController {
                 .add(.imageButtonViews(
                     [
                         .init(
-                            image: IRAssetsImages.Dashboard.rickAndMortyApp,
-                            title: "Rick And Morty App")
+                            assetsImage: IRAssets.Dashboard.rickAndMorty,
+                            assetsTitle: IRAssets.Dashboard.jsonPlaceHolder
+                        )
                     ]
                 ))
                 .add(.spacer(250))
@@ -26,3 +26,5 @@ class ViewController: IRViewsBaseTableViewController {
         ]
     }
 }
+
+//TODO: tıklanma efektini kaldırmak gerekiyor optional olması lazım.
