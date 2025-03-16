@@ -6,12 +6,16 @@
 //
 
 import UIKit
-import IRDashboardInterface
 import IRCore
+import IRDashboardInterface
+import IRJPH
 
+@MainActor
 protocol IRDashboardNavigationLogic {
-    
+    func navigationToJPHApp()
 }
+
+typealias NavigationLogic = IRDashboardNavigationLogic
 
 public class IRDashboardCoordinator: IRBaseCoordinator, IRDashboardInterface {
     
@@ -20,11 +24,15 @@ public class IRDashboardCoordinator: IRBaseCoordinator, IRDashboardInterface {
     }
     
     public override func start() -> UIViewController {
-//        IRDashboardRouter.createModule()
-        IRDashboardController()
+        let viewController = IRDashboardController()
+        viewController.navigator = self
+        return viewController
     }
 }
 
 extension IRDashboardCoordinator: IRDashboardNavigationLogic {
-    
+    func navigationToJPHApp() {
+        let viewController = IRJPHViewController()
+        navigationController?.pushViewController(viewController, with: .zoom)
+    }
 }

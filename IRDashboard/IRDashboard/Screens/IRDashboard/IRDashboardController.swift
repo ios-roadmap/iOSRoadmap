@@ -11,6 +11,8 @@ import IRAssets
 
 final class IRDashboardController: IRViewsBaseTableViewController {
     
+    var navigator: NavigationLogic!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .white
@@ -29,8 +31,8 @@ final class IRDashboardController: IRViewsBaseTableViewController {
                         .init(
                             assetsImage: IRAssets.Dashboard.jsonPlaceHolder,
                             assetsTitle: IRAssets.Dashboard.jsonPlaceHolder,
-                            handler: {
-                                print("Tapped Rick And Morty")
+                            handler: { [weak self] in
+                                self?.navigator.navigationToJPHApp()
                             }
                         ),
                     ]

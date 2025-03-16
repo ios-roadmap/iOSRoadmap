@@ -9,7 +9,7 @@ import UIKit
 import IRCommon
 
 @MainActor
-public protocol IRCoordinatorProtocol: AnyObject, Sendable {
+public protocol IRCoordinatorProtocol: AnyObject {
     
     var navigationController: UINavigationController? { get set }
     var parentCoordinator: IRCoordinatorProtocol? { get set }
@@ -25,7 +25,7 @@ public protocol IRCoordinatorProtocol: AnyObject, Sendable {
     
     func startCoordinator(
         _ coordinator: IRCoordinatorProtocol,
-        with method: CoordinatorPresentationMethod,
+        with method: IRCoordinatorPresentationMethod,
         animated: Bool,
         completion: IRVoidHandler?
     )
@@ -46,7 +46,7 @@ public extension IRCoordinatorProtocol {
 
     func startCoordinator(
         _ coordinator: any IRCoordinatorProtocol,
-        with method: CoordinatorPresentationMethod,
+        with method: IRCoordinatorPresentationMethod,
         animated: Bool,
         completion: (() -> Void)? = nil
     ) {
@@ -69,11 +69,11 @@ public extension IRCoordinatorProtocol {
 }
 
 
-public enum CoordinatorPresentationMethod: Equatable {
+public enum IRCoordinatorPresentationMethod: Equatable {
     case push
     case present(UIModalPresentationStyle)
 
-    public static func == (lhs: CoordinatorPresentationMethod, rhs: CoordinatorPresentationMethod) -> Bool {
+    public static func == (lhs: IRCoordinatorPresentationMethod, rhs: IRCoordinatorPresentationMethod) -> Bool {
         switch (lhs, rhs) {
         case (.push, .push):
             return true
