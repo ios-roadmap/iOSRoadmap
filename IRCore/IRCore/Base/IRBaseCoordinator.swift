@@ -8,7 +8,7 @@
 import UIKit
 import IRCommon
 
-@MainActor
+
 open class IRBaseCoordinator: IRCoordinatorProtocol {
     public weak var navigationController: UINavigationController?
     public weak var parentCoordinator: (any IRCoordinatorProtocol)?
@@ -22,7 +22,7 @@ open class IRBaseCoordinator: IRCoordinatorProtocol {
 
     open func startCoordinator(
         _ child: any IRCoordinatorProtocol,
-        with method: CoordinatorPresentationMethod,
+        with method: IRCoordinatorPresentationMethod,
         animated: Bool,
         completion: IRVoidHandler? = nil
     ) {
