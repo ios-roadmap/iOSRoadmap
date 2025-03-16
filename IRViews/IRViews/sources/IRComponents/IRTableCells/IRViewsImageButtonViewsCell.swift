@@ -25,9 +25,10 @@ public final class IRViewsImageButtonViewsCell: IRViewsBaseTableCell {
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.alignment = .center
-        stackView.distribution = .equalSpacing
+        stackView.distribution = .fillEqually // Değiştirildi
         return stackView
     }()
+
     
     public override func setupViews() {
         contentView.addSubview(scrollView)

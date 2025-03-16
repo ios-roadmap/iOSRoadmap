@@ -11,13 +11,13 @@ import UIKit
 import SnapKit
 
 public struct IRViewsImageButtonViewModel: IRViewsBaseViewModel {
-    let image: UIImage?
-    let title: String?
+    let assetsImage: (any IRAssetsRawRepresentable)?
+    let assetsTitle: (any IRAssetsRawRepresentable)?
     let handler: IRVoidHandler?
     
-    public init(image: UIImage? = nil, title: String? = nil, handler: IRVoidHandler? = nil) {
-        self.image = image
-        self.title = title
+    public init(assetsImage: (any IRAssetsRawRepresentable)? = nil, assetsTitle: (any IRAssetsRawRepresentable)? = nil, handler: IRVoidHandler? = nil) {
+        self.assetsImage = assetsImage
+        self.assetsTitle = assetsTitle
         self.handler = handler
     }
 }
@@ -41,8 +41,7 @@ public final class IRViewsImageButtonView: IRViewsBaseView<IRViewsImageButtonVie
     private var handler: IRVoidHandler?
     
     public override func setupUI() {
-        addSubview(imageView)
-        addSubview(titleLabel)
+        addSubviews(imageView, titleLabel)
         
         imageView.snp.makeConstraints { make in
             make.top.centerX.equalToSuperview()
@@ -66,8 +65,8 @@ public final class IRViewsImageButtonView: IRViewsBaseView<IRViewsImageButtonVie
     
     public override func configure(viewModel: IRViewsImageButtonViewModel?) {
         super.configure(viewModel: viewModel)
-        imageView.image = viewModel?.image
-        titleLabel.text = viewModel?.title
+        imageView.image = viewModel?.assetsImage?.image
+        titleLabel.text = viewModel?.assetsTitle?.formatted
         handler = viewModel?.handler
     }
     
@@ -80,28 +79,61 @@ public final class IRViewsImageButtonView: IRViewsBaseView<IRViewsImageButtonVie
 
 @MainActor
 public final class IRViewsImageButtonViewBuilder {
-    private var image: UIImage?
-    private var title: String?
+    private var assetsImage: (any IRAssetsRawRepresentable)?
+    private var assetsTitle: (any IRAssetsRawRepresentable)?
     private var handler: IRVoidHandler?
     
-    public func setImage(_ image: UIImage) -> IRViewsImageButtonViewBuilder {
-        self.image = image
+    public func setImage(_ assetsImage: some IRAssetsRawRepresentable) -> IRViewsImageButtonViewBuilder {
+        self.assetsImage = assetsImage
         return self
     }
     
-    public func setTitle(_ title: String) -> IRViewsImageButtonViewBuilder {
-        self.title = title
+    public func setTitle(_ assetsTitle: some IRAssetsRawRepresentable) -> IRViewsImageButtonViewBuilder {
+        self.assetsTitle = assetsTitle
         return self
     }
     
     public func build() -> IRViewsImageButtonView {
         let view = IRViewsImageButtonView()
         let viewModel = IRViewsImageButtonViewModel(
-            image: image,
-            title: title,
+            assetsImage: assetsImage,
+            assetsTitle: assetsTitle,
             handler: handler
         )
         view.configure(viewModel: viewModel)
         return view
     }
 }
+
+/*
+ Swift’te any ve some kullanımı, protokolleri nasıl ele aldığımızla ilgilidir. Bu iki kavram, varlık türleri (existential types) ve belirsiz türler (opaque types) olarak ayrılır.
+ 
+ any, farklı türleri saklayabilmek için kullanılır. Yani:
+ var image1: any IRAssetsImagesProtocol = IRAssetsImages.Main.appIcon
+ var image2: any IRAssetsImagesProtocol = IRAssetsImages.Dashboard.rickAndMorty
+
+ Bu mümkün çünkü any, farklı türlerin bir arada saklanmasına izin verir.
+ 
+ Ancak, derleyici değişkenin hangi tür olduğunu önceden bilemez. Swift, bu türleri çalıştırma zamanında çözer (dynamic dispatch), bu da küçük bir performans kaybına neden olabilir.
+ Ayrıca, any kullanıldığında, protokolün içindeki özelliklere doğrudan erişemezsin. Örneğin, aşağıdaki kod hata verir:
+ let image: any IRAssetsImagesProtocol = IRAssetsImages.Main.appIcon
+ print(image.image) // ❌ Hata! image özelliği çağrılamaz.
+ Çünkü any, tam türü bilmediği için doğrudan bu özelliğe erişemez.
+ 
+ Bu, setImage(_:) fonksiyonunun tek bir belirli tür kabul ettiğini ve geri kalan her şeyin derleyici tarafından belirleneceğini ifade eder.
+
+ some, aynı anda yalnızca tek bir türü kabul eder. Örneğin:
+ let image1: some IRAssetsImagesProtocol = IRAssetsImages.Main.appIcon // ✅ Geçerli
+ let image2: some IRAssetsImagesProtocol = IRAssetsImages.Dashboard.rickAndMorty // ✅ Geçerli
+ Ama:
+
+ let images: [some IRAssetsImagesProtocol] = [IRAssetsImages.Main.appIcon, IRAssetsImages.Dashboard.rickAndMorty] // ❌ Hata!
+ Çünkü some, farklı türleri tek bir değişkende saklamaya izin vermez.
+ 
+ some kullanıldığında, Swift o değişkenin türünü derleme anında bilir ve bu sayede doğrudan özelliklere erişebilirsin:
+ let image: some IRAssetsImagesProtocol = IRAssetsImages.Main.appIcon
+ print(image.image) // ✅ Çalışır!
+ 
+ Çünkü some, çağrıldığı yerde türü kesin olarak belirlediği için dinamik değil, statik olarak bağlanır (static dispatch). Bu da daha hızlıdır.
+ 
+*/

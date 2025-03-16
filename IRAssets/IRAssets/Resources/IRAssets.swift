@@ -1,19 +1,39 @@
 //
-//  IRAssets.swift
+//  IRAssetsImages.swift
 //  IRAssets
 //
 //  Created by Ömer Faruk Öztürk on 14.03.2025.
 //
 
-import Foundation
+//TODO: Bu modül için R swift ya da SwiftGen tarzı bir kütüphane ile yönetilecek.
 
-public final class IRAssets {
-    public static let bundle: Bundle = {
-        return Bundle(for: IRAssetsHelper.self)
-    }()
+import UIKit
+
+public protocol IRAssetsRawRepresentable: RawRepresentable where RawValue == String { }
+
+public extension IRAssetsRawRepresentable {
+    var image: UIImage {
+        //Eğer farklı modülden bakarsak .module'u görüyor.
+        UIImage(named: rawValue, in: .module, compatibleWith: nil) ?? UIImage(systemName: "exclamationmark.triangle")!
+    }
+    
+    var formatted: String {
+        rawValue
+            .replacingOccurrences(of: "([a-z])([A-Z])", with: "$1 $2", options: .regularExpression)
+            .capitalized
+    }
 }
 
-private final class IRAssetsHelper {}
+public enum IRAssets {
+    public enum Main: String, IRAssetsRawRepresentable {
+        case iOSRoadmap
+    }
+    
+    public enum Dashboard: String, IRAssetsRawRepresentable {
+        case rickAndMorty
+        case jsonPlaceHolder
+    }
+}
 
 /*
  

@@ -19,19 +19,22 @@ final class IRDashboardController: IRViewsBaseTableViewController {
             IRViewsBaseTableSectionBuilder()
                 .add(.imageButtonViews(
                     [
-                        .init(image: IRAssetsImages.Dashboard.jsonPlaceHolder, title: IRAssetsStrings.Dashboard.jsonPlaceHolder) {
-                            print("Tapped")
-                        },
-                        .init(image: IRAssetsImages.Dashboard.rickAndMorty, title: IRAssetsStrings.Dashboard.rickAndMorty) {
-                            print("Tapped Rick And Morty")
-                        }
+                        .init(
+                            assetsImage: IRAssets.Dashboard.rickAndMorty,
+                            assetsTitle: IRAssets.Dashboard.rickAndMorty,
+                            handler: {
+                                print("Tapped Rick And Morty")
+                            }
+                        ),
+                        .init(
+                            assetsImage: IRAssets.Dashboard.jsonPlaceHolder,
+                            assetsTitle: IRAssets.Dashboard.jsonPlaceHolder,
+                            handler: {
+                                print("Tapped Rick And Morty")
+                            }
+                        ),
                     ]
                 ))
-                .add(.imageButtonViews([
-                    .init(image: IRAssetsImages.Main.appIcon, title: "asd") {
-                        print("asd")
-                    }
-                ]))
                 .build()
         ]
     }

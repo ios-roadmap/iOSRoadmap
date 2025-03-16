@@ -21,9 +21,12 @@ let package = Package(
         .target(
             name: "IRAssets",
             dependencies: [
-
+                
             ],
-            path: "IRAssets"
+            path: "IRAssets",
+            resources: [
+                .process("Resources/IRMedia.xcassets")
+            ]
         ),
     ]
 )
