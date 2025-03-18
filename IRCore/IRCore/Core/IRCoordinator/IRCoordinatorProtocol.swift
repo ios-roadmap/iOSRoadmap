@@ -9,78 +9,108 @@ import UIKit
 import IRCommon
 
 @MainActor
-public protocol IRCoordinatorProtocol: AnyObject {
-    
-    var navigationController: UINavigationController? { get set }
-    var parentCoordinator: IRCoordinatorProtocol? { get set }
-    var children: [any IRCoordinatorProtocol] { get set }
-    
-    @discardableResult
-    func start() -> UIViewController
-    
-    @discardableResult
-    func start(_ coordinator: IRCoordinatorProtocol) -> UIViewController
-    
-    func start(with window: UIWindow?)
-    
-    func startCoordinator(
-        _ coordinator: IRCoordinatorProtocol,
-        with method: IRCoordinatorPresentationMethod,
+public protocol IRCoreCoordinatorProtocol: Sendable {
+    func start()
+    func setupWindow(windowScene: UIWindowScene)
+    func startChildCoordinator(
+        _ coordinator: IRCoreCoordinatorProtocol,
+        with method: IRCoreCoordinator.IRCoordinatorPresentationMethod,
         animated: Bool,
-        completion: IRVoidHandler?
+        completion: (() -> Void)?
     )
-    
-    func navigationControllerForPresentation() -> UINavigationController
+    func stopChildCoordinator()
 }
 
-public extension IRCoordinatorProtocol {
-    func start(with window: UIWindow?) { }
-
-    @discardableResult
-    func start(_ coordinator: any IRCoordinatorProtocol) -> UIViewController {
-        print("Child: \(coordinator) added to parent: \(self)")
-        children.append(coordinator)
-        coordinator.parentCoordinator = self
-        return coordinator.start()
+open class IRCoreCoordinator: IRCoreCoordinatorProtocol {
+    
+    public var navigationController: UINavigationController?
+    private let navigationDelegate = IRNavigationControllerDelegate()
+    
+    private weak var parentCoordinator: IRCoreCoordinator?
+    public var childCoordinator: IRCoreCoordinator?
+    
+    public init(parent: IRCoreCoordinator? = nil) {
+        self.parentCoordinator = parent
+    }
+    
+    public enum IRCoordinatorPresentationMethod: Equatable {
+        case push
+        case present(UIModalPresentationStyle = .automatic)
     }
 
-    func startCoordinator(
-        _ coordinator: any IRCoordinatorProtocol,
+    open func start() {
+        fatalError("Subclasses should implement `start()`")
+    }
+
+    open func navigate(
+        to viewController: UIViewController,
+        with method: IRCoordinatorPresentationMethod = .push,
+        animated: Bool = true
+    ) {
+        switch method {
+        case .push:
+            navigationController?.pushViewController(viewController, animated: animated)
+        case .present(let style):
+            let navController = UINavigationController(rootViewController: viewController)
+            navController.modalPresentationStyle = style
+            navigationController?.present(navController, animated: animated)
+        }
+    }
+
+
+    open func pop(animated: Bool = true) {
+        if navigationController?.viewControllers.count ?? 0 > 1 {
+            navigationController?.popViewController(animated: animated)
+        } else {
+            stopChildCoordinator()
+        }
+    }
+
+    public var window: UIWindow?
+    public func setupWindow(windowScene: UIWindowScene) {
+        navigationController = UINavigationController()
+        
+        let window = UIWindow(windowScene: windowScene)
+        window.rootViewController = navigationController
+        window.makeKeyAndVisible()
+        self.window = window
+        
+        start()
+    }
+
+    public func startChildCoordinator(
+        _ coordinator: IRCoreCoordinatorProtocol,
         with method: IRCoordinatorPresentationMethod,
         animated: Bool,
         completion: (() -> Void)? = nil
     ) {
-        coordinator.navigationController = (method == .push) ? navigationController : coordinator.navigationControllerForPresentation()
-        let initialVC = start(coordinator)
+        guard let concreteCoordinator = coordinator as? IRCoreCoordinator else {
+            fatalError("Coordinator is not a subclass of IRCoreCoordinator")
+        }
 
+        // Koordinatörü Dependency Container’a strong olarak kaydediyoruz
+        IRCoreDependencyContainer.shared.register(concreteCoordinator, strong: true)
+        
         switch method {
         case .push:
-            navigationController?.pushViewController(initialVC, animated: animated)
+            concreteCoordinator.navigationController = self.navigationController
+            concreteCoordinator.start()
         case .present(let style):
-            coordinator.navigationController?.viewControllers = [initialVC]
-            coordinator.navigationController?.modalPresentationStyle = style
-            navigationController?.present(coordinator.navigationController!, animated: animated, completion: completion)
+            let navController = UINavigationController(rootViewController: concreteCoordinator.navigationController!)
+            navController.modalPresentationStyle = style
+            self.navigationController?.present(navController, animated: animated)
         }
     }
 
-    func navigationControllerForPresentation() -> UINavigationController {
-        UINavigationController()
-    }
-}
+    public func stopChildCoordinator() {
+        childCoordinator?.navigationController?.dismiss(animated: true)
 
-
-public enum IRCoordinatorPresentationMethod: Equatable {
-    case push
-    case present(UIModalPresentationStyle)
-
-    public static func == (lhs: IRCoordinatorPresentationMethod, rhs: IRCoordinatorPresentationMethod) -> Bool {
-        switch (lhs, rhs) {
-        case (.push, .push):
-            return true
-        case (.present(let lhsStyle), .present(let rhsStyle)):
-            return lhsStyle == rhsStyle
-        default:
-            return false
+        // Dependency Container’dan koordinatörü kaldır
+        if let coordinator = childCoordinator {
+            IRCoreDependencyContainer.shared.unregister(type(of: coordinator))
         }
+
+        childCoordinator = nil
+        IRCoreDependencyContainer.shared.debugPrint()
     }
 }

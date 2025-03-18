@@ -9,22 +9,10 @@ import UIKit
 import IRCore
 import IRJPHInterface
 
-@MainActor
-public protocol IRJPHNavigationLogic {
-    func logOut()
-}
-
-final class IRJPHCoordinator: IRBaseCoordinator, IRJPHInterface {
-
-    override func start() -> UIViewController {
-        let vc = IRJPHViewController()
-        vc.navigator = self
-        return vc
-    }
-}
-
-extension IRJPHCoordinator: IRJPHNavigationLogic {
-    func logOut() {
-        navigationController?.popViewController(animated: true)
+public class IRJPHCoordinator: IRCoreCoordinator, IRJPHInterface {
+    
+    public override func start() {
+        let dashboardVC = IRJPHViewController()
+        navigate(to: dashboardVC)
     }
 }

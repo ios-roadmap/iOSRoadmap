@@ -5,14 +5,14 @@
 //  Created by Ömer Faruk Öztürk on 19.02.2025.
 //
 
-import Foundation
+import UIKit
 import IRDashboardInterface
 
-@MainActor
-public class IRDashboardFactory: @preconcurrency IRDashboardFactoryProtocol {
-    public init() {}
+public class IRDashboardFactory: IRDashboardFactoryProtocol {
     
-    public func create() -> IRDashboardInterface {
+    public init() { }
+
+    public func create() -> any IRDashboardInterface {
         return IRDashboardCoordinator()
     }
 }

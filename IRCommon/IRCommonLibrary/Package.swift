@@ -12,7 +12,7 @@ let package = Package(
             targets: ["IRCommonLibrary"]),
     ],
     dependencies: [
-        .package(name: "IRAssets", path: "../../IRAssets")
+        
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -20,7 +20,7 @@ let package = Package(
         .target(
             name: "IRCommonLibrary",
             dependencies: [
-                "IRAssets"
+                
             ]
         ),
 

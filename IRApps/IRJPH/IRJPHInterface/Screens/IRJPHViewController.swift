@@ -6,13 +6,14 @@
 //
 
 import UIKit
-import IRCore
-import IRViews
 
-public final class IRJPHViewController: IRViewsBaseViewController {
+public final class IRJPHViewController: UIViewController {
+    
+//    public var navigator: IRJPHNavigationLogic?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
         view.backgroundColor = .red
     }
 }

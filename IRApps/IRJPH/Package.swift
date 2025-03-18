@@ -15,16 +15,15 @@ let package = Package(
             targets: ["IRJPH"]),
     ],
     dependencies: [
-        .package(
-            name: "IRJPHInterface",
-            path: "IRJPHInterface"
-        )
+        .package(name: "IRJPHInterface", path: "IRJPHInterface"),
+        .package(name: "IRViews", path: "../../IRViews")
     ],
     targets: [
         .target(
             name: "IRJPH",
             dependencies: [
-                "IRJPHInterface"
+                "IRJPHInterface",
+                "IRViews"
             ],
             path: "IRJPH"
         ),
