@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 public protocol IRJPHFactoryProtocol {
     func create() -> any IRJPHInterface
 }

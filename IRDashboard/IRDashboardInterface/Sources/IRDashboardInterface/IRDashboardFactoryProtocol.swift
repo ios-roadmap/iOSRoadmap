@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 public protocol IRDashboardFactoryProtocol {
     func create() -> any IRDashboardInterface
 }

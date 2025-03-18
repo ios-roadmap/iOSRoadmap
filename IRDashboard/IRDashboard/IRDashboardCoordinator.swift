@@ -5,34 +5,32 @@
 //  Created by Ömer Faruk Öztürk on 19.02.2025.
 //
 
-import UIKit
 import IRCore
+
 import IRDashboardInterface
-import IRJPH
+import IRJPHInterface
 
 @MainActor
-protocol IRDashboardNavigationLogic {
-    func navigationToJPHApp()
+protocol IRDashboardNavigateAppsProtocol {
+    func navigateToJPHApp()
 }
 
-typealias NavigationLogic = IRDashboardNavigationLogic
+typealias IRDashboardNavigationLogic = IRDashboardNavigateAppsProtocol
 
-public class IRDashboardCoordinator: IRBaseCoordinator, IRDashboardInterface {
+public class IRDashboardCoordinator: IRCoreCoordinator, IRDashboardInterface {
     
-    public override init() {
-        super.init()
-    }
+    @IRLazyInjected private var jphCoordinator: IRJPHInterface
     
-    public override func start() -> UIViewController {
-        let viewController = IRDashboardController()
-        viewController.navigator = self
-        return viewController
+    public override func start() {
+        let dashboardVC = IRDashboardController()
+        dashboardVC.navigator = self
+        navigate(to: dashboardVC, with: .push)
     }
 }
 
 extension IRDashboardCoordinator: IRDashboardNavigationLogic {
-    func navigationToJPHApp() {
-        let viewController = IRJPHViewController()
-        navigationController?.pushViewController(viewController, with: .zoom)
+    func navigateToJPHApp() {
+        childCoordinator = jphCoordinator as? IRCoreCoordinator
+        startChildCoordinator(jphCoordinator, with: .push, animated: true)
     }
 }

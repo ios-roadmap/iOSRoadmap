@@ -3,6 +3,7 @@
 
 import IRCore
 
-public protocol IRJPHInterface: IRCoordinatorProtocol {
+@MainActor
+public protocol IRJPHInterface: IRCoreCoordinatorProtocol {
     
 }

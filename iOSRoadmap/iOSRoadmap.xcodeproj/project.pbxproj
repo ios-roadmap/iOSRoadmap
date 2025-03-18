@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		646E72012D646A3D002CA668 /* IRLibraries in Frameworks */ = {isa = PBXBuildFile; productRef = 646E72002D646A3D002CA668 /* IRLibraries */; };
+		64DFEA7F2D8A11B60064B0C3 /* iOSRoadmapLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 64DFEA7E2D8A11B60064B0C3 /* iOSRoadmapLibrary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		646E71FF2D646A18002CA668 /* IRLibraries */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = IRLibraries; sourceTree = "<group>"; };
 		64B7127D2D5E685000C09C09 /* iOSRoadmap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSRoadmap.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		64DFEA7D2D8A116D0064B0C3 /* iOSRoadmapLibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = iOSRoadmapLibrary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -41,7 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				646E72012D646A3D002CA668 /* IRLibraries in Frameworks */,
+				64DFEA7F2D8A11B60064B0C3 /* iOSRoadmapLibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -58,7 +58,7 @@
 		64B712742D5E685000C09C09 = {
 			isa = PBXGroup;
 			children = (
-				646E71FF2D646A18002CA668 /* IRLibraries */,
+				64DFEA7D2D8A116D0064B0C3 /* iOSRoadmapLibrary */,
 				64B7127F2D5E685000C09C09 /* iOSRoadmap */,
 				640ED52F2D63E48100820794 /* Frameworks */,
 				64B7127E2D5E685000C09C09 /* Products */,
@@ -93,7 +93,7 @@
 			);
 			name = iOSRoadmap;
 			packageProductDependencies = (
-				646E72002D646A3D002CA668 /* IRLibraries */,
+				64DFEA7E2D8A11B60064B0C3 /* iOSRoadmapLibrary */,
 			);
 			productName = iOSRoadmap;
 			productReference = 64B7127D2D5E685000C09C09 /* iOSRoadmap.app */;
@@ -356,9 +356,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		646E72002D646A3D002CA668 /* IRLibraries */ = {
+		64DFEA7E2D8A11B60064B0C3 /* iOSRoadmapLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = IRLibraries;
+			productName = iOSRoadmapLibrary;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

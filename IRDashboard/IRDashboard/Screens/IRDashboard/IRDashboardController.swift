@@ -9,9 +9,11 @@ import UIKit
 import IRViews
 import IRAssets
 
+import IRCore
+
 final class IRDashboardController: IRViewsBaseTableViewController {
     
-    var navigator: NavigationLogic!
+    var navigator: IRDashboardNavigationLogic!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,7 +34,7 @@ final class IRDashboardController: IRViewsBaseTableViewController {
                             assetsImage: IRAssets.Dashboard.jsonPlaceHolder,
                             assetsTitle: IRAssets.Dashboard.jsonPlaceHolder,
                             handler: { [weak self] in
-                                self?.navigator.navigationToJPHApp()
+                                self?.navigator.navigateToJPHApp()
                             }
                         ),
                     ]
@@ -41,3 +43,5 @@ final class IRDashboardController: IRViewsBaseTableViewController {
         ]
     }
 }
+
+

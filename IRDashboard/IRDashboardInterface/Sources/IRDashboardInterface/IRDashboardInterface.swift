@@ -3,6 +3,7 @@
 
 import IRCore
 
-public protocol IRDashboardInterface: IRCoordinatorProtocol {
+@MainActor
+public protocol IRDashboardInterface: IRCoreCoordinatorProtocol {
     
 }
