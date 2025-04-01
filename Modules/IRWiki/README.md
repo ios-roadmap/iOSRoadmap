@@ -38,9 +38,12 @@ Offline destek sunmak için kullanılabilir.
 Kullanıcı oturum yönetimi, giriş ve çıkış işlemlerini kapsar.
 JWT, OAuth, Apple Sign-In, Firebase Auth gibi kimlik doğrulama yöntemlerini destekler.
 
-5️⃣ IRViews
+5️⃣ IRStyleKit
 Uygulamada tekrar kullanılabilir UI bileşenlerini içerir.
 Özel butonlar, input alanları, modallar gibi UI öğelerini barındırır.
+
+5️⃣ IRBaseUI
+Uygulamanın BaseUI'larının yönetildiği yapıdır.
 
 6️⃣ IRAssets
 Tüm renk, font, ikon ve görselleri merkezi bir noktada toplar.
@@ -194,201 +197,9 @@ Super App içindeki her mini-app bağımsız bir modül olmalı. Ana uygulamaya 
 🔹 Super App: Çekirdek uygulama (Ana yönlendirme, menü, login, bildirimler, ortak servisler)
 🔹 Mini-App’ler: Super App içinde çalışan bağımsız uygulamalar
 
-📌 Mini-App Örnekleri:
-
-IRFood 🍔 → Yemek siparişi uygulaması
-IRMarket 🛒 → Market alışverişi uygulaması
-IRTaksi 🚖 → Taksi çağırma uygulaması
-IRFinance 💳 → Bankacılık ve ödeme sistemi
-IRHealth 🏥 → Doktor randevu uygulaması
-
-```
-SuperApp/
-│── IRCore/
-│── IRNetworking/
-│── IRDatabase/
-│── IRAuth/
-│── IRCommon/
-│── IRAssets/
-│── IRFeatureFlags/
-│── Modules/
-│   │── IRFood/ 🍔 (Mini-App 1)
-│   │── IRMarket/ 🛒 (Mini-App 2)
-│   │── IRTaksi/ 🚖 (Mini-App 3)
-│   │── IRFinance/ 💳 (Mini-App 4)
-│   │── IRHealth/ 🏥 (Mini-App 5)
-│── App/
-│   │── AppDelegate.swift
-│   │── SceneDelegate.swift
-```
-Mini-app’lerin ana uygulama tarafından yüklenmesi gerektiğinde dinamik olarak yönetilmesi gerekir.
-Bu, Swift Package Manager (SPM), Dynamic Frameworks veya Remote Modules ile yapılabilir.
-
-2️⃣ Mini-App’lerin Yüklenmesi ve Yönetimi
-
-Super App içinde hangi mini-app'lerin yüklü olup olmayacağı dinamik olarak yönetilmeli.
-Bunu sağlamak için Feature Flag’ler, Dynamic Frameworks veya Remote Modules kullanılabilir.
-
-📌 Yöntem 1: Feature Flag ile Mini-App Yönetimi
-Super App, kullanıcıya gösterilecek mini-app’leri Remote Config veya Feature Flag ile belirleyebilir.
-
-📌 Yöntem 2: Dynamic Frameworks ile Mini-App’leri Yüklemek
-Bazı mini-app’ler sadece ihtiyacı olan kullanıcılar tarafından yüklenmeli (örneğin IRFinance sadece bankacılık hizmetleriyle ilgilenen kullanıcılara sunulmalı).
-
-3️⃣ Ortak Bileşenler ve Veri Paylaşımı
-
-Mini-App’lerin birbiriyle veri paylaşımı yapması gerekebilir. Ancak bunu doğrudan bağımlılık oluşturmadan yönetmek gerekir.
-
-📌 Yöntem 1: Centralized API (Ortak Servis Katmanı)
-
-Tüm mini-app’ler ortak bir veri katmanına bağlanır.
-IRNetworking veya IRDatabase modülleri merkezi bir API sağlar.
-
-
-```
-IRBase  
-│── IRCommon  
-│── IRCore  
-│    │── IRNetworking  
-│    │── IRDatabase  
-│    │── IRAuth  
-│    │── IRStorage  
-│    │── IRPermissions  
-│── IRAssets  
-│── IRViews  
-│── IRFeatureFlags  
-│── IRLogging  
-│── IRAnalytics  
-│── IRNotifications  
-│── IRLaunch  
-│    │── IRCore  
-│    │── IRAuth  
-│    │── IRLogin  
-│    │── IROnboarding  
-│── IRLogin  
-│    │── IRAuth  
-│    │── IRNetworking  
-│── IROnboarding  
-│    │── IRPermissions  
-│── IRDashboard  
-│    │── IRSearch  
-│    │── IRNotifications  
-│── IRSearch  
-│    │── IRNetworking  
-│── IRLogging  
-│    │── IRAnalytics  
-│    │── IRStorage  
-│── IRFeatureFlags  
-│── IRPermissions  
-│── IRStorage  
-```
-
-# 📌 Açıklamalar & En İyi Bağımlılık Yapısı
-
-1️⃣ IRBase:
-
-En temel modül, tüm diğer modüllerin en alt katmanıdır.
-Bağımsızdır, hiçbir modüle bağlı olmamalıdır.
-2️⃣ IRCommon:
-
-Yardımcı fonksiyonlar, extension'lar ve typealias’ler içerir.
-Bağımsız olmalı, hiçbir modüle bağımlı olmamalıdır.
-Diğer tüm modüller bunu kullanabilir.
-3️⃣ IRCore:
-
-Uygulamanın merkezi modülü ve kordinasyon noktasıdır.
-Networking, Database, Auth, Storage ve Permissions gibi altyapısal modülleri yönetir.
-IRCore’a bağlı olan modüller:
-IRNetworking, IRDatabase, IRAuth, IRStorage, IRPermissions
-Bağımlı olmaması gerekenler:
-IRLaunch, IRDashboard, IRLogin gibi daha üst seviye modüller bağımsız olmalı.
-4️⃣ IRNetworking & IRDatabase:
-
-Core’un altyapı modülleridir.
-IRCore’a bağlıdır, ancak geri dönüşümlü bir bağımlılık olmamalıdır.
-IRNetworking, API çağrılarını yönettiği için IRCore kullanır.
-5️⃣ IRAuth:
-
-Kullanıcı kimlik doğrulama sistemlerini yönetir.
-IRNetworking ve IRDatabase’e bağlıdır çünkü API ve lokal veritabanıyla iletişim kurar.
-6️⃣ IRStorage & IRPermissions:
-
-Bağımsız modüller olarak çalışmalıdır.
-IRCore kullanabilir, ancak diğer modüllere bağımlı olmamalıdır.
-7️⃣ IRLaunch:
-
-Uygulama açılışında hangi ekranın gösterileceğini yönetir.
-IRCore, IRAuth ve IRLogin’e bağlıdır.
-8️⃣ IRLogin:
-
-Giriş ve kayıt işlemlerini yönetir.
-IRAuth ve IRNetworking ile çalışmalıdır.
-9️⃣ IROnboarding:
-
-Yeni kullanıcılar için rehber ekranlarını içerir.
-IRPermissions ile bağımlı olmalıdır.
-🔟 IRDashboard:
-
-Uygulamanın ana ekranıdır, genellikle bir TabBar içerir.
-IRSearch ve IRNotifications’ı çağırabilir.
-1️⃣1️⃣ IRSearch:
-
-Genel arama fonksiyonlarını ve filtreleme işlemlerini kapsar.
-IRNetworking'e bağımlı olmalıdır.
-1️⃣2️⃣ IRLogging & IRAnalytics:
-
-Hata ayıklama ve kullanıcı aksiyonlarını takip eden modüllerdir.
-IRLogging → IRAnalytics bağımlılığı içerebilir.
-IRLogging, IRStorage ile entegre olmalıdır.
-
-Circular Dependency’den Kaçınma
-
-IRCore hiçbir zaman IRCommon’a bağımlı olmamalıdır.
-IRCore en üst düzey yönetici olmalıdır ve sadece altyapı modülleriyle konuşmalıdır.
-IRCommon, IRCore'u asla import etmemelidir!
-Bağımsız UI bileşenleri (IRViews, IRAssets) sadece görüntüleme amaçlı olmalı, hiçbir modüle bağımlı olmamalıdır.
-✅ Sonuç - En Temiz Modüler Bağımlılık Ağı
-
-Bu yapıyla:
-
-Her modül sadece ihtiyacı olan modüllere bağlı olur.
-Circular dependency oluşmaz.
-Bağımsız ve yönetilebilir modüler yapı elde edilir.
-Gelecekte yeni modüller kolayca eklenebilir.
-
 
 📌 Interface Modülleri Ne İşe Yarar?
 
 1️⃣ Bağımlılıkları azaltır → Modüller arası direkt bağımlılık yerine sadece protokol ile iletişim kurulur.
 2️⃣ Bağımsız geliştirme sağlar → Bir ekibin IRDashboardInterface, başka bir ekibin IRDashboard üzerinde çalışmasını sağlar.
 3️⃣ Mock ve test kolaylığı sunar → UI veya iş mantığı modüllerini mock’lamak kolaylaşır.
-
-```
-SuperApp/
-│── Packages/
-│   │── IRCore/
-│   │── IRCommon/
-│   │── IRNetworking/
-│   │── IRDatabase/
-│   │── IRAuth/
-│   │── IRStorage/
-│   │── IRViews/
-│   │── IRFeatureFlags/
-│── Modules/
-│   │── IRDashboard/
-│   │   │── Sources/
-│   │   │   │── IRDashboardCoordinator.swift
-│   │── IRDashboardInterface/  👈 Interface Modülü
-│   │   │── Sources/
-│   │   │   │── IRDashboardCoordinatorProtocol.swift
-│   │── IRLogin/
-│   │   │── Sources/
-│   │   │   │── IRLoginCoordinator.swift
-│   │── IRLoginInterface/  👈 Interface Modülü
-│   │   │── Sources/
-│   │   │   │── IRLoginCoordinatorProtocol.swift
-│── App/
-│   │── AppDelegate.swift
-│   │── SceneDelegate.swift
-│   │── AppCoordinator.swift
-```
