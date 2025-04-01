@@ -6,4 +6,4 @@
 - Amaç, kütüphaneyi bağımlılık haline getirmek değil, içindeki işe yarar kısımları projeye kazandırmak olmalı.  
 
 ## Module Design
-<img width="896" alt="Screenshot 2025-04-01 at 09 14 19" src="https://github.com/user-attachments/assets/5cc64197-2297-43a4-9fa3-636c01fd66e1" />
+![FigJam basics](https://github.com/user-attachments/assets/07986721-f39a-4954-8bcc-390284b9db6a)
