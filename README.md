@@ -6,3 +6,4 @@
 - Amaç, kütüphaneyi bağımlılık haline getirmek değil, içindeki işe yarar kısımları projeye kazandırmak olmalı.  
 - **Şu an için projede kullanımı onaylanan tek harici kütüphane:**  
   - **SnapKit**
+
