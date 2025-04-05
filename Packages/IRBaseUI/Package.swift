@@ -4,24 +4,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "IRBase",
+    name: "IRBaseUI",
     platforms: [.iOS(.v18)],
     products: [
         .library(
-            name: "IRBase",
-            targets: ["IRBase"]
-        ),
+            name: "IRBaseUI",
+            targets: ["IRBaseUI"]),
     ],
     dependencies: [
-//        .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.7.1")
+
     ],
     targets: [
         .target(
-            name: "IRBase",
+            name: "IRBaseUI",
             dependencies: [
-//                .product(name: "SnapKit", package: "SnapKit")
+                
             ],
-            path: "IRBase"
+            path: "IRBaseUI"
         ),
     ]
 )

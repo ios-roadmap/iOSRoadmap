@@ -12,14 +12,14 @@ let package = Package(
             targets: ["IRStyleKit"]),
     ],
     dependencies: [
-        .package(name: "IRBase", path: "../IRBase"),
+        .package(name: "IRBaseUI", path: "../IRBaseUI"),
         .package(name: "IRCore", path: "../IRCore"),
     ],
     targets: [
         .target(
             name: "IRStyleKit",
             dependencies: [
-                "IRBase",
+                "IRBaseUI",
                 "IRCore",
             ],
             path: "IRStyleKit"

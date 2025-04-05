@@ -9,7 +9,7 @@ import UIKit
 
 import IRCore
 import IRStyleKit
-import IRBase
+import IRBaseUI
 
 final class IRDashboardController: IRViewController {
     

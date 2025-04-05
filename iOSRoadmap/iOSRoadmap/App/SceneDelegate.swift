@@ -23,8 +23,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         
-        IRCoreDependencyContainer.shared.register(dashboardFactory)
-        IRCoreDependencyContainer.shared.register(jphFactory)
+        IRDependencyContainer.shared.register(dashboardFactory)
+        IRDependencyContainer.shared.register(jphFactory)
 
         let dashboardCoordinator = IRDashboardFactory().create()
         dashboardCoordinator.setupWindow(windowScene: windowScene)

@@ -1,8 +1,8 @@
 //
 //  IRTableViewCell.swift
-//  IRBase
+//  IRBaseUI
 //
-//  Created by Ömer Faruk Öztürk on 26.03.2025.
+//  Created by Ömer Faruk Öztürk on 5.04.2025.
 //
 
 import UIKit

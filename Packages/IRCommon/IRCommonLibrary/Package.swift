@@ -15,7 +15,7 @@ let package = Package(
         .package(name: "IRAssets", path: "../IRAssets"),
         .package(name: "IRCore", path: "../IRCore"),
         .package(name: "IRStyleKit", path: "../IRStyleKit"),
-        .package(name: "IRBase", path: "../IRBase"),
+        .package(name: "IRBaseUI", path: "../IRBaseUI"),
     ],
     targets: [
         .target(
@@ -24,7 +24,7 @@ let package = Package(
                 "IRAssets",
                 "IRCore",
                 "IRStyleKit",
-                "IRBase",
+                "IRBaseUI",
             ]
         ),
     ]
