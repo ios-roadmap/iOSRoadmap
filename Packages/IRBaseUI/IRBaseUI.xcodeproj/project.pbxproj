@@ -6,125 +6,62 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		64683A962D646329002ADCC2 /* IRNetworking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64683A6F2D646281002ADCC2 /* IRNetworking.framework */; };
-		64683A972D646329002ADCC2 /* IRNetworking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 64683A6F2D646281002ADCC2 /* IRNetworking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-/* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		64683A982D646329002ADCC2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 64683A662D646281002ADCC2 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 64683A6E2D646281002ADCC2;
-			remoteInfo = IRNetworking;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		64683A9A2D646329002ADCC2 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				64683A972D646329002ADCC2 /* IRNetworking.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
-		64683A6F2D646281002ADCC2 /* IRNetworking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRNetworking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		64683A802D646322002ADCC2 /* IRNetworkingDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRNetworkingDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6488243D2DA1B0B30029843B /* IRBaseUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRBaseUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		64683A742D646281002ADCC2 /* Exceptions for "IRNetworking" folder in "IRNetworking" target */ = {
+		648824422DA1B0B30029843B /* Exceptions for "IRBaseUI" folder in "IRBaseUI" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			publicHeaders = (
-				include/IRNetworking.h,
+				include/IRBaseUI.h,
 			);
-			target = 64683A6E2D646281002ADCC2 /* IRNetworking */;
-		};
-		64683A912D646323002ADCC2 /* Exceptions for "IRNetworkingDemo" folder in "IRNetworkingDemo" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 64683A7F2D646322002ADCC2 /* IRNetworkingDemo */;
+			target = 6488243C2DA1B0B30029843B /* IRBaseUI */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		64683A712D646281002ADCC2 /* IRNetworking */ = {
+		6488243F2DA1B0B30029843B /* IRBaseUI */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				64683A742D646281002ADCC2 /* Exceptions for "IRNetworking" folder in "IRNetworking" target */,
+				648824422DA1B0B30029843B /* Exceptions for "IRBaseUI" folder in "IRBaseUI" target */,
 			);
-			path = IRNetworking;
-			sourceTree = "<group>";
-		};
-		64683A812D646322002ADCC2 /* IRNetworkingDemo */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				64683A912D646323002ADCC2 /* Exceptions for "IRNetworkingDemo" folder in "IRNetworkingDemo" target */,
-			);
-			path = IRNetworkingDemo;
+			path = IRBaseUI;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		64683A6C2D646281002ADCC2 /* Frameworks */ = {
+		6488243A2DA1B0B30029843B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		64683A7D2D646322002ADCC2 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				64683A962D646329002ADCC2 /* IRNetworking.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		64683A652D646281002ADCC2 = {
+		648824332DA1B0B30029843B = {
 			isa = PBXGroup;
 			children = (
-				64683A712D646281002ADCC2 /* IRNetworking */,
-				64683A812D646322002ADCC2 /* IRNetworkingDemo */,
-				64683A952D646329002ADCC2 /* Frameworks */,
-				64683A702D646281002ADCC2 /* Products */,
+				6488243F2DA1B0B30029843B /* IRBaseUI */,
+				6488243E2DA1B0B30029843B /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		64683A702D646281002ADCC2 /* Products */ = {
+		6488243E2DA1B0B30029843B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				64683A6F2D646281002ADCC2 /* IRNetworking.framework */,
-				64683A802D646322002ADCC2 /* IRNetworkingDemo.app */,
+				6488243D2DA1B0B30029843B /* IRBaseUI.framework */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		64683A952D646329002ADCC2 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		64683A6A2D646281002ADCC2 /* Headers */ = {
+		648824382DA1B0B30029843B /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -134,101 +71,65 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		64683A6E2D646281002ADCC2 /* IRNetworking */ = {
+		6488243C2DA1B0B30029843B /* IRBaseUI */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 64683A752D646281002ADCC2 /* Build configuration list for PBXNativeTarget "IRNetworking" */;
+			buildConfigurationList = 648824432DA1B0B30029843B /* Build configuration list for PBXNativeTarget "IRBaseUI" */;
 			buildPhases = (
-				64683A6A2D646281002ADCC2 /* Headers */,
-				64683A6B2D646281002ADCC2 /* Sources */,
-				64683A6C2D646281002ADCC2 /* Frameworks */,
-				64683A6D2D646281002ADCC2 /* Resources */,
+				648824382DA1B0B30029843B /* Headers */,
+				648824392DA1B0B30029843B /* Sources */,
+				6488243A2DA1B0B30029843B /* Frameworks */,
+				6488243B2DA1B0B30029843B /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				64683A712D646281002ADCC2 /* IRNetworking */,
+				6488243F2DA1B0B30029843B /* IRBaseUI */,
 			);
-			name = IRNetworking;
+			name = IRBaseUI;
 			packageProductDependencies = (
 			);
-			productName = IRNetworking;
-			productReference = 64683A6F2D646281002ADCC2 /* IRNetworking.framework */;
+			productName = IRBaseUI;
+			productReference = 6488243D2DA1B0B30029843B /* IRBaseUI.framework */;
 			productType = "com.apple.product-type.framework";
-		};
-		64683A7F2D646322002ADCC2 /* IRNetworkingDemo */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 64683A922D646323002ADCC2 /* Build configuration list for PBXNativeTarget "IRNetworkingDemo" */;
-			buildPhases = (
-				64683A7C2D646322002ADCC2 /* Sources */,
-				64683A7D2D646322002ADCC2 /* Frameworks */,
-				64683A7E2D646322002ADCC2 /* Resources */,
-				64683A9A2D646329002ADCC2 /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				64683A992D646329002ADCC2 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				64683A812D646322002ADCC2 /* IRNetworkingDemo */,
-			);
-			name = IRNetworkingDemo;
-			packageProductDependencies = (
-			);
-			productName = IRNetworkingDemo;
-			productReference = 64683A802D646322002ADCC2 /* IRNetworkingDemo.app */;
-			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		64683A662D646281002ADCC2 /* Project object */ = {
+		648824342DA1B0B30029843B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
-					64683A6E2D646281002ADCC2 = {
+					6488243C2DA1B0B30029843B = {
 						CreatedOnToolsVersion = 16.0;
 						LastSwiftMigration = 1600;
 					};
-					64683A7F2D646322002ADCC2 = {
-						CreatedOnToolsVersion = 16.0;
-					};
 				};
 			};
-			buildConfigurationList = 64683A692D646281002ADCC2 /* Build configuration list for PBXProject "IRNetworking" */;
+			buildConfigurationList = 648824372DA1B0B30029843B /* Build configuration list for PBXProject "IRBaseUI" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 64683A652D646281002ADCC2;
+			mainGroup = 648824332DA1B0B30029843B;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 64683A702D646281002ADCC2 /* Products */;
+			productRefGroup = 6488243E2DA1B0B30029843B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				64683A6E2D646281002ADCC2 /* IRNetworking */,
-				64683A7F2D646322002ADCC2 /* IRNetworkingDemo */,
+				6488243C2DA1B0B30029843B /* IRBaseUI */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		64683A6D2D646281002ADCC2 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		64683A7E2D646322002ADCC2 /* Resources */ = {
+		6488243B2DA1B0B30029843B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -238,14 +139,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		64683A6B2D646281002ADCC2 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		64683A7C2D646322002ADCC2 /* Sources */ = {
+		648824392DA1B0B30029843B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -254,16 +148,8 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		64683A992D646329002ADCC2 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 64683A6E2D646281002ADCC2 /* IRNetworking */;
-			targetProxy = 64683A982D646329002ADCC2 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin XCBuildConfiguration section */
-		64683A762D646281002ADCC2 /* Debug */ = {
+		648824442DA1B0B30029843B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
@@ -287,7 +173,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRNetworking;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRBaseUI;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -298,7 +184,7 @@
 			};
 			name = Debug;
 		};
-		64683A772D646281002ADCC2 /* Release */ = {
+		648824452DA1B0B30029843B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
@@ -322,7 +208,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRNetworking;
+				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRBaseUI;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -332,7 +218,7 @@
 			};
 			name = Release;
 		};
-		64683A782D646281002ADCC2 /* Debug */ = {
+		648824462DA1B0B30029843B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -398,7 +284,7 @@
 			};
 			name = Debug;
 		};
-		64683A792D646281002ADCC2 /* Release */ = {
+		648824472DA1B0B30029843B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -457,93 +343,28 @@
 			};
 			name = Release;
 		};
-		64683A932D646323002ADCC2 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IRNetworkingDemo/Info.plist;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRNetworkingDemo;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		64683A942D646323002ADCC2 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IRNetworkingDemo/Info.plist;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.IRNetworkingDemo;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		64683A692D646281002ADCC2 /* Build configuration list for PBXProject "IRNetworking" */ = {
+		648824372DA1B0B30029843B /* Build configuration list for PBXProject "IRBaseUI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				64683A782D646281002ADCC2 /* Debug */,
-				64683A792D646281002ADCC2 /* Release */,
+				648824462DA1B0B30029843B /* Debug */,
+				648824472DA1B0B30029843B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		64683A752D646281002ADCC2 /* Build configuration list for PBXNativeTarget "IRNetworking" */ = {
+		648824432DA1B0B30029843B /* Build configuration list for PBXNativeTarget "IRBaseUI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				64683A762D646281002ADCC2 /* Debug */,
-				64683A772D646281002ADCC2 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		64683A922D646323002ADCC2 /* Build configuration list for PBXNativeTarget "IRNetworkingDemo" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				64683A932D646323002ADCC2 /* Debug */,
-				64683A942D646323002ADCC2 /* Release */,
+				648824442DA1B0B30029843B /* Debug */,
+				648824452DA1B0B30029843B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 64683A662D646281002ADCC2 /* Project object */;
+	rootObject = 648824342DA1B0B30029843B /* Project object */;
 }

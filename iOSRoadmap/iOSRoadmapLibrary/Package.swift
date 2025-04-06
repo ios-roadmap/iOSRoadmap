@@ -18,15 +18,15 @@ let package = Package(
     dependencies: [
         .package(
             name: "IRDashboard",
-            path: "../../IRDashboard"
+            path: "../../Modules/IRDashboard"
         ),
         .package(
             name: "IRJPH",
-            path: "../../IRApps/IRJPH"
+            path: "../../Apps/IRJPH"
         ),
         .package(
             name: "IRCore",
-            path: "../../IRCore"
+            path: "../../Packages/IRCore"
         )
     ],
     targets: [

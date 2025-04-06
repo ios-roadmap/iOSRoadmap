@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import IRBase
+import IRBaseUI
 
 @MainActor
 public enum IRTableViewCellItem {

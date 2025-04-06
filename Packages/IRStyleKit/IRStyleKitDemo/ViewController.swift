@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import IRBase
+import IRBaseUI
 import IRStyleKit
 
 final class ViewController: IRViewController {

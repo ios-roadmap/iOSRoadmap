@@ -4,24 +4,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "IRNetworking",
-    defaultLocalization: "en",
+    name: "IRBaseUI",
     platforms: [.iOS(.v18)],
     products: [
         .library(
-            name: "IRNetworking",
-            targets: ["IRNetworking"]),
+            name: "IRBaseUI",
+            targets: ["IRBaseUI"]),
     ],
     dependencies: [
-        
+
     ],
     targets: [
         .target(
-            name: "IRNetworking",
+            name: "IRBaseUI",
             dependencies: [
                 
             ],
-            path: "IRNetworking"
+            path: "IRBaseUI"
         ),
     ]
 )

@@ -5,7 +5,7 @@
 //  Created by Ömer Faruk Öztürk on 31.03.2025.
 //
 
-import IRBase
+import IRBaseUI
 
 @MainActor
 public class IRTableViewSectionBuilder {

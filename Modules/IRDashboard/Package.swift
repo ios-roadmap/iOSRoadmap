@@ -13,17 +13,19 @@ let package = Package(
             targets: ["IRDashboard"]),
     ],
     dependencies: [
+        .package(name: "IRCommon", path: "../../Packages/IRCommon"),
+        .package(name: "IRStyleKit", path: "../../Packages/IRStyleKit"),
         .package(name: "IRDashboardInterface", path: "IRDashboardInterface"),
-        .package(name: "IRViews", path: "../IRViews"),
-        .package(name: "IRJPHInterface", path: "../IRApps/IRJPH/IRJPHInterface")
+        .package(name: "IRJPHInterface", path: "../../Apps/IRJPH/IRJPHInterface"),
     ],
     targets: [
         .target(
             name: "IRDashboard",
             dependencies: [
+                "IRCommon",
+                "IRStyleKit",
                 "IRDashboardInterface",
-                "IRViews",
-                "IRJPHInterface"
+                "IRJPHInterface",
             ],
             path: "IRDashboard"
         ),
