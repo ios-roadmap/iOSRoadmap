@@ -12,7 +12,7 @@ import IRJPHInterface
 public class IRJPHCoordinator: IRCoordinator, IRJPHInterface {
     
     public override func start() {
-        let dashboardVC = IRJPHViewController()
+        let dashboardVC = IRJPHUserListRouter.build()
         navigate(to: dashboardVC)
     }
 }

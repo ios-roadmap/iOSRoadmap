@@ -44,7 +44,7 @@
 		64683A742D646281002ADCC2 /* Exceptions for "IRNetworking" folder in "IRNetworking" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			publicHeaders = (
-				IRNetworking.h,
+				include/IRNetworking.h,
 			);
 			target = 64683A6E2D646281002ADCC2 /* IRNetworking */;
 		};
