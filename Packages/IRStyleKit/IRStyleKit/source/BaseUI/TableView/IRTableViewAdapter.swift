@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 public final class IRTableViewAdapter: NSObject {
     private weak var tableView: UITableView?
     private var sections: [IRTableSection] = []

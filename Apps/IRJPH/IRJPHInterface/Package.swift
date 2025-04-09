@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "IRJPHInterface",
+    defaultLocalization: "en",
     platforms: [.iOS(.v18)],
     products: [
         .library(

@@ -29,29 +29,38 @@ import Foundation
 @MainActor
 public final class IRDependencyContainer {
     public static let shared = IRDependencyContainer()
-
-    private var weakRegistry = NSMapTable<NSString, AnyObject>(keyOptions: .strongMemory, valueOptions: .weakMemory)
-
+    
+    //Burada instance’ı değil, onu oluşturacak closure’ı tutuyorsun. Nesne henüz oluşturulmaz, sadece nasıl oluşturulacağı saklanır. resolve() çağrıldığında nesne o an yaratılır.
+    private var factoryRegistry = [String: () -> Any]()
+    /// 🤯 Ama neden? Şöyle yapsaydık olmaz mıydı?
+    /// private var factoryRegistry = [String: Any]()
+    /// Ve sonra:
+    /// register(IRJPHInterface.self, factory: IRJPHFactory().create())
+    ///
+    /// Evet olurdu ama bu durumda:
+    /// Tüm bağımlılıklar uygulama başlarken oluşturulur. Lifecycle kontrolü, performans ve testability kaybolur. Injection sırasında henüz ihtiyaç duyulmayan nesneler de yaratılmış olur. ❌ Özellikle view controller'lar gibi "heavy" objeleri eager olarak yaratmak istemezsin.
+    
     private init() {}
-
-    public func register<T>(_ dependency: T) {
+    
+    public func register<T>(_ type: T.Type, factory: @escaping () -> T) {
         let key = String(describing: T.self)
-        weakRegistry.setObject(dependency as AnyObject, forKey: key as NSString)
+        factoryRegistry[key] = factory
     }
-
-    public func resolve<T>() -> T? {
+    
+    public func resolve<T>() -> T {
         let key = String(describing: T.self)
-        return weakRegistry.object(forKey: key as NSString) as? T
+        guard let factory = factoryRegistry[key]?() as? T else {
+            fatalError("❗️Dependency for \(key) not registered.")
+        }
+        return factory
     }
-
+    
     public func unregister<T>(_ type: T.Type) {
         let key = String(describing: type)
-        weakRegistry.removeObject(forKey: key as NSString)
+        factoryRegistry.removeValue(forKey: key)
     }
-
+    
     public func debugPrint() {
-        print("🔍 Weak Registry: \(weakRegistry)")
+        print("🔍 Registered factories: \(factoryRegistry.keys)")
     }
 }
-
-

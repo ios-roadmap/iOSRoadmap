@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 public protocol IRCellViewModelProtocol {
     static var cellClass: IRBaseCell.Type { get }
     var reuseIdentifier: String { get }

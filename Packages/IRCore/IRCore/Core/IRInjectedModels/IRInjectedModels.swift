@@ -17,25 +17,14 @@ public struct IRLazyInjected<Service: Sendable> {
 
     public var wrappedValue: Service {
         mutating get {
-            if let service { return service }
-
-            guard let resolvedService: Service = container.resolve() else {
-                fatalError("❗ Service of type \(Service.self) could not be resolved!")
-            }
-
-            service = resolvedService
-            return service!
+            if let service { return service } // ✅ daha önce resolve edildiyse cache'liyoruz
+            let resolved: Service = container.resolve()
+            service = resolved
+            return resolved
         }
     }
-
-    public mutating func asyncWrappedValue() async -> Service {
-        if let service { return service }
-
-        guard let resolvedService: Service = container.resolve() else {
-            fatalError("❗ Service of type \(Service.self) could not be resolved!")
-        }
-
-        service = resolvedService
-        return service!
-    }
+    
+    // 👉 Bu tam anlamıyla lazy var gibi davranıyor, ama dependency injection ve property wrapper kombinasyonuyla.
 }
+
+

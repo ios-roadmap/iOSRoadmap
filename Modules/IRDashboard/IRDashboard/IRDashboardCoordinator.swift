@@ -31,6 +31,7 @@ public class IRDashboardCoordinator: IRCoordinator, IRDashboardInterface {
 extension IRDashboardCoordinator: IRDashboardNavigationLogic {
     func navigateToJPHApp() {
         childCoordinator = jphCoordinator as? IRCoordinator
+        //İşte burada wrappedValue tetiklenir, container.resolve() çağrılır ve factory devreye girer.
         startChildCoordinator(jphCoordinator, with: .push, animated: true)
     }
 }

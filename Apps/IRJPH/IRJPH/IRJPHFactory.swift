@@ -5,7 +5,6 @@
 //  Created by Ömer Faruk Öztürk on 16.03.2025.
 //
 
-import UIKit
 import IRJPHInterface
 
 public class IRJPHFactory: IRJPHFactoryProtocol {

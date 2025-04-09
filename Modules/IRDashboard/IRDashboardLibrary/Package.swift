@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "IRDashboardLibrary",
+    defaultLocalization: "en",
     platforms: [.iOS(.v18)],
     products: [
         .library(
@@ -16,18 +17,20 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "IRCommon", path: "../../../Packages/IRCommon"),
-        .package(name: "IRStyleKit", path: "../../../Packages/IRStyleKit"),
         .package(name: "IRDashboardInterface", path: "../IRDashboardInterface"),
         .package(name: "IRJPHInterface", path: "../../../Apps/IRJPH/IRJPHInterface"),
+        
+        //TODO: MUST DELETE
+        .package(name: "IRJPH", path: "../../../Apps/IRJPH"),
     ],
     targets: [
         .target(
             name: "IRDashboardLibrary",
             dependencies: [
                 "IRCommon",
-                "IRStyleKit",
                 "IRDashboardInterface",
                 "IRJPHInterface",
+                "IRJPH",
             ]
         )
     ]

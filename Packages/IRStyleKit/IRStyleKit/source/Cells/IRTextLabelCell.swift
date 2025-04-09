@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import IRBaseUI
 
 public final class IRTextCell: IRBaseCell {
     
