@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import IRNetworking
 import IRCore
 import IRDashboard
 import IRJPH
@@ -13,8 +14,6 @@ import IRJPH
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-    var dashboardFactory = IRDashboardFactory().create()
-    var jphFactory = IRJPHFactory().create()
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -23,8 +22,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         
-        IRDependencyContainer.shared.register(dashboardFactory)
-        IRDependencyContainer.shared.register(jphFactory)
+        IRDashboardDemoRegistrar.registerDepencies()
 
         let dashboardCoordinator = IRDashboardFactory().create()
         dashboardCoordinator.setupWindow(windowScene: windowScene)

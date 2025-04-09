@@ -25,7 +25,7 @@ open class IRViewController: UIViewController {
     }
 
     /// Lazy-loaded tableView. İlk erişimde yaratılır.
-    public var tableView: UITableView {
+    private var tableView: UITableView {
         if _tableView == nil {
             print("[BaseVC] Creating tableView")
             let tv = createTableView()

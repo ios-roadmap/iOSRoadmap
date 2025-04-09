@@ -6,20 +6,19 @@
 //
 
 import UIKit
+import IRNetworking
 
 // VIEW -> PRESENTER
 @MainActor
 protocol IRJPHUserListPresenterProtocol: AnyObject {
-    var response: [IRJPHUserListEntity.User] { get }
-
     func viewDidLoad()
-    func didSelectUser(at index: Int)
+    func didSelectUser(_ user: IRJPHUser)
 }
 
 // PRESENTER -> VIEW
 @MainActor
 protocol IRJPHUserListViewProtocol: AnyObject {
-    func showUsers(_ users: [IRJPHUserListEntity.User])
+    func showUsers(_ users: [IRJPHUser])
     func showError(_ message: String)
     func showLoading(_ isLoading: Bool)
 }
@@ -27,18 +26,18 @@ protocol IRJPHUserListViewProtocol: AnyObject {
 // PRESENTER -> INTERACTOR
 @MainActor
 protocol IRJPHUserListInteractorProtocol: AnyObject {
-    func fetchUsers()
+    func fetchUsers() async
 }
 
 // INTERACTOR -> PRESENTER (Interactor Output)
 @MainActor
 protocol IRJPHUserListInteractorOutput: AnyObject {
-    func usersFetched(_ response: [IRJPHUserListEntity.User])
+    func usersFetched(_ response: [IRJPHUser])
     func usersFetchFailed(_ error: Error)
 }
 
 // PRESENTER -> ROUTER
 @MainActor
 protocol IRJPHUserListRouterProtocol: AnyObject {
-    func navigateToUserDetail(user: IRJPHUserListEntity.User)
+    func navigateToUserDetail(user: IRJPHUser)
 }

@@ -13,8 +13,7 @@ final class IRJPHUserListRouter: IRJPHUserListRouterProtocol {
     weak var viewController: UIViewController?
     
     static func build() -> UIViewController {
-        let service = IRNetworkService(environment: .jsonPlaceholder)
-        let interactor = IRJPHUserListInteractor(service: service)
+        let interactor = IRJPHUserListInteractor()
         let presenter = IRJPHUserListPresenter()
         let router = IRJPHUserListRouter()
         let view = IRJPHUserListViewController()
@@ -29,12 +28,13 @@ final class IRJPHUserListRouter: IRJPHUserListRouterProtocol {
         return view
     }
     
-    func navigateToUserDetail(user: IRJPHUserListEntity.User) {
+    func navigateToUserDetail(user: IRJPHUser) {
         guard let sourceVC = viewController, let navigation = sourceVC.navigationController else {
             return
         }
         
-        let detailVC = UIViewController()
+        let detailVC = IRJPHUserDetailViewController()
+        detailVC.title = user.name
         navigation.pushViewController(detailVC, animated: true)
     }
 }

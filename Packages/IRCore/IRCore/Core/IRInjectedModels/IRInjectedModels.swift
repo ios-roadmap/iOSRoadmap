@@ -18,7 +18,7 @@ public struct IRLazyInjected<Service: Sendable> {
     public var wrappedValue: Service {
         mutating get {
             if let service { return service } // ✅ daha önce resolve edildiyse cache'liyoruz
-            let resolved: Service = container.resolve()
+            let resolved: Service = container.resolve(.module)
             service = resolved
             return resolved
         }

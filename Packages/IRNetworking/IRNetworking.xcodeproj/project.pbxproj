@@ -38,6 +38,7 @@
 /* Begin PBXFileReference section */
 		64683A6F2D646281002ADCC2 /* IRNetworking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRNetworking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		64683A802D646322002ADCC2 /* IRNetworkingDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRNetworkingDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6483077E2DA6F240000BC52A /* IRNetworkingLibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = IRNetworkingLibrary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -98,6 +99,7 @@
 		64683A652D646281002ADCC2 = {
 			isa = PBXGroup;
 			children = (
+				6483077E2DA6F240000BC52A /* IRNetworkingLibrary */,
 				64683A712D646281002ADCC2 /* IRNetworking */,
 				64683A812D646322002ADCC2 /* IRNetworkingDemo */,
 				64683A952D646329002ADCC2 /* Frameworks */,
@@ -266,7 +268,7 @@
 		64683A762D646281002ADCC2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -301,7 +303,7 @@
 		64683A772D646281002ADCC2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

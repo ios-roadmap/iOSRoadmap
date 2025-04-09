@@ -28,6 +28,12 @@ import Foundation
 
 @MainActor
 public final class IRDependencyContainer {
+    
+    private var registry: [IRContainerScope: [String: () -> Any]] = [
+        .module: [:],
+        .service: [:]
+    ]
+    
     public static let shared = IRDependencyContainer()
     
     //Burada instance’ı değil, onu oluşturacak closure’ı tutuyorsun. Nesne henüz oluşturulmaz, sadece nasıl oluşturulacağı saklanır. resolve() çağrıldığında nesne o an yaratılır.
@@ -42,15 +48,15 @@ public final class IRDependencyContainer {
     
     private init() {}
     
-    public func register<T>(_ type: T.Type, factory: @escaping () -> T) {
-        let key = String(describing: T.self)
-        factoryRegistry[key] = factory
+    public func register<T>(_ type: T.Type, scope: IRContainerScope, factory: @escaping () -> T) {
+        let key = String(describing: type)
+        registry[scope]?[key] = factory
     }
-    
-    public func resolve<T>() -> T {
+
+    public func resolve<T>(_ scope: IRContainerScope) -> T {
         let key = String(describing: T.self)
-        guard let factory = factoryRegistry[key]?() as? T else {
-            fatalError("❗️Dependency for \(key) not registered.")
+        guard let factory = registry[scope]?[key]?() as? T else {
+            fatalError("Dependency \(key) not registered in \(scope)")
         }
         return factory
     }
@@ -63,4 +69,9 @@ public final class IRDependencyContainer {
     public func debugPrint() {
         print("🔍 Registered factories: \(factoryRegistry.keys)")
     }
+}
+
+public enum IRContainerScope {
+    case module
+    case service
 }
