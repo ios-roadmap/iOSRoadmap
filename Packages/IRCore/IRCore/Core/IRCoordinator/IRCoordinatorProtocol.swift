@@ -88,7 +88,7 @@ open class IRCoordinator: IRCoordinatorProtocol {
         }
 
         // Koordinatörü Dependency Container’a strong olarak kaydediyoruz
-        IRDependencyContainer.shared.register(concreteCoordinator)
+        IRDependencyContainer.shared.register(IRCoordinator.self) { concreteCoordinator}
         
         switch method {
         case .push:

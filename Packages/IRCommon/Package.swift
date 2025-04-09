@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "IRCommon",
+    defaultLocalization: "en",
     platforms: [.iOS(.v18)],
     products: [
         .library(
@@ -15,7 +16,6 @@ let package = Package(
         .package(name: "IRAssets", path: "../IRAssets"),
         .package(name: "IRCore", path: "../IRCore"),
         .package(name: "IRStyleKit", path: "../IRStyleKit"),
-        .package(name: "IRBaseUI", path: "../IRBaseUI"),
         .package(name: "IRNetworking", path: "../IRNetworking"),
     ],
     targets: [
@@ -25,7 +25,6 @@ let package = Package(
                 "IRAssets",
                 "IRCore",
                 "IRStyleKit",
-                "IRBaseUI",
                 "IRNetworking",
             ],
             path: "IRCommon"

@@ -1,8 +1,8 @@
 //
 //  UIView+Extension.swift
-//  IRBaseUI
+//  IRStyleKit
 //
-//  Created by Ömer Faruk Öztürk on 5.04.2025.
+//  Created by Ömer Faruk Öztürk on 7.04.2025.
 //
 
 import UIKit

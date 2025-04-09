@@ -27,7 +27,7 @@ protocol IRJPHUserListViewProtocol: AnyObject {
 // PRESENTER -> INTERACTOR
 @MainActor
 protocol IRJPHUserListInteractorProtocol: AnyObject {
-    func fetchUsers() async
+    func fetchUsers()
 }
 
 // INTERACTOR -> PRESENTER (Interactor Output)

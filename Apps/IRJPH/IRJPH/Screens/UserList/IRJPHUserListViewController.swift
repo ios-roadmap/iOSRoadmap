@@ -6,9 +6,9 @@
 //
 
 import UIKit
-import IRBaseUI
+import IRStyleKit
 
-final class IRJPHUserListViewController: IRViewController {
+final class IRJPHUserListViewController: UIViewController {
     
     var presenter: IRJPHUserListPresenterProtocol?
     

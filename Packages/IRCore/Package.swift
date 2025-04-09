@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "IRCore",
+    defaultLocalization: "en",
     platforms: [.iOS(.v18)],
     products: [
         .library(

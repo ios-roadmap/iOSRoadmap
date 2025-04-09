@@ -15,13 +15,16 @@ final class IRJPHUserListInteractor: IRJPHUserListInteractorProtocol {
         self.service = service
     }
 
-    func fetchUsers() async {
+    func fetchUsers() {
         let request = IRJPHUserListEntity.UsersRequest()
-        do {
-            let response = try await service.performRequest(request)
-            output?.usersFetched(response)
-        } catch {
-            output?.usersFetchFailed(error)
+        Task {
+            do {
+                let response = try await service.performRequest(request)
+                output?.usersFetched(response)
+            } catch {
+                output?.usersFetchFailed(error)
+            }
         }
     }
+
 }

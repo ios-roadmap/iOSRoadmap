@@ -6,16 +6,15 @@
 //
 
 import UIKit
-import IRBaseUI
 
-public final class IRSpacerCell: IRTableViewCell {
+public final class IRSpacerCell: IRBaseCell {
 
-    private let spacerView = UIView()
-    private var heightConstraint: NSLayoutConstraint?
+    private let spacerView = IRSpacerView()
 
-    public override func setupViews() {
-        spacerView.translatesAutoresizingMaskIntoConstraints = false
+    public override func setup() {
+        super.setup()
         contentView.addSubview(spacerView)
+        spacerView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             spacerView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -23,31 +22,34 @@ public final class IRSpacerCell: IRTableViewCell {
             spacerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             spacerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
         ])
-
-        let height = spacerView.heightAnchor.constraint(equalToConstant: 0)
-        height.isActive = true
-        heightConstraint = height
     }
 
-    public override func configure(with item: any IRTableViewCellViewModelProtocol) {
-        guard let viewModel = item as? IRSpacerCellViewModel else { return }
-        heightConstraint?.constant = viewModel.height
-        spacerView.backgroundColor = viewModel.backgroundColor
+    public override func configureContent(with viewModel: IRBaseCellViewModel) {
+        guard let viewModel = viewModel as? IRSpacerCellViewModel else { return }
+        spacerView.configure(height: viewModel.height, backgroundColor: viewModel.backgroundColor)
     }
 }
 
-public final class IRSpacerCellViewModel: IRTableViewCellViewModelProtocol {
-    public typealias CellType = IRSpacerCell
+public final class IRSpacerCellViewModel: IRBaseCellViewModel {
+    public override class var cellClass: IRBaseCell.Type { IRSpacerCell.self }
 
-    let height: CGFloat
-    let backgroundColor: UIColor?
+    public let height: CGFloat
+    public let backgroundColor: UIColor?
 
-    public init(height: CGFloat, backgroundColor: UIColor? = nil) {
+    public init(
+        height: CGFloat,
+        backgroundColor: UIColor? = nil,
+        onSelect: (() -> Void)? = nil,
+        onPrefetch: (() -> Void)? = nil,
+        swipeActions: [IRSwipeAction]? = nil,
+        isSelectionEnabled: Bool = false
+    ) {
         self.height = height
         self.backgroundColor = backgroundColor
+        super.init(onSelect: onSelect, onPrefetch: onPrefetch, swipeActions: swipeActions, isSelectionEnabled: isSelectionEnabled)
     }
 
-    public func configure(_ cell: IRSpacerCell) {
-        cell.configure(with: self)
+    public override func configure(cell: IRBaseCell) {
+        super.configure(cell: cell)
     }
 }

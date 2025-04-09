@@ -14,7 +14,6 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "IRCommon", path: "../../Packages/IRCommon"),
-        .package(name: "IRStyleKit", path: "../../Packages/IRStyleKit"),
         .package(name: "IRDashboardInterface", path: "IRDashboardInterface"),
         .package(name: "IRJPHInterface", path: "../../Apps/IRJPH/IRJPHInterface"),
     ],
@@ -23,7 +22,6 @@ let package = Package(
             name: "IRDashboard",
             dependencies: [
                 "IRCommon",
-                "IRStyleKit",
                 "IRDashboardInterface",
                 "IRJPHInterface",
             ],

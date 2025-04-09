@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		640CCF922D82BD0F00FAD39D /* IRDashboardLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 640CCF912D82BD0F00FAD39D /* IRDashboardLibrary */; };
-		6420C2912D9BB30100EAA3CE /* IRDashboardDemoLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 6420C2902D9BB30100EAA3CE /* IRDashboardDemoLibrary */; };
 		643D42A32D63D20D0034B91C /* IRDashboardLibrary in Resources */ = {isa = PBXBuildFile; fileRef = 643D42A22D63D20D0034B91C /* IRDashboardLibrary */; };
 		64E1F2162D9B173B0056C623 /* IRDashboard.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 643D42392D63CD7E0034B91C /* IRDashboard.framework */; };
 		64E1F2172D9B173B0056C623 /* IRDashboard.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 643D42392D63CD7E0034B91C /* IRDashboard.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -21,13 +20,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 643D42562D63CDA70034B91C;
 			remoteInfo = IRDashboardDemo;
-		};
-		64E1F2182D9B173B0056C623 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 643D42302D63CD7E0034B91C /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 643D42382D63CD7E0034B91C;
-			remoteInfo = IRDashboard;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -64,7 +56,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				IRDashboardDemoLibrary,
 			);
 			target = 643D42562D63CDA70034B91C /* IRDashboardDemo */;
 		};
@@ -115,7 +106,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				64E1F2162D9B173B0056C623 /* IRDashboard.framework in Frameworks */,
-				6420C2912D9BB30100EAA3CE /* IRDashboardDemoLibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -223,14 +213,12 @@
 			buildRules = (
 			);
 			dependencies = (
-				64E1F2192D9B173B0056C623 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				643D42582D63CDA70034B91C /* IRDashboardDemo */,
 			);
 			name = IRDashboardDemo;
 			packageProductDependencies = (
-				6420C2902D9BB30100EAA3CE /* IRDashboardDemoLibrary */,
 			);
 			productName = IRDashboardDemo;
 			productReference = 643D42572D63CDA70034B91C /* IRDashboardDemo.app */;
@@ -336,11 +324,6 @@
 			isa = PBXTargetDependency;
 			target = 643D42562D63CDA70034B91C /* IRDashboardDemo */;
 			targetProxy = 64524F582D81B60800E4F866 /* PBXContainerItemProxy */;
-		};
-		64E1F2192D9B173B0056C623 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 643D42382D63CD7E0034B91C /* IRDashboard */;
-			targetProxy = 64E1F2182D9B173B0056C623 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -676,10 +659,6 @@
 		640CCF912D82BD0F00FAD39D /* IRDashboardLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = IRDashboardLibrary;
-		};
-		6420C2902D9BB30100EAA3CE /* IRDashboardDemoLibrary */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = IRDashboardDemoLibrary;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

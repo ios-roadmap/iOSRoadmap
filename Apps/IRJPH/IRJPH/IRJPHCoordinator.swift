@@ -5,9 +5,9 @@
 //  Created by Ömer Faruk Öztürk on 16.03.2025.
 //
 
-import UIKit
 import IRCore
 import IRJPHInterface
+import UIKit
 
 public class IRJPHCoordinator: IRCoordinator, IRJPHInterface {
     

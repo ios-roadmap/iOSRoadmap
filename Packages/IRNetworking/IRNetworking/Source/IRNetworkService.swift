@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 public protocol IRNetworkServiceProtocol {
     func performRequest<T: IRAPIRequest>(_ request: T) async throws -> T.Response
 }

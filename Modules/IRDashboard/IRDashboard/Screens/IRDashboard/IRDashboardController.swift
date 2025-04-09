@@ -6,36 +6,23 @@
 //
 
 import UIKit
-
-import IRCore
 import IRStyleKit
-import IRBaseUI
 
 final class IRDashboardController: IRViewController {
     
     var navigator: IRDashboardNavigationLogic!
     
-    lazy var tableView = IRTableView()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let section = IRTableViewSectionBuilder()
-            .add(.spacer(50, .red))
-            .build()
         
-        tableView.update(sections: [section])
-        tableView.backgroundColor = .green
-        
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        let section = IRTableSection(items: [
+            IRTextCellViewModel(text: "Json Place Holder", onSelect: { [weak self] in
+                self?.navigator.navigateToJPHApp()
+            })
         ])
-
+        
+        update(sections: [section])
     }
 }
 

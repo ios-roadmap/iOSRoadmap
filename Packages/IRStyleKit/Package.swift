@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "IRStyleKit",
+    defaultLocalization: "en",
     platforms: [.iOS(.v18)],
     products: [
         .library(
@@ -12,14 +13,12 @@ let package = Package(
             targets: ["IRStyleKit"]),
     ],
     dependencies: [
-        .package(name: "IRBaseUI", path: "../IRBaseUI"),
         .package(name: "IRCore", path: "../IRCore"),
     ],
     targets: [
         .target(
             name: "IRStyleKit",
             dependencies: [
-                "IRBaseUI",
                 "IRCore",
             ],
             path: "IRStyleKit"
