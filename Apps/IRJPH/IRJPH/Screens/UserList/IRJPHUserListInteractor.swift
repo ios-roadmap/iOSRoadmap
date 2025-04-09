@@ -6,24 +6,19 @@
 //
 
 import IRNetworking
+import IRCore
 
 final class IRJPHUserListInteractor: IRJPHUserListInteractorProtocol {
     weak var output: IRJPHUserListInteractorOutput?
-    private let service: IRNetworkServiceProtocol
+    
+    @IRService var userService: IRJPHUserServiceProtocol
 
-    init(service: IRNetworkServiceProtocol) {
-        self.service = service
-    }
-
-    func fetchUsers() {
-        let request = IRJPHUserListEntity.UsersRequest()
-        Task {
-            do {
-                let response = try await service.performRequest(request)
-                output?.usersFetched(response)
-            } catch {
-                output?.usersFetchFailed(error)
-            }
+    func fetchUsers() async {
+        do {
+            let users = try await userService.fetchUsers()
+            output?.usersFetched(users)
+        } catch {
+            output?.usersFetchFailed(error)
         }
     }
 
