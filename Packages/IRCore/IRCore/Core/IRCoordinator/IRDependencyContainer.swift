@@ -29,6 +29,11 @@ import Foundation
 @MainActor
 public final class IRDependencyContainer {
     
+    public enum IRContainerScope {
+        case module
+        case service
+    }
+    
     private var registry: [IRContainerScope: [String: () -> Any]] = [
         .module: [:],
         .service: [:]
@@ -65,13 +70,4 @@ public final class IRDependencyContainer {
         let key = String(describing: type)
         factoryRegistry.removeValue(forKey: key)
     }
-    
-    public func debugPrint() {
-        print("🔍 Registered factories: \(factoryRegistry.keys)")
-    }
-}
-
-public enum IRContainerScope {
-    case module
-    case service
 }

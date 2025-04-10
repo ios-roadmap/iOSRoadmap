@@ -20,8 +20,7 @@ public final class IRNetworkService: IRNetworkServiceProtocol {
     private let maxRetries: Int
     private let retryDelay: TimeInterval
     
-    public init(environment: IREnvironment,
-         session: URLSession = .shared,
+    public init(session: URLSession = .shared,
          authToken: String? = nil,
          timeout: TimeInterval = 10.0,
          maxRetries: Int = 3,
@@ -33,7 +32,7 @@ public final class IRNetworkService: IRNetworkServiceProtocol {
         self.retryDelay = retryDelay
     }
     
-    func setAuthToken(_ token: String?) {
+    private func setAuthToken(_ token: String?) {
         self.authToken = token
     }
     
@@ -159,7 +158,7 @@ public final class IRNetworkService: IRNetworkServiceProtocol {
         throw lastError ?? IRNetworkError.unknown(NSError(domain: "NetworkService", code: -1, userInfo: nil))
     }
     
-    func isRetriableError(_ error: Error) -> Bool {
+    private func isRetriableError(_ error: Error) -> Bool {
         if let urlError = error as? URLError {
             return urlError.code == .timedOut ||
             urlError.code == .networkConnectionLost ||
@@ -171,7 +170,7 @@ public final class IRNetworkService: IRNetworkServiceProtocol {
         return false
     }
     
-    func parseAPIErrorMessage(from data: Data) -> String? {
+    private func parseAPIErrorMessage(from data: Data) -> String? {
         if let errorResponse = try? JSONDecoder().decode(IRAPIErrorResponse.self, from: data) {
             return errorResponse.message ?? errorResponse.error
         }

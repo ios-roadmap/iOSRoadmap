@@ -52,21 +52,13 @@ public enum IRJsonPlaceHolderModels {
 }
 
 @MainActor
-public protocol IRJPHUserServiceProtocol {
+public protocol IRJsonPlaceHolderServiceProtocol {
     func fetchUsers() async throws -> [IRJsonPlaceHolderModels.User]
 }
 
-@MainActor
-public final class IRJsonPlaceHolderService: IRJPHUserServiceProtocol {
+public final class IRJsonPlaceHolderService: IRBaseService, IRJsonPlaceHolderServiceProtocol {
     
-    private let network: IRNetworkServiceProtocol
-
-    public init(network: IRNetworkServiceProtocol) {
-        self.network = network
-    }
-
-    public func fetchUsers() async throws -> [IRJsonPlaceHolderModels.User] {
-        let request = IRJsonPlaceHolderModels.UsersRequest()
-        return try await network.performRequest(request)
+    public func fetchUsers() async throws -> [IRJPHUser] {
+        try await execute(IRJsonPlaceHolderModels.UsersRequest())
     }
 }

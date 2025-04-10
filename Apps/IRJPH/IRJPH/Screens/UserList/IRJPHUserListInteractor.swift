@@ -11,7 +11,7 @@ import IRCore
 final class IRJPHUserListInteractor: IRJPHUserListInteractorProtocol {
     weak var output: IRJPHUserListInteractorOutput?
     
-    @IRService var userService: IRJPHUserServiceProtocol
+    @IRService var userService: IRJsonPlaceHolderServiceProtocol
 
     func fetchUsers() async {
         do {
