@@ -10,10 +10,10 @@ import Foundation
 @MainActor
 @propertyWrapper
 public struct IRService<Service> {
-    private let scope: IRContainerScope
+    private let scope: IRDependencyContainer.IRContainerScope
     private var service: Service?
 
-    public init(scope: IRContainerScope = .service) {
+    public init(scope: IRDependencyContainer.IRContainerScope = .service) {
         self.scope = scope
     }
 

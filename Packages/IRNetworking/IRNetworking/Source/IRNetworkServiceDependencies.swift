@@ -11,9 +11,6 @@ import IRCore
 public enum IRNetworkServiceDependencies {
     
     public static func register() {
-        IRDependencyContainer.shared.register(IRJPHUserServiceProtocol.self, scope: .service) {
-            let networkService = IRNetworkService(environment: .jsonPlaceholder)
-            return IRJsonPlaceHolderService(network: networkService)
-        }
+        IRDependencyContainer.shared.register(IRJsonPlaceHolderServiceProtocol.self, scope: .service) { IRJsonPlaceHolderService() }
     }
 }

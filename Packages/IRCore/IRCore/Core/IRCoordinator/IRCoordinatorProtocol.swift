@@ -110,6 +110,5 @@ open class IRCoordinator: IRCoordinatorProtocol {
         }
 
         childCoordinator = nil
-        IRDependencyContainer.shared.debugPrint()
     }
 }

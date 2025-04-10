@@ -35,3 +35,4 @@ extension IRDashboardCoordinator: IRDashboardNavigationLogic {
         startChildCoordinator(jphCoordinator, with: .push, animated: true)
     }
 }
+
