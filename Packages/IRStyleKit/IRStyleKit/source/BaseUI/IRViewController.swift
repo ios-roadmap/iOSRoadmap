@@ -73,7 +73,7 @@ open class IRViewController: UIViewController {
     private func createTableView() -> UITableView {
         let tv = UITableView()
         tv.translatesAutoresizingMaskIntoConstraints = false
-        tv.separatorStyle = .none
+        tv.separatorStyle = .singleLine
         tv.backgroundColor = .clear
         tv.rowHeight = UITableView.automaticDimension
         tv.estimatedRowHeight = 60
