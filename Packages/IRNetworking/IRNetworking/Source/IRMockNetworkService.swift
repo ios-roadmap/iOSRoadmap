@@ -8,41 +8,29 @@
 import Foundation
 
 public final class MockNetworkService: IRNetworkServiceProtocol {
-    
-    var nextData: Data?
-    var nextError: Error?
-    private var responseMap: [String: Data] = [:]
-    private var errorMap: [String: Error] = [:]
+    private var mockResponses: [String: Data] = [:]
 
-    func registerMockResponse(path: String, data: Data) {
-        responseMap[path] = data
-    }
+    public init() {}
 
-    func registerMockError(path: String, error: Error) {
-        errorMap[path] = error
-    }
-
-    func registerMockResponse(fromFile fileName: String, forPath path: String, bundle: Bundle = .main) {
-        if let url = bundle.url(forResource: fileName, withExtension: "json") {
-            responseMap[path] = try? Data(contentsOf: url)
+    public func registerMock(fromFileNamed fileName: String,
+                             forPath path: String,
+                             bundle: Bundle) {
+        guard let url = bundle.url(forResource: fileName, withExtension: "json"),
+              let data = try? Data(contentsOf: url) else {
+            assertionFailure("Mock JSON file \(fileName).json not found in bundle.")
+            return
         }
+        mockResponses[path] = data
     }
 
     public func performRequest<T: IRAPIRequest>(_ request: T) async throws -> T.Response {
-        if let error = errorMap[request.path] ?? nextError {
-            throw error
-        }
-        
-        if let data = responseMap[request.path] ?? nextData {
-            let decoder = JSONDecoder()
-            do {
-                let result = try decoder.decode(T.Response.self, from: data)
-                return result
-            } catch {
-                throw IRNetworkError.decodingError(error)
-            }
+        guard let data = mockResponses[request.path] else {
+            throw IRNetworkError.httpError(statusCode: 0, message: "No mock data registered for path: \(request.path)")
+//            throw IRNetworkError.invalidMockData("No mock data registered for path: \(request.path)")
         }
 
-        throw IRNetworkError.httpError(statusCode: 0, message: "No mock response for \(request.path)")
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return try decoder.decode(T.Response.self, from: data)
     }
 }
