@@ -40,25 +40,35 @@ public enum IRJsonPlaceHolderModels {
         public let address: Address?
         public let company: Company?
     }
+}
+
+public struct IRJPHUsersRequest: IRAPIRequest {
+    public typealias Response = [IRJPHUser]
     
-    public struct UsersRequest: IRAPIRequest {
-        public typealias Response = [User]
-        
-        public var environment: IREnvironment { .jsonPlaceholder }
-        public var path: String { IREndpoints.JsonPlaceHolder.users.path }
-        public var method: HTTPMethod { .get }
-        public var requiresAuth: Bool { false }
-    }
+    public var environment: IREnvironment { .jsonPlaceholder }
+    public var path: String { IREndpoints.JsonPlaceHolder.users.path }
+    public var method: HTTPMethod { .get }
+    public var requiresAuth: Bool { false }
 }
 
 @MainActor
 public protocol IRJsonPlaceHolderServiceProtocol {
-    func fetchUsers() async throws -> [IRJsonPlaceHolderModels.User]
+    func fetchUsers() async throws -> [IRJPHUser]
 }
 
 public final class IRJsonPlaceHolderService: IRBaseService, IRJsonPlaceHolderServiceProtocol {
-    
+
+    public override init(mocking path: String = IREndpoints.JsonPlaceHolder.users.path,
+                responseTypeName: String = "users",
+                bundle: Bundle = .main) {
+        super.init(mocking: path, responseTypeName: responseTypeName, bundle: bundle)
+    }
+
     public func fetchUsers() async throws -> [IRJPHUser] {
-        try await execute(IRJsonPlaceHolderModels.UsersRequest())
+        try await execute(IRJPHUsersRequest())
     }
 }
+
+import Foundation
+
+

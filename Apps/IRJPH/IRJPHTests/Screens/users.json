@@ -1,0 +1,25 @@
+[
+  {
+    "id": 1,
+    "name": "Ömer Faruk Öztürk",
+    "username": "iosroadmap",
+    "email": "contact@iosroadmap.com",
+    "address": {
+      "street": "OneDay",
+      "suite": "Hoping",
+      "city": "Istanbul",
+      "zipcode": "342312",
+      "geo": {
+        "lat": "-37.3159",
+        "lng": "81.1496"
+      }
+    },
+    "phone": "+90 543 123 32 32",
+    "website": "iosroadmap.com",
+    "company": {
+      "name": "iOSRoadmap",
+      "catchPhrase": "Master iOS: From A to Z",
+      "bs": "iR"
+    }
+  }
+]
