@@ -89,7 +89,7 @@ public final class IRCoachmarkView: UIView {
         button.backgroundColor = .orange
         button.layer.cornerRadius = 8
         button.layer.masksToBounds = true
-        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
+        button.configuration = .filled()
         return button
     }()
     
@@ -111,11 +111,37 @@ public final class IRCoachmarkView: UIView {
 }
 
 extension IRCoachmarkView {
+    
     private func setupUI() {
+        configureHierarchy()
+        configureLayout()
+        configureContent()
+        configureActions()
+        setupTriangleView()
+    }
+
+    private func configureHierarchy() {
         addSubview(clearView)
         addSubview(backgroundView)
         backgroundView.addSubview(containerView)
+        
+        containerView.addSubview(titleLabel)
+        containerView.addSubview(closeButton)
+        containerView.addSubview(seperatorView)
+        containerView.addSubview(descriptionLabel)
+        containerView.addSubview(actionButton)
 
+        if pageData.numberOfPages > 1 {
+            containerView.addSubview(pageControl)
+        }
+    }
+
+    private func configureLayout() {
+        layoutClearAndBackgroundViews()
+        layoutContainerSubviews()
+    }
+
+    private func layoutClearAndBackgroundViews() {
         switch pageData.direction {
         case .top:
             NSLayoutConstraint.activate([
@@ -149,13 +175,9 @@ extension IRCoachmarkView {
             containerView.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: Constants.Size.defaultPadding),
             containerView.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant: -Constants.Size.defaultPadding)
         ])
+    }
 
-        // MARK: - Title & Close
-        containerView.addSubview(titleLabel)
-        containerView.addSubview(closeButton)
-        containerView.addSubview(seperatorView)
-        containerView.addSubview(descriptionLabel)
-
+    private func layoutContainerSubviews() {
         titleLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         closeButton.setContentHuggingPriority(.required, for: .horizontal)
         closeButton.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -182,30 +204,7 @@ extension IRCoachmarkView {
             descriptionLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
         ])
 
-        closeButton.addAction { [weak self] in
-            guard let self else { return }
-            self.delegate?.closeDidTapped(self)
-        }
-
-        titleLabel.text = pageData.title
-        descriptionLabel.text = pageData.description
-
-        // MARK: - Action Button
-        containerView.addSubview(actionButton)
-        actionButton.setTitle(pageData.actionButtonTitle, for: .normal)
-        actionButton.setContentHuggingPriority(.required, for: .horizontal)
-        actionButton.contentHorizontalAlignment = .center
-
-        actionButton.addAction { [weak self] in
-            guard let self else { return }
-            self.delegate?.actionDidTapped(self, index: self.pageData.pageIndex)
-        }
-
         if pageData.numberOfPages > 1 {
-            containerView.addSubview(pageControl)
-            pageControl.numberOfPages = pageData.numberOfPages
-            pageControl.currentPage = pageData.pageIndex
-            
             NSLayoutConstraint.activate([
                 pageControl.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: Constants.Size.defaultPadding),
                 pageControl.leadingAnchor.constraint(equalTo: descriptionLabel.leadingAnchor),
@@ -214,7 +213,6 @@ extension IRCoachmarkView {
                 actionButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
                 actionButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
             ])
-
         } else {
             closeButton.isHidden = true
 
@@ -225,11 +223,31 @@ extension IRCoachmarkView {
                 actionButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
             ])
         }
-
-        setupTriangleView()
     }
 
+    private func configureContent() {
+        titleLabel.text = pageData.title
+        descriptionLabel.text = pageData.description
+        actionButton.setTitle(pageData.actionButtonTitle, for: .normal)
 
+        if pageData.numberOfPages > 1 {
+            pageControl.numberOfPages = pageData.numberOfPages
+            pageControl.currentPage = pageData.pageIndex
+        }
+    }
+
+    private func configureActions() {
+        closeButton.addAction { [weak self] in
+            guard let self else { return }
+            delegate?.closeDidTapped(self)
+        }
+
+        actionButton.addAction { [weak self] in
+            guard let self else { return }
+            delegate?.actionDidTapped(self, index: pageData.pageIndex)
+        }
+    }
+    
     func setupTriangleView() {
         let originX = pageData.triangleViewMidX - Constants.Size.defaultPadding - Constants.Size.triangleViewSize.width / 2
         let triangleView = IRTriangleView(frame: .init(origin: .init(x: originX, y: .zero), size: Constants.Size.triangleViewSize))
@@ -237,11 +255,11 @@ extension IRCoachmarkView {
         
         clearView.addSubview(triangleView)
     }
-    
+
     public func show() {
         fadeIn()
     }
-    
+
     public func hide() {
         fadeOut { [weak self] in
             self?.removeFromSuperview()
@@ -346,5 +364,41 @@ public extension UIView {
                 completion?()
             }
         )
+    }
+}
+
+extension UIView {
+    public enum FitOrientation {
+        case horizontal
+        case vertical
+        case horizontalAndVertical
+    }
+    
+    @discardableResult
+    public func fit(subView view: UIView, orientated orientation: FitOrientation = .horizontalAndVertical, withPadding padding: UIEdgeInsets = .zero) -> [NSLayoutConstraint] {
+        if view.superview != self {
+            self.addSubview(view)
+        }
+        
+        view.translatesAutoresizingMaskIntoConstraints = false
+        var constraints: [NSLayoutConstraint] = []
+        
+        if orientation == .horizontal || orientation == .horizontalAndVertical {
+            constraints.append(contentsOf: [
+                view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding.left),
+                view.rightAnchor.constraint(equalTo: rightAnchor, constant: -padding.right)
+            ])
+        }
+        
+        if orientation == .vertical || orientation == .horizontalAndVertical {
+            constraints.append(contentsOf: [
+                view.topAnchor.constraint(equalTo: topAnchor, constant: padding.top),
+                view.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding.bottom)
+            ])
+        }
+        
+        NSLayoutConstraint.activate(constraints)
+        
+        return constraints
     }
 }
