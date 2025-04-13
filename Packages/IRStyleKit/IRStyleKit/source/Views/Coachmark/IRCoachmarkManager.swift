@@ -1,208 +1,176 @@
 //
-//  IRCoachmarkManager.swift
-//  IRStyleKit
+//  CoachmarkManager.swift
+//  CoachmarksKit
 //
-//  Created by Ömer Faruk Öztürk on 12.04.2025.
+//  Created by Developer on 12.04.2025.
 //
 
 import UIKit
 
 public protocol IRCoachmarkManagerDelegate: AnyObject {
-    func coachmarkDidComplete()
-    func coachmarkDidCurrentPage(index: Int, coachmark: IRCoachmarkProtocol)
+    func coachmarksDidComplete()
+    func coachmark(didDisplayPage index: Int, coachmark: IRCoachmarkProtocol)
 }
 
 public extension IRCoachmarkManagerDelegate {
-    func coachmarkDidCurrentPage(index: Int, coachmark: IRCoachmarkProtocol) {
-        
-    }
+    func coachmark(didDisplayPage index: Int, coachmark: IRCoachmarkProtocol) { }
 }
 
 public final class IRCoachmarkManager: NSObject {
     
-    private var parentView: UIView!
-    private var coachmarks: [IRCoachmarkProtocol] = []
-    private var coachmarkDelay: CGFloat = .zero
+    // MARK: - Properties
+
+    private weak var parentView: UIView?
+    
+    private var coachmarkItems: [IRCoachmarkProtocol] = []
+    
+    private var delay: TimeInterval = 0.0
+    
     public private(set) var didSetupCoachmarks: Bool = false
+    public weak var delegate: IRCoachmarkManagerDelegate?
+    
+    public var coachmarksAlreadyShown: Bool = false
+    
     private let bundle: Bundle
     
-    private var isEnable: Bool {
-        guard let statusString = bundle.infoDictionary?["CoachmarkStatus"] as? String,
-              let status = CoachmarkStatus(rawValue: statusString) else {
-            return true
-        }
-        
-        return status.isEnabled
-    }
-    
-    private enum CoachmarkStatus: String {
-        case enabled = "NO"
-        case disabled = "YES"
-        
-        var isEnabled: Bool {
-            switch self {
-            case .enabled:
-                return true
-            case .disabled:
-                return false
-            }
-        }
-    }
-    
-    public weak var delegate: IRCoachmarkManagerDelegate?
-    public var coachmarkItemsAlreadyShown = false
+    // MARK: - Initialisation
     
     public init(bundle: Bundle = .main) {
         self.bundle = bundle
     }
     
-    public func setup(
-        coachmarks: [IRCoachmarkProtocol],
-        parentView: UIView
-    ) {
-        guard isEnable else {
+    // MARK: - Public Methods
+    
+    public func setupCoachmarks(_ items: [IRCoachmarkProtocol], on view: UIView) {
+        guard isCoachmarkEnabled else {
             return
         }
         
         didSetupCoachmarks = true
+        guard !items.isEmpty else { return }
         
-        guard !coachmarks.isEmpty else {
+        parentView = view
+        coachmarkItems = items
+        
+        if coachmarkItems.allSatisfy({ $0.hasBeenShown }) {
+            coachmarksAlreadyShown = true
+            delegate?.coachmarksDidComplete()
             return
         }
         
-        self.parentView = parentView
-        self.coachmarks = coachmarks
-        
-        guard !coachmarks.allSatisfy({ $0.didShow }) else {
-            coachmarkItemsAlreadyShown = true
-            delegate?.coachmarkDidComplete()
+        view.addDarkOverlay { [weak self] in
+            self?.displayCoachmark(at: 0)
+        }
+    }
+    
+    public func setDelay(_ delay: TimeInterval) {
+        self.delay = delay
+    }
+    
+    // MARK: - Private Methods
+    
+    private var isCoachmarkEnabled: Bool {
+        if let statusString = bundle.infoDictionary?["CoachmarkStatus"] as? String,
+           let status = CoachmarkStatus(rawValue: statusString.lowercased()) {
+            return status == .enabled
+        }
+        return true
+    }
+    
+    private enum CoachmarkStatus: String {
+        case enabled, disabled
+    }
+    
+    private func displayCoachmark(at index: Int) {
+        guard let view = parentView else { return }
+        guard let coachmark = coachmarkItems[safe: index] else {
+            view.removeDarkOverlay()
+            delegate?.coachmarksDidComplete()
             return
         }
         
-        parentView.addDarkView { [weak self] in
-            self?.showNext(index: 0)
-        }
-    }
-    
-    public func setCoachmarkDelay(coachmarkDelay: CGFloat) {
-        self.coachmarkDelay = coachmarkDelay
-    }
-    
-    public static func didShowCoachmark(key: String) -> Bool {
-        let userDefaultsValue = UserDefaults.standard.bool(forKey: Constants.baseKey + key)
-        return userDefaultsValue
-    }
-    
-    public func didShowCoachmarks(keys: [String]) -> Bool {
-        var isShowCoachmarks: [Bool] = []
-        keys.forEach {
-            let userDefaultsValue = UserDefaults.standard.bool(forKey: Constants.baseKey + $0)
-            isShowCoachmarks.append(userDefaultsValue)
-        }
+        delegate?.coachmark(didDisplayPage: index, coachmark: coachmark)
         
-        return !isShowCoachmarks.contains(false)
-    }
-    
-    public static func didShowAllCoachmarks(keys: [String]) -> Bool {
-        var isShowCoachmarks: Set<Bool> = []
-        keys.forEach {
-            let userDefaultsValue = UserDefaults.standard.bool(forKey: Constants.baseKey + $0)
-            isShowCoachmarks.insert(userDefaultsValue)
-        }
-        
-        return !isShowCoachmarks.contains(false)
-    }
-    
-    private func showNext(index: Int) {
-        guard let coachmark = coachmarks[safe: index] else {
-            parentView.removeDarkView()
-            delegate?.coachmarkDidComplete()
-            return
-        }
-
-        delegate?.coachmarkDidCurrentPage(index: index, coachmark: coachmark)
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + coachmarkDelay) { [weak self] in
-            guard let self else { return }
-
-            guard !coachmark.didShow else { // <-- 🔁 fix burada
-                self.showNext(index: index + 1)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self = self else { return }
+            
+            if coachmark.hasBeenShown {
+                self.displayCoachmark(at: index + 1)
                 return
             }
-
-            guard let snapshotView = coachmark.addSnapshot(to: self.parentView) else {
-                self.parentView.removeDarkView()
-                self.delegate?.coachmarkDidComplete()
+            
+            guard let snapshotView = coachmark.addSnapshot(to: view) else {
+                view.removeDarkOverlay()
+                self.delegate?.coachmarksDidComplete()
                 return
             }
-
-            let actionButtonTitle = self.coachmarks.count == 1
-                ? "Devam"
-                : index == self.coachmarks.count - 1 ? "Tamam" : "Devam"
-
+            
+            let actionTitle = (self.coachmarkItems.count == 1 || index == self.coachmarkItems.count - 1) ? "Done" : "Next"
+            
             let pageData = IRCoachmarkPageData(
                 title: coachmark.title,
                 description: coachmark.message,
-                numberOfPages: self.coachmarks.count,
+                totalPages: self.coachmarkItems.count,
                 pageIndex: index,
-                triangleViewMidX: snapshotView.frame.midX,
+                triangleMidX: snapshotView.frame.midX,
                 direction: coachmark.direction,
-                actionButtonTitle: actionButtonTitle
+                actionTitle: actionTitle
             )
-
+            
             let coachmarkView = IRCoachmarkView(pageData: pageData)
             coachmarkView.translatesAutoresizingMaskIntoConstraints = false
-            self.parentView.addSubview(coachmarkView)
-
-            var constraints: [NSLayoutConstraint] = [
-                coachmarkView.leftAnchor.constraint(equalTo: self.parentView.leftAnchor, constant: Constants.horizontalPadding),
-                coachmarkView.rightAnchor.constraint(equalTo: self.parentView.rightAnchor, constant: -Constants.horizontalPadding)
-            ]
-
+            view.addSubview(coachmarkView)
+            
+            NSLayoutConstraint.activate([
+                coachmarkView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.horizontalPadding),
+                coachmarkView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.horizontalPadding)
+            ])
+            
             switch coachmark.direction {
             case .top:
-                constraints.append(
+                NSLayoutConstraint.activate([
                     coachmarkView.topAnchor.constraint(equalTo: snapshotView.bottomAnchor, constant: Constants.verticalPadding)
-                )
+                ])
             case .bottom:
-                constraints.append(
+                NSLayoutConstraint.activate([
                     coachmarkView.bottomAnchor.constraint(equalTo: snapshotView.topAnchor, constant: -Constants.verticalPadding)
-                )
+                ])
             }
-
-            NSLayoutConstraint.activate(constraints)
-
+            
             coachmarkView.delegate = self
             coachmarkView.show()
         }
     }
-
 }
+
+// MARK: - CoachmarkViewDelegate
 
 extension IRCoachmarkManager: IRCoachmarkViewDelegate {
-    public func closeDidTapped(_ view: IRCoachmarkView) {
-        coachmarks.forEach {
-            $0.setShown()
-            view.hide()
-            parentView.removeSnapshots()
-            parentView.removeDarkView()
-            delegate?.coachmarkDidComplete()
+    public func closeTapped(on view: IRCoachmarkView) {
+        coachmarkItems.forEach {
+            $0.markAsShown()
         }
+        view.hide()
+        parentView?.removeSnapshots()
+        parentView?.removeDarkOverlay()
+        delegate?.coachmarksDidComplete()
     }
     
-    public func actionDidTapped(_ view: IRCoachmarkView, index: Int) {
-        guard let coachmark = coachmarks[safe: index] else { return }
+    public func actionTapped(on view: IRCoachmarkView, pageIndex: Int) {
+        guard let coachmark = coachmarkItems[safe: pageIndex] else { return }
         
-        coachmark.setShown()
+        coachmark.markAsShown()
         view.hide()
-        parentView.removeSnapshots()
-        showNext(index: index + 1)
+        parentView?.removeSnapshots()
+        displayCoachmark(at: pageIndex + 1)
     }
 }
+
+// MARK: - Constants
 
 public extension IRCoachmarkManager {
     enum Constants {
-         public static let baseKey = "retailCoachmarkDidShow_"
+         public static let baseKey = "CoachmarkDidShow_"
          public static let horizontalPadding: CGFloat = 16
          public static let verticalPadding: CGFloat = 12
     }
