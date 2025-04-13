@@ -18,6 +18,7 @@ public enum IRMaskFormatterType {
     }
 }
 
+@MainActor
 protocol IRMaskFormatter {
     func format(text: String, with definition: IRMaskDefinition) -> String
 }

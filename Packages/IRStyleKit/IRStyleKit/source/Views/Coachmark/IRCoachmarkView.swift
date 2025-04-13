@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 public protocol IRCoachmarkViewDelegate: AnyObject {
     func actionTapped(on view: IRCoachmarkView, pageIndex: Int)
     func closeTapped(on view: IRCoachmarkView)

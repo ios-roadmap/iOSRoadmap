@@ -42,7 +42,7 @@ public enum IRJsonPlaceHolderModels {
     }
 }
 
-public struct IRJPHUsersRequest: IRAPIRequest {
+public struct IRJPHUsersRequest: IRAPIRequest, Sendable {
     public typealias Response = [IRJPHUser]
     
     public var environment: IREnvironment { .jsonPlaceholder }
@@ -58,17 +58,7 @@ public protocol IRJsonPlaceHolderServiceProtocol {
 
 public final class IRJsonPlaceHolderService: IRBaseService, IRJsonPlaceHolderServiceProtocol {
 
-    public override init(mocking path: String = IREndpoints.JsonPlaceHolder.users.path,
-                responseTypeName: String = "users",
-                bundle: Bundle = .main) {
-        super.init(mocking: path, responseTypeName: responseTypeName, bundle: bundle)
-    }
-
     public func fetchUsers() async throws -> [IRJPHUser] {
         try await execute(IRJPHUsersRequest())
     }
 }
-
-import Foundation
-
-
