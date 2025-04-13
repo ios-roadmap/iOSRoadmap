@@ -30,7 +30,7 @@ final class IRJPHUserListPresenter: IRJPHUserListPresenterProtocol, IRJPHUserLis
 
     func usersFetchFailed(_ error: Error) {
         view?.showLoading(false)
-        view?.showError("Failed to fetch users. Please try again.")
+        view?.showError(error.localizedDescription)
     }
 
     func didSelectUser(_ user: IRJPHUser) {
