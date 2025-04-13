@@ -7,6 +7,7 @@
 
 import UIKit
 
+@MainActor
 public protocol IRCoachmarkProtocol {
     var key: String { get }
     var ownerView: UIView { get }
@@ -14,6 +15,22 @@ public protocol IRCoachmarkProtocol {
     var message: String { get }
     var snapshotMargin: UIEdgeInsets { get }
     var direction: IRCoachmarkDirection { get }
+}
+
+@MainActor
+public extension IRCoachmarkProtocol {
+    var hasBeenShown: Bool {
+//        UserDefaults.standard.bool(forKey: "\(CoachmarkManager.Constants.baseKey)\(key)")
+        return false
+    }
+    
+    func markAsShown() {
+//        UserDefaults.standard.set(true, forKey: "\(CoachmarkManager.Constants.baseKey)\(key)")
+    }
+    
+    func addSnapshot(to parentView: UIView) -> UIView? {
+        parentView.addSnapshot(of: ownerView, with: snapshotMargin)
+    }
 }
 
 public struct IRCoachmark: IRCoachmarkProtocol {
@@ -36,19 +53,4 @@ public struct IRCoachmark: IRCoachmarkProtocol {
 
 public enum IRCoachmarkDirection {
     case top, bottom
-}
-
-public extension IRCoachmarkProtocol {
-    var hasBeenShown: Bool {
-//        UserDefaults.standard.bool(forKey: "\(CoachmarkManager.Constants.baseKey)\(key)")
-        return false
-    }
-    
-    func markAsShown() {
-//        UserDefaults.standard.set(true, forKey: "\(CoachmarkManager.Constants.baseKey)\(key)")
-    }
-    
-    func addSnapshot(to parentView: UIView) -> UIView? {
-        parentView.addSnapshot(of: ownerView, with: snapshotMargin)
-    }
 }

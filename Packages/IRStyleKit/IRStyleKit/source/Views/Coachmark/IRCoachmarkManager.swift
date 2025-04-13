@@ -7,15 +7,18 @@
 
 import UIKit
 
+@MainActor
 public protocol IRCoachmarkManagerDelegate: AnyObject {
     func coachmarksDidComplete()
     func coachmark(didDisplayPage index: Int, coachmark: IRCoachmarkProtocol)
 }
 
+@MainActor
 public extension IRCoachmarkManagerDelegate {
     func coachmark(didDisplayPage index: Int, coachmark: IRCoachmarkProtocol) { }
 }
 
+@MainActor
 public final class IRCoachmarkManager: NSObject {
     
     // MARK: - Properties
