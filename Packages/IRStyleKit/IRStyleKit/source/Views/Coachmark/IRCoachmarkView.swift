@@ -1,42 +1,59 @@
 //
-//  IRCoachmarkView.swift
-//  IRStyleKit
+//  CoachmarkView.swift
+//  CoachmarksKit
 //
-//  Created by Ömer Faruk Öztürk on 11.04.2025.
+//  Created by Developer on 11.04.2025.
 //
 
 import UIKit
 
 public protocol IRCoachmarkViewDelegate: AnyObject {
-    func actionDidTapped(_ view: IRCoachmarkView, index: Int)
-    func closeDidTapped(_ view: IRCoachmarkView)
+    func actionTapped(on view: IRCoachmarkView, pageIndex: Int)
+    func closeTapped(on view: IRCoachmarkView)
+}
+
+public struct IRCoachmarkPageData {
+    public let title: String
+    public let description: String
+    public let totalPages: Int
+    public let pageIndex: Int
+    public let triangleMidX: CGFloat
+    public let direction: IRCoachmarkDirection
+    public let actionTitle: String
+    
+    public init(
+        title: String,
+        description: String,
+        totalPages: Int = 1,
+        pageIndex: Int,
+        triangleMidX: CGFloat,
+        direction: IRCoachmarkDirection,
+        actionTitle: String
+    ) {
+        self.title = title
+        self.description = description
+        self.totalPages = totalPages
+        self.pageIndex = pageIndex
+        self.triangleMidX = triangleMidX
+        self.direction = direction
+        self.actionTitle = actionTitle
+    }
 }
 
 public final class IRCoachmarkView: UIView {
     
-    private let clearView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
+    // MARK: - UI Components
+    private let clearView = UIView()
     private let backgroundView: UIView = {
         let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.cornerRadius = Constants.Size.cornerRadius
         view.backgroundColor = Constants.Color.backgroundColor
         return view
     }()
     
-    private let containerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
+    private let containerView = UIView()
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.font = Constants.Font.titleLabelFont
         label.textColor = Constants.Color.titleLabelColor
         label.numberOfLines = 1
@@ -46,25 +63,23 @@ public final class IRCoachmarkView: UIView {
     
     private let closeButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Kapat", for: .normal)
-        button.setTitleColor(UIColor.purple, for: .normal)
+        button.setTitle("Close", for: .normal)
+        button.setTitleColor(.purple, for: .normal)
         button.titleLabel?.font = Constants.Font.titleLabelFont
-        button.translatesAutoresizingMaskIntoConstraints = false
         button.contentHorizontalAlignment = .right
+        button.contentEdgeInsets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)
         return button
     }()
     
-    private let seperatorView: UIView = {
+    private let separatorView: UIView = {
         let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = UIColor.gray
-        view.heightAnchor.constraint(equalToConstant: Constants.Size.seperatorViewHeight).isActive = true
+        view.backgroundColor = .gray
+        view.heightAnchor.constraint(equalToConstant: Constants.Size.separatorHeight).isActive = true
         return view
     }()
     
     private let descriptionLabel: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.font = Constants.Font.descriptionLabelFont
         label.textColor = Constants.Color.descriptionLabelColor
         label.numberOfLines = 0
@@ -73,75 +88,92 @@ public final class IRCoachmarkView: UIView {
     }()
     
     private let pageControl: UIPageControl = {
-        let pageControl = UIPageControl()
-        pageControl.translatesAutoresizingMaskIntoConstraints = false
-        pageControl.currentPageIndicatorTintColor = Constants.Color.titleLabelColor
-        pageControl.pageIndicatorTintColor = Constants.Color.pageIndicatorTintColor
-        pageControl.isUserInteractionEnabled = false
-        return pageControl
+        let control = UIPageControl()
+        control.currentPageIndicatorTintColor = Constants.Color.titleLabelColor
+        control.pageIndicatorTintColor = Constants.Color.pageIndicatorTintColor
+        control.isUserInteractionEnabled = false
+        return control
     }()
     
     private let actionButton: UIButton = {
         let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitleColor(Constants.Color.titleLabelColor, for: .normal)
         button.titleLabel?.font = Constants.Font.titleLabelFont
         button.backgroundColor = .orange
         button.layer.cornerRadius = 8
-        button.layer.masksToBounds = true
         button.configuration = .filled()
         return button
     }()
     
+    // MARK: - Properties
     
     public weak var delegate: IRCoachmarkViewDelegate?
     private var pageData: IRCoachmarkPageData
     
+    // MARK: - Initialisation
+    
     public init(pageData: IRCoachmarkPageData) {
         self.pageData = pageData
         super.init(frame: .zero)
-        
         isHidden = true
         setupUI()
     }
     
-    public required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) not implemented")
+    }
+    
+    // MARK: - Animations
+    
+    public func show() {
+        fadeIn()
+    }
+    
+    public func hide() {
+        fadeOut { [weak self] in
+            self?.removeFromSuperview()
+        }
     }
 }
 
-extension IRCoachmarkView {
+// MARK: - UI Setup
+
+private extension IRCoachmarkView {
     
-    private func setupUI() {
+    func setupUI() {
         configureHierarchy()
         configureLayout()
         configureContent()
         configureActions()
         setupTriangleView()
     }
-
-    private func configureHierarchy() {
+    
+    func configureHierarchy() {
+        clearView.translatesAutoresizingMaskIntoConstraints = false
+        backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        
         addSubview(clearView)
         addSubview(backgroundView)
         backgroundView.addSubview(containerView)
         
-        containerView.addSubview(titleLabel)
-        containerView.addSubview(closeButton)
-        containerView.addSubview(seperatorView)
-        containerView.addSubview(descriptionLabel)
-        containerView.addSubview(actionButton)
-
-        if pageData.numberOfPages > 1 {
+        [titleLabel, closeButton, separatorView, descriptionLabel, actionButton].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            containerView.addSubview($0)
+        }
+        
+        if pageData.totalPages > 1 {
+            pageControl.translatesAutoresizingMaskIntoConstraints = false
             containerView.addSubview(pageControl)
         }
     }
-
-    private func configureLayout() {
-        layoutClearAndBackgroundViews()
+    
+    func configureLayout() {
+        layoutClearAndBackground()
         layoutContainerSubviews()
     }
-
-    private func layoutClearAndBackgroundViews() {
+    
+    func layoutClearAndBackground() {
         switch pageData.direction {
         case .top:
             NSLayoutConstraint.activate([
@@ -149,26 +181,26 @@ extension IRCoachmarkView {
                 clearView.heightAnchor.constraint(equalToConstant: Constants.Size.clearViewHeight),
                 clearView.leadingAnchor.constraint(equalTo: leadingAnchor),
                 clearView.trailingAnchor.constraint(equalTo: trailingAnchor),
-
+                
                 backgroundView.topAnchor.constraint(equalTo: clearView.bottomAnchor),
                 backgroundView.leadingAnchor.constraint(equalTo: leadingAnchor),
                 backgroundView.trailingAnchor.constraint(equalTo: trailingAnchor),
-                backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor),
+                backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor)
             ])
         case .bottom:
             NSLayoutConstraint.activate([
                 backgroundView.topAnchor.constraint(equalTo: topAnchor),
                 backgroundView.leadingAnchor.constraint(equalTo: leadingAnchor),
                 backgroundView.trailingAnchor.constraint(equalTo: trailingAnchor),
-
+                
                 clearView.topAnchor.constraint(equalTo: backgroundView.bottomAnchor),
                 clearView.heightAnchor.constraint(equalToConstant: Constants.Size.clearViewHeight),
                 clearView.leadingAnchor.constraint(equalTo: leadingAnchor),
                 clearView.trailingAnchor.constraint(equalTo: trailingAnchor),
-                clearView.bottomAnchor.constraint(equalTo: bottomAnchor),
+                clearView.bottomAnchor.constraint(equalTo: bottomAnchor)
             ])
         }
-
+        
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: Constants.Size.defaultPadding),
             containerView.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor, constant: -Constants.Size.defaultPadding),
@@ -176,46 +208,45 @@ extension IRCoachmarkView {
             containerView.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant: -Constants.Size.defaultPadding)
         ])
     }
-
-    private func layoutContainerSubviews() {
+    
+    func layoutContainerSubviews() {
         titleLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         closeButton.setContentHuggingPriority(.required, for: .horizontal)
         closeButton.setContentCompressionResistancePriority(.required, for: .horizontal)
         closeButton.titleLabel?.lineBreakMode = .byTruncatingTail
-        closeButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)
-
+        
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 8),
             titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
             titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: closeButton.leadingAnchor, constant: -8),
-
+            
             closeButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
             closeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
             closeButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 60),
             closeButton.heightAnchor.constraint(equalToConstant: Constants.Size.closeButtonSize.height),
-
-            seperatorView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
-            seperatorView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            seperatorView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            seperatorView.heightAnchor.constraint(equalToConstant: Constants.Size.seperatorViewHeight),
-
-            descriptionLabel.topAnchor.constraint(equalTo: seperatorView.bottomAnchor, constant: Constants.Size.descriptionLabelTopPadding),
+            
+            separatorView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
+            separatorView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            separatorView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            separatorView.heightAnchor.constraint(equalToConstant: Constants.Size.separatorHeight),
+            
+            descriptionLabel.topAnchor.constraint(equalTo: separatorView.bottomAnchor, constant: Constants.Size.descriptionTopPadding),
             descriptionLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
             descriptionLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
         ])
-
-        if pageData.numberOfPages > 1 {
+        
+        if pageData.totalPages > 1 {
             NSLayoutConstraint.activate([
                 pageControl.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: Constants.Size.defaultPadding),
                 pageControl.leadingAnchor.constraint(equalTo: descriptionLabel.leadingAnchor),
-
+                
                 actionButton.centerYAnchor.constraint(equalTo: pageControl.centerYAnchor),
                 actionButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
                 actionButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
             ])
         } else {
             closeButton.isHidden = true
-
+            
             NSLayoutConstraint.activate([
                 actionButton.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: Constants.Size.defaultPadding),
                 actionButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
@@ -224,181 +255,90 @@ extension IRCoachmarkView {
             ])
         }
     }
-
-    private func configureContent() {
+    
+    func configureContent() {
         titleLabel.text = pageData.title
         descriptionLabel.text = pageData.description
-        actionButton.setTitle(pageData.actionButtonTitle, for: .normal)
-
-        if pageData.numberOfPages > 1 {
-            pageControl.numberOfPages = pageData.numberOfPages
+        actionButton.setTitle(pageData.actionTitle, for: .normal)
+        
+        if pageData.totalPages > 1 {
+            pageControl.numberOfPages = pageData.totalPages
             pageControl.currentPage = pageData.pageIndex
         }
     }
-
-    private func configureActions() {
+    
+    func configureActions() {
         closeButton.addAction { [weak self] in
-            guard let self else { return }
-            delegate?.closeDidTapped(self)
+            guard let self = self else { return }
+            self.delegate?.closeTapped(on: self)
         }
-
+        
         actionButton.addAction { [weak self] in
-            guard let self else { return }
-            delegate?.actionDidTapped(self, index: pageData.pageIndex)
+            guard let self = self else { return }
+            self.delegate?.actionTapped(on: self, pageIndex: self.pageData.pageIndex)
         }
     }
     
     func setupTriangleView() {
-        let originX = pageData.triangleViewMidX - Constants.Size.defaultPadding - Constants.Size.triangleViewSize.width / 2
-        let triangleView = IRTriangleView(frame: .init(origin: .init(x: originX, y: .zero), size: Constants.Size.triangleViewSize))
-        triangleView.direction = pageData.direction
+        let originX = pageData.triangleMidX - Constants.Size.defaultPadding - Constants.Size.triangleSize.width / 2
+        let triangleFrame = CGRect(origin: CGPoint(x: originX, y: 0), size: Constants.Size.triangleSize)
         
+        let triangleView = UIView(frame: triangleFrame)
+        triangleView.backgroundColor = .clear
+        triangleView.isUserInteractionEnabled = false
+        triangleView.tag = 999 
         clearView.addSubview(triangleView)
+
+        drawTriangle(in: triangleView, direction: pageData.direction)
     }
 
-    public func show() {
-        fadeIn()
-    }
+    func drawTriangle(in view: UIView, direction: IRCoachmarkDirection) {
+        let shapeLayer = CAShapeLayer()
+        let path = UIBezierPath()
+        let rect = view.bounds
+        let pointingUp = (direction == .top)
 
-    public func hide() {
-        fadeOut { [weak self] in
-            self?.removeFromSuperview()
+        if pointingUp {
+            path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.midX, y: rect.minY))
+        } else {
+            path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
         }
+        path.close()
+
+        shapeLayer.path = path.cgPath
+        shapeLayer.fillColor = UIColor.green.cgColor
+        view.layer.addSublayer(shapeLayer)
     }
 }
 
+// MARK: - Constants
+
 extension IRCoachmarkView {
-    private enum Constants {
+    enum Constants {
         enum Size {
-            static let seperatorViewHeight: CGFloat = 1
+            static let separatorHeight: CGFloat = 1
             static let clearViewHeight: CGFloat = 12
             static let cornerRadius: CGFloat = 4
-            static let triangleViewSize: CGSize = .init(width: 24, height: 12)
+            static let triangleSize = CGSize(width: 24, height: 12)
             static let defaultPadding: CGFloat = 16
-            static let closeButtonSize: CGSize = .init(width: 24, height: 24)
-            static let descriptionLabelTopPadding: CGFloat = 16
+            static let closeButtonSize = CGSize(width: 24, height: 24)
+            static let descriptionTopPadding: CGFloat = 16
         }
-
-
+        
         enum Color {
             static let backgroundColor = UIColor.green.withAlphaComponent(0.2)
             static let titleLabelColor = UIColor.black
             static let descriptionLabelColor = UIColor.darkGray
             static let pageIndicatorTintColor: UIColor = .lightGray
         }
-
         
         enum Font {
-            static let titleLabelFont: UIFont = .systemFont(ofSize: 17, weight: .medium)
-            static let descriptionLabelFont: UIFont = .systemFont(ofSize: 14)
+            static let titleLabelFont = UIFont.systemFont(ofSize: 17, weight: .medium)
+            static let descriptionLabelFont = UIFont.systemFont(ofSize: 14)
         }
-    }
-}
-
-final class IRTriangleView: UIView {
-    
-    var direction: IRCoachmarkDirection = .top
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        backgroundColor = .clear
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func draw(_ rect: CGRect) {
-        guard let context = UIGraphicsGetCurrentContext() else { return }
-        
-        let isDirectionUp = direction == .top
-        
-        context.beginPath()
-        context.move(to: CGPoint(x: rect.minX, y: isDirectionUp ? rect.maxY : rect.minY))
-        context.addLine(to: CGPoint(x: rect.maxX, y: isDirectionUp ? rect.maxY : rect.minY))
-        context.addLine(to: CGPoint(x: (rect.maxX / 2), y: isDirectionUp ? rect.minY : rect.maxY))
-        context.closePath()
-        
-        context.setFillColor(UIColor.green.cgColor)
-        context.fillPath()
-    }
-}
-
-public extension UIControl {
-    
-    @discardableResult
-    func addAction(for event: UIControl.Event = .touchUpInside, unparametrizedAction action: @escaping () -> Void) -> Any {
-        let uiAction = UIAction { _ in
-            action()
-        }
-        
-        addAction(uiAction, for: event)
-        return uiAction
-    }
-}
-
-public extension UIView {
-    func fadeIn(completion: (() -> Void)? = nil) {
-        alpha = 0
-        isHidden = false
-        
-        UIView.animate(
-            withDuration: 0.3,
-            animations: { [weak self] in
-                self?.alpha = 1
-            },
-            completion: { _ in
-                completion?()
-            }
-        )
-    }
-    
-    func fadeOut(completion: (() -> Void)? = nil) {
-        UIView.animate(
-            withDuration: 0.3,
-            animations: { [weak self] in
-                self?.alpha = 0
-            },
-            completion: { [weak self] _ in
-                self?.isHidden = true
-                completion?()
-            }
-        )
-    }
-}
-
-extension UIView {
-    public enum FitOrientation {
-        case horizontal
-        case vertical
-        case horizontalAndVertical
-    }
-    
-    @discardableResult
-    public func fit(subView view: UIView, orientated orientation: FitOrientation = .horizontalAndVertical, withPadding padding: UIEdgeInsets = .zero) -> [NSLayoutConstraint] {
-        if view.superview != self {
-            self.addSubview(view)
-        }
-        
-        view.translatesAutoresizingMaskIntoConstraints = false
-        var constraints: [NSLayoutConstraint] = []
-        
-        if orientation == .horizontal || orientation == .horizontalAndVertical {
-            constraints.append(contentsOf: [
-                view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding.left),
-                view.rightAnchor.constraint(equalTo: rightAnchor, constant: -padding.right)
-            ])
-        }
-        
-        if orientation == .vertical || orientation == .horizontalAndVertical {
-            constraints.append(contentsOf: [
-                view.topAnchor.constraint(equalTo: topAnchor, constant: padding.top),
-                view.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding.bottom)
-            ])
-        }
-        
-        NSLayoutConstraint.activate(constraints)
-        
-        return constraints
     }
 }
