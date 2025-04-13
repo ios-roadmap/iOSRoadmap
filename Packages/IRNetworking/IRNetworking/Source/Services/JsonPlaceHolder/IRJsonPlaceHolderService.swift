@@ -42,23 +42,19 @@ public enum IRJsonPlaceHolderModels {
     }
 }
 
-public struct IRJPHUsersRequest: IRAPIRequest, Sendable {
-    public typealias Response = [IRJPHUser]
-    
-    public var environment: IREnvironment { .jsonPlaceholder }
-    public var path: String { IREndpoints.JsonPlaceHolder.users.path }
-    public var method: HTTPMethod { .get }
-    public var requiresAuth: Bool { false }
-}
-
 @MainActor
 public protocol IRJsonPlaceHolderServiceProtocol {
     func fetchUsers() async throws -> [IRJPHUser]
 }
 
 public final class IRJsonPlaceHolderService: IRBaseService, IRJsonPlaceHolderServiceProtocol {
-
     public func fetchUsers() async throws -> [IRJPHUser] {
-        try await execute(IRJPHUsersRequest())
+        let request = GenericAPIRequest<[IRJPHUser]>(
+            environment: .jsonPlaceholder,
+            path: IREndpoints.JsonPlaceHolder.users.path,
+            method: .get,
+            requiresAuth: false
+        )
+        return try await execute(request)
     }
 }

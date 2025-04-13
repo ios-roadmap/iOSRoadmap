@@ -6,11 +6,12 @@
 //
 
 import IRNetworking
+import IRCore
 
 @MainActor
 public class IRJPHDemoLibraries {
     
     public static func registerDependencies() {
-        IRNetworkServiceDependencies.register()
+        IRDependencyContainer.shared.register(IRJsonPlaceHolderServiceProtocol.self, scope: .service) { IRJsonPlaceHolderService() }
     }
 }
