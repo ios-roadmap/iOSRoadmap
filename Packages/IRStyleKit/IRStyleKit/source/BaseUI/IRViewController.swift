@@ -23,6 +23,13 @@ open class IRViewController: UIViewController {
         let current = class_getInstanceMethod(type(of: self), #selector(refreshData))
         return base != current
     }
+    
+    private(set) lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
 
     /// Lazy-loaded tableView. İlk erişimde yaratılır.
     private var tableView: UITableView {
@@ -126,5 +133,27 @@ open class IRViewController: UIViewController {
 
     @objc open func refreshData() {
         // Override by subclass
+    }
+}
+
+@MainActor
+public protocol IRLoadable: AnyObject {
+    func setLoading(_ isLoading: Bool)
+}
+
+// MARK: Indicator
+extension IRViewController: IRLoadable {
+    public func setLoading(_ isLoading: Bool) {
+        if isLoading {
+            view.addSubview(loadingIndicator)
+            NSLayoutConstraint.activate([
+                loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            ])
+            loadingIndicator.startAnimating()
+        } else {
+            loadingIndicator.stopAnimating()
+            loadingIndicator.removeFromSuperview()
+        }
     }
 }
