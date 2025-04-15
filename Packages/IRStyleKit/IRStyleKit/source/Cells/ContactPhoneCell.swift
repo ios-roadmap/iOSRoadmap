@@ -9,7 +9,7 @@ import UIKit
 
 public final class ContactPhoneCell: IRBaseCell {
 
-    private lazy var imagePhone: UIImageView = {
+    private lazy var avatarImageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFit
         view.image = UIImage(systemName: "phone")
@@ -47,15 +47,17 @@ public final class ContactPhoneCell: IRBaseCell {
         return view
     }()
     
-    private lazy var iconButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage(.init(systemName: "ellipsis.circle"), for: .normal)
+    private lazy var ellipsisButton: UIButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(systemName: "ellipsis")
+        button.setImage(image, for: .normal)
+        button.tintColor = .gray
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     private lazy var horizontalStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [imagePhone, verticalStackView, iconButton])
+        let stackView = UIStackView(arrangedSubviews: [avatarImageView, verticalStackView, ellipsisButton])
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -65,22 +67,26 @@ public final class ContactPhoneCell: IRBaseCell {
     public override func setup() {
         super.setup()
         
-        setupViews()
-    }
-    
-    func setupViews() {
-      
         contentView.addSubview(horizontalStackView)
+        setupConstraints()
         
-        setupConstrainsts()
+        ellipsisButton.addAction {
+            print("Triggered ellipsis button action")
+        }
     }
     
-    func setupConstrainsts() {
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
-            horizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            horizontalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            horizontalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            horizontalStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            horizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            horizontalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            horizontalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            horizontalStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
+
+            avatarImageView.widthAnchor.constraint(equalToConstant: 48),
+            avatarImageView.heightAnchor.constraint(equalTo: avatarImageView.widthAnchor),
+
+            ellipsisButton.widthAnchor.constraint(equalToConstant: 32),
+            ellipsisButton.heightAnchor.constraint(equalTo: ellipsisButton.widthAnchor)
         ])
     }
 
