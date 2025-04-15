@@ -7,11 +7,13 @@
 
 import UIKit
 
+@MainActor
 public protocol CustomSearchControllerDelegate: AnyObject {
     func searchDidUpdate(query: String)
     func searchDidCancel()
 }
 
+@MainActor
 public final class CustomSearchController: NSObject {
     public let searchController: UISearchController
     public weak var delegate: CustomSearchControllerDelegate?
