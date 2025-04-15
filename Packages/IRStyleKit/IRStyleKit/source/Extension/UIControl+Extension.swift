@@ -7,6 +7,8 @@
 
 import UIKit
 
+//TODO: Extensionlar IRFoundation gibi bir kütüphanede toplanması gerekiyor.
+
 public extension UIControl {
     
     @discardableResult

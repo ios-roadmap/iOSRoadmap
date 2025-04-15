@@ -12,31 +12,25 @@ import IRNetworking
 final class IRJPHUserListViewController: IRViewController {
     
     var presenter: IRJPHUserListPresenterProtocol?
-    
-    private let loadingIndicator = UIActivityIndicatorView(style: .large)
 
     override func setup() {
         super.setup()
-        
-        title = "Users"
-        view.addSubview(loadingIndicator)
-        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-        ])
-        loadingIndicator.hidesWhenStopped = true
+        setupNavigationBar()
+    }
+    
+    func setupNavigationBar() {
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
+        navigationItem.title = "My Contacts"
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter?.viewDidLoad()
     }
+}
 
-    func showLoading(_ isLoading: Bool) {
-        isLoading ? loadingIndicator.startAnimating() : loadingIndicator.stopAnimating()
-    }
-
+extension IRJPHUserListViewController: IRJPHUserListViewProtocol {
     func showUsers(_ users: [IRJPHUser]) {
         let items: [IRTextCellViewModel] = users.map { user in
             IRTextCellViewModel(text: user.name ?? "", onSelect: { [weak self] in
@@ -48,7 +42,6 @@ final class IRJPHUserListViewController: IRViewController {
     }
 
     func showError(_ message: String) {
-        loadingIndicator.stopAnimating()
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)

@@ -16,7 +16,7 @@ final class IRJPHUserListPresenter: IRJPHUserListPresenterProtocol, IRJPHUserLis
     private var users: [IRJPHUser] = []
 
     func viewDidLoad() {
-        view?.showLoading(true)
+        view?.setLoading(true)
         Task {
             await interactor?.fetchUsers()
         }
@@ -24,12 +24,12 @@ final class IRJPHUserListPresenter: IRJPHUserListPresenterProtocol, IRJPHUserLis
 
     func usersFetched(_ response: [IRJPHUser]) {
         users = response
-        view?.showLoading(false)
+        view?.setLoading(false)
         view?.showUsers(response)
     }
 
     func usersFetchFailed(_ error: Error) {
-        view?.showLoading(false)
+        view?.setLoading(false)
         view?.showError(error.localizedDescription)
     }
 

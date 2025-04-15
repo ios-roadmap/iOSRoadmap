@@ -20,7 +20,7 @@ protocol IRJPHUserListPresenterProtocol: AnyObject {
 protocol IRJPHUserListViewProtocol: AnyObject {
     func showUsers(_ users: [IRJPHUser])
     func showError(_ message: String)
-    func showLoading(_ isLoading: Bool)
+    func setLoading(_ isLoading: Bool)
 }
 
 // PRESENTER -> INTERACTOR

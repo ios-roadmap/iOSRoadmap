@@ -21,6 +21,7 @@ extension ShowcaseListViewControllerProtocol {
 final class ShowcaseListViewController: IRViewController {
     private let demoPages: [ShowcaseListViewControllerProtocol.Type] = [
         CoachmarkDemoPageController.self,
+        ContactPhoneDemoPageController.self,
         TableDemoPageController.self,
         SpacerDemoPageController.self,
         TextLabelDemoPageController.self,
