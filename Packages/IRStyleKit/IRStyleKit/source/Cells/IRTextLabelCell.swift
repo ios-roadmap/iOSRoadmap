@@ -9,11 +9,10 @@ import UIKit
 
 public final class IRTextCell: IRBaseCell {
     
-    private lazy var labelView = IRTextLabelView()
+    private lazy var labelView = TextLabel()
 
     public override func setup() {
         super.setup()
-        labelView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(labelView)
 
         NSLayoutConstraint.activate([
@@ -27,7 +26,8 @@ public final class IRTextCell: IRBaseCell {
     public override func configureContent(with viewModel: IRBaseCellViewModel) {
         guard let viewModel = viewModel as? IRTextCellViewModel else { return }
         
-        labelView.configure(text: viewModel.text)
+        labelView
+            .withText(viewModel.text)
     }
 }
 

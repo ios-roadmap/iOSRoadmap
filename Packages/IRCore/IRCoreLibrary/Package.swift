@@ -4,24 +4,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "IRCore",
+    name: "IRCoreLibrary",
     defaultLocalization: "en",
     platforms: [.iOS(.v18)],
     products: [
         .library(
-            name: "IRCore",
-            targets: ["IRCore"]),
+            name: "IRCoreLibrary",
+            targets: ["IRCoreLibrary"]),
     ],
     dependencies: [
-        .package(name: "IRFoundation", path: "../IRFoundation"),
+        .package(name: "IRFoundation", path: "../../IRFoundation"),
     ],
     targets: [
         .target(
-            name: "IRCore",
+            name: "IRCoreLibrary",
             dependencies: [
                 "IRFoundation"
-            ],
-            path: "IRCore"
+            ]
         ),
     ]
 )
