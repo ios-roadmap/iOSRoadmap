@@ -105,3 +105,7 @@ extension TextLabel {
         return self
     }
 }
+
+//TODO: Swiftlint
+///UIColor direkt kullanmak YASAK!
+///Swiftlint ile kontrol sağlanacak.
