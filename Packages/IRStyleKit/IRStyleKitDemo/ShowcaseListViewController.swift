@@ -25,6 +25,7 @@ final class ShowcaseListViewController: IRViewController {
         TableDemoPageController.self,
         SpacerDemoPageController.self,
         TextLabelDemoPageController.self,
+        ButtonDemoPageController.self,
     ]
 
     override func viewDidLoad() {
