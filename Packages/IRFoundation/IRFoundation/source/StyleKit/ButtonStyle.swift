@@ -5,97 +5,164 @@
 //  Created by Ömer Faruk Öztürk on 17.04.2025.
 //
 
-import UIKit
+import Foundation
 
-public enum ButtonStyle: CaseIterable {
-    case primaryLargeFilled
-    case primarySmallOutline
-    case secondaryLargeTextOnly
-    case secondarySmallFilled
-    case destructiveLargeFilled
-    case destructiveSmallTextOnly
-    case iconLeadingSmall
-    case iconTrailingLarge
+public enum ButtonStyle: Equatable {
 
-    // MARK: - Visual Properties
+    // Filled -----------------------------------------------------------------
+    case filledPrimary      (iconAlignment: IconAlignment = .leading)
+    case filledSecondary    (iconAlignment: IconAlignment = .leading)
+    case filledSuccess      (iconAlignment: IconAlignment = .leading)
+    case filledWarning      (iconAlignment: IconAlignment = .leading)
+    case filledDestructive  (iconAlignment: IconAlignment = .leading)
 
-    public var fontType: FontType {
+    // Outlined ---------------------------------------------------------------
+    case outlinedPrimary    (iconAlignment: IconAlignment = .leading)
+    case outlinedSecondary  (iconAlignment: IconAlignment = .leading)
+    case outlinedDestructive(iconAlignment: IconAlignment = .leading)
+
+    // Ghost / subtle background ---------------------------------------------
+    case ghost              (iconAlignment: IconAlignment = .leading)
+
+    // Link‑style -------------------------------------------------------------
+    case link                       // plain text link
+    case linkUnderlined             // always underlined
+
+    // Icon‑only --------------------------------------------------------------
+    case iconOnly                   // square, no title
+}
+
+public extension ButtonStyle {
+
+    /// Typography spec
+    var fontSize: FontSize {
         switch self {
-        case .destructiveLargeFilled: return .bold
-        case .secondaryLargeTextOnly: return .medium
-        default: return .semibold
+        case .link, .linkUnderlined: return .callout
+        case .iconOnly:              return .callout
+        default:                     return .body
         }
     }
 
-    public var fontSize: FontSize {
+    var fontType: FontType {
         switch self {
-        case .primarySmallOutline,
-             .secondarySmallFilled,
-             .destructiveSmallTextOnly,
-             .iconLeadingSmall:
-            return .callout
+        case .filledPrimary,
+             .filledSuccess,
+             .filledWarning,
+             .filledDestructive,
+             .outlinedPrimary,
+             .outlinedDestructive:
+            return .semibold
+
+        case .filledSecondary,
+             .outlinedSecondary,
+             .ghost:
+            return .medium
+
+        case .link, .linkUnderlined:
+            return .regular
+
+        case .iconOnly:
+            return .regular
+        }
+    }
+
+    /// Text transform policy
+    var textTransform: TextTransform {
+        switch self {
+        case .filledDestructive,
+             .outlinedDestructive:
+            return .uppercase
+
         default:
-            return .body
+            return .none
         }
     }
 
-    public var cornerRadius: Spacing {
+    /// Horizontal gap between title & icon
+    var spacing: Spacing {
         switch self {
-        case .iconLeadingSmall:
-            return .large
-        default:
-            return .tiny
+        case .link, .linkUnderlined: return .micro
+        case .iconOnly:              return .none
+        default:                     return .small
         }
     }
 
-    //TODO: ömer spacing
-    public var height: CGFloat {
+    /// Icon placement (determined once at init)
+    var iconAlignment: IconAlignment {
         switch self {
-        case .primarySmallOutline,
-             .secondarySmallFilled,
-             .destructiveSmallTextOnly,
-             .iconLeadingSmall:
-            return 40
-        default:
-            return 56
+        case let .filledPrimary(a),
+             let .filledSecondary(a),
+             let .filledSuccess(a),
+             let .filledWarning(a),
+             let .filledDestructive(a),
+             let .outlinedPrimary(a),
+             let .outlinedSecondary(a),
+             let .outlinedDestructive(a),
+             let .ghost(a):
+            return a
+
+        case .link, .linkUnderlined:
+            return .trailing          // textual links read better
+
+        case .iconOnly:
+            return .leading           // N/A but consistent
         }
     }
 
-    public var padding: UIEdgeInsets {
-        switch self {
-        case .iconLeadingSmall:
-            return .init(top: 6, left: 6, bottom: 6, right: 6)
-        default:
-            return .init(top: 12, left: 16, bottom: 12, right: 16)
+    /// Fixed Auto‑Layout height
+    var height: CGFloat {
+        switch fontSize {
+        case .largeTitle: return 64
+        case .title1:     return 56
+        case .title2:     return 48
+        case .title3:     return 44
+        case .body:       return 40
+        case .callout:    return 36
+        case .footnote:   return 30
+        case .caption:    return 26
         }
     }
 
-    public var spacing: Spacing {
+    // -----------------------------------------------------------------------
+    // Colour & border tokens ↓ keep these as design‑system identifiers
+    // to be mapped to actual UIColor in IRStyleKit.
+    // -----------------------------------------------------------------------
+
+    var backgroundToken: String {
         switch self {
-        case .iconLeadingSmall: return .micro
-        case .iconTrailingLarge: return .small
-        default: return .tiny
+        case .filledPrimary:      return "btnBg/primary"
+        case .filledSecondary:    return "btnBg/secondary"
+        case .filledSuccess:      return "btnBg/success"
+        case .filledWarning:      return "btnBg/warning"
+        case .filledDestructive:  return "btnBg/destructive"
+
+        case .ghost:              return "btnBg/ghost"
+        case .outlinedPrimary,
+             .outlinedSecondary,
+             .outlinedDestructive,
+             .link, .linkUnderlined,
+             .iconOnly:           return "btnBg/clear"
         }
     }
 
-    public var hasText: Bool {
+    var titleToken: String {
         switch self {
-        case .iconLeadingSmall: return false
-        default: return true
+        case .filledDestructive,
+             .outlinedDestructive: return "txt/destructive"
+
+        case .link,
+             .linkUnderlined:      return "txt/link"
+
+        default:                  return "txt/standard"
         }
     }
 
-    public var hasIcon: Bool {
+    var borderToken: String? {
         switch self {
-        case .iconLeadingSmall, .iconTrailingLarge: return true
-        default: return false
-        }
-    }
-
-    public var iconAlignment: IconAlignment {
-        switch self {
-        case .iconTrailingLarge: return .trailing
-        default: return .leading
+        case .outlinedPrimary:     return "border/primary"
+        case .outlinedSecondary:   return "border/secondary"
+        case .outlinedDestructive: return "border/destructive"
+        default:                   return nil
         }
     }
 }

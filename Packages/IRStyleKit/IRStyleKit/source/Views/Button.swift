@@ -14,117 +14,46 @@ import IRFoundation
 /// UIControl: State yönetimi içerir (isEnabled, isSelected, isHighlighted).
 /// UIResponder - UIView - UIControl - UIButton
 
-public final class Button: UIControl {
+public final class Button: UIButton {
 
-    private let label = UILabel()
-    private let iconView = UIImageView()
-    private let stackView = UIStackView()
-    private let container = UIView()
-
-    private let style: ButtonStyle
-    private var action: (() -> Void)?
-
-    public init(style: ButtonStyle) {
-        self.style = style
+    public init(style: ButtonStyle,
+                title: String,
+                icon: Icons = .none) {
         super.init(frame: .zero)
-        setup()
-        applyStyle()
-    }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+        let font = style.fontType
+            .font(ofSize: style.fontSize.pointSize,
+                  textStyle: style.fontSize.textStyle)
+        let transformedTitle = style.textTransform.apply(to: title)
 
-    @discardableResult
-    public func withTitle(_ text: String) -> Self {
-        label.text = text
-        return self
-    }
+        setTitle(transformedTitle, for: .normal)
+        titleLabel?.font = font
 
-    @discardableResult
-    public func withIcon(_ image: UIImage?) -> Self {
-        iconView.image = image
-        updateStackAlignment()
-        return self
-    }
+        backgroundColor = UIColor(named: style.backgroundToken)
+        setTitleColor(UIColor(named: style.titleToken), for: .normal)
 
-    @discardableResult
-    public func withAction(_ callback: @escaping () -> Void) -> Self {
-        action = callback
-        return self
-    }
-
-    private func setup() {
-        isUserInteractionEnabled = true
-        addSubview(container)
-        container.translatesAutoresizingMaskIntoConstraints = false
-        container.clipsToBounds = true
-        container.isUserInteractionEnabled = false
-
-        container.addSubview(stackView)
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.axis = .horizontal
-        stackView.alignment = .center
-        stackView.distribution = .fill
-        stackView.spacing = style.spacing.value
-        stackView.isUserInteractionEnabled = false
-
-        label.numberOfLines = 1
-        iconView.contentMode = .scaleAspectFit
-
-        addTarget(self, action: #selector(didTap), for: .touchUpInside)
-        setupConstraints()
-    }
-
-    private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            container.leadingAnchor.constraint(equalTo: leadingAnchor),
-            container.trailingAnchor.constraint(equalTo: trailingAnchor),
-            container.topAnchor.constraint(equalTo: topAnchor),
-            container.bottomAnchor.constraint(equalTo: bottomAnchor),
-
-            stackView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: style.padding.left),
-            stackView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -style.padding.right),
-            stackView.topAnchor.constraint(equalTo: container.topAnchor, constant: style.padding.top),
-            stackView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -style.padding.bottom),
-            heightAnchor.constraint(equalToConstant: style.height)
-        ])
-    }
-
-    private func applyStyle() {
-        container.backgroundColor = .yellow
-        container.layer.cornerRadius = style.cornerRadius.value
-
-        label.textColor = .red
-        label.font = UIFont.systemFont(ofSize: style.fontSize.pointSize)
-
-        iconView.tintColor = .black
-
-        if style.hasText { stackView.addArrangedSubview(label) }
-        if style.hasIcon { stackView.addArrangedSubview(iconView) }
-
-        updateStackAlignment()
-    }
-
-    private func updateStackAlignment() {
-        guard style.hasText && style.hasIcon else { return }
-
-        stackView.arrangedSubviews.forEach {
-            stackView.removeArrangedSubview($0)
-            $0.removeFromSuperview()
+        if let border = style.borderToken {
+            layer.borderColor = UIColor(named: border)?.cgColor
+            layer.borderWidth = 1 / UIScreen.main.scale
         }
 
-        switch style.iconAlignment {
-        case .leading:
-            stackView.addArrangedSubview(iconView)
-            stackView.addArrangedSubview(label)
-        case .trailing:
-            stackView.addArrangedSubview(label)
-            stackView.addArrangedSubview(iconView)
+        // Eğer icon varsa ekle
+        if let image = UIImage(systemName: "person") {//icon.rawV) {
+            setImage(image, for: .normal)
+            imageView?.contentMode = .scaleAspectFit
+            semanticContentAttribute = style.iconAlignment == .leading ? .forceLeftToRight : .forceRightToLeft
+            imageEdgeInsets = UIEdgeInsets(top: 0, left: -8, bottom: 0, right: 8)
         }
+
+        contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        layer.cornerRadius = 7 //style.cornerRadius
+        clipsToBounds = true
+
+        heightAnchor.constraint(equalToConstant: style.height).isActive = true
+        translatesAutoresizingMaskIntoConstraints = false
     }
 
-    @objc private func didTap() {
-        action?()
+    required init(coder: NSCoder) {
+        fatalError()
     }
 }

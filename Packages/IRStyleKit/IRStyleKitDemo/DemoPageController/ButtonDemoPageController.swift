@@ -37,39 +37,9 @@ final class ButtonDemoPageController: IRViewController, ShowcaseListViewControll
             stack.bottomAnchor.constraint(equalTo: scroll.bottomAnchor),
             stack.widthAnchor.constraint(equalTo: scroll.widthAnchor)
         ])
-
-        stack.addArrangedSubview(Button(style: .primaryLargeFilled)
-            .withTitle("Primary Filled")
-            .withAction { print("Primary Large Filled tapped") })
-
-        stack.addArrangedSubview(Button(style: .primarySmallOutline)
-            .withTitle("Primary Outline")
-            .withAction { print("Primary Small Outline tapped") })
-
-        stack.addArrangedSubview(Button(style: .secondaryLargeTextOnly)
-            .withTitle("Secondary Text Only")
-            .withAction { print("Secondary Text tapped") })
-
-        stack.addArrangedSubview(Button(style: .secondarySmallFilled)
-            .withTitle("Secondary Filled")
-            .withAction { print("Secondary Small Filled tapped") })
-
-        stack.addArrangedSubview(Button(style: .destructiveLargeFilled)
-            .withTitle("Delete")
-            .withIcon(UIImage(systemName: "trash"))
-            .withAction { print("Destructive tapped") })
-
-        stack.addArrangedSubview(Button(style: .destructiveSmallTextOnly)
-            .withTitle("Remove")
-            .withAction { print("Remove tapped") })
-
-        stack.addArrangedSubview(Button(style: .iconLeadingSmall)
-            .withIcon(UIImage(systemName: "plus"))
-            .withAction { print("Icon only tapped") })
-
-        stack.addArrangedSubview(Button(style: .iconTrailingLarge)
-            .withTitle("Next")
-            .withIcon(UIImage(systemName: "chevron.right"))
-            .withAction { print("Next tapped") })
+        
+        stack.addArrangedSubview(
+            Button(style: .filledSecondary(iconAlignment: .leading), title: "OMER", icon: .arrowLeft)
+        )
     }
 }

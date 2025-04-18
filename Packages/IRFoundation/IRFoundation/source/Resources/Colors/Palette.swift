@@ -7,6 +7,7 @@
 
 import UIKit
 
+//TODO: Move to Assets Folder
 enum Palette {
     static let clear = UIColor.clear
     
