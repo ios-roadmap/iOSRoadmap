@@ -53,27 +53,18 @@ final class TextLabelDemoPageController: IRViewController, ShowcaseListViewContr
                 createKeyValueView(
                     key: String(describing: $0),
                     value: "Omer Faruk Ozturk",
-                    transform: $0
+                    transform: $0,
+                    typography: .body
                 )
             }
         }
-
-        addSection(title: "Font Type") {
-            FontType.allCases.map {
+        
+        addSection(title: "Typography") {
+            Typography.allCases.map {
                 createKeyValueView(
                     key: String(describing: $0),
-                    value: "Font Type",
-                    fontType: $0
-                )
-            }
-        }
-
-        addSection(title: "Font Size") {
-            FontSize.allCases.map {
-                createKeyValueView(
-                    key: String(describing: $0),
-                    value: "Font Size",
-                    fontSize: $0
+                    value: "Omer Faruk Ozturk",
+                    typography: $0
                 )
             }
         }
@@ -83,6 +74,7 @@ final class TextLabelDemoPageController: IRViewController, ShowcaseListViewContr
                 createKeyValueView(
                     key: "\($0.rawValue)pt",
                     value: "Padding",
+                    typography: .button,
                     padding: $0
                 )
             }
@@ -91,7 +83,7 @@ final class TextLabelDemoPageController: IRViewController, ShowcaseListViewContr
 
     private func addSection(title: String, content: () -> [UIView]) {
         let titleLabel = TextLabel()
-            .withFont(.bold, size: .title1)
+            .withTypography(.bodySemibold)
             .withText(title)
             .withAlignment(.left)
 
@@ -103,25 +95,23 @@ final class TextLabelDemoPageController: IRViewController, ShowcaseListViewContr
         key: String,
         value: String,
         transform: TextTransform? = nil,
-        fontType: FontType? = nil,
-        fontSize: FontSize? = nil,
+        typography: Typography,
         padding: Spacing? = nil
     ) -> UIStackView {
         let keyLabel = TextLabel()
-            .withFont(.medium, size: .body)
+            .withTypography(.button)
             .withText(key)
-            .withColor(.black)
+            .withTextColor(.black)
             .withAlignment(.left)
             .withPadding(.small)
 
         let valueLabel = TextLabel()
-            .withFont(fontType ?? .regular, size: fontSize ?? .body)
+            .withTypography(typography)
             .withText(value)
-            .withColor(.gray)
+            .withTextColor(.gray)
             .withLines(1)
             .withAlignment(.left)
             .withPadding(padding ?? .small)
-            .withDynamicType(false)
 
         if let transform = transform {
             valueLabel.withTransform(transform)

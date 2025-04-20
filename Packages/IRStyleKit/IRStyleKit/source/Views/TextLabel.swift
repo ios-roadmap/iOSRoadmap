@@ -10,11 +10,9 @@ import IRFoundation
 
 public final class TextLabel: UILabel {
 
-    private var fontType: FontType = .regular
-    private var fontSize: FontSize = .body
+    private var typography: Typography = .body
     private var textTransform: TextTransform = .none
     private var padding: UIEdgeInsets = .zero
-    private var dynamicTypeEnabled: Bool = true
     private var originalText: String?
 
     public override init(frame: CGRect) {
@@ -34,11 +32,6 @@ public final class TextLabel: UILabel {
         numberOfLines = 0
     }
 
-    private func updateFont() {
-        let style = dynamicTypeEnabled ? fontSize.textStyle : nil
-        font = fontType.font(ofSize: fontSize.pointSize, textStyle: style)
-    }
-
     public override func drawText(in rect: CGRect) {
         super.drawText(in: rect.inset(by: padding))
     }
@@ -52,10 +45,8 @@ public final class TextLabel: UILabel {
 
 extension TextLabel {
     @discardableResult
-    public func withFont(_ type: FontType, size: FontSize) -> Self {
-        fontType = type
-        fontSize = size
-        updateFont()
+    public func withTypography(_ typography: Typography) -> Self {
+        font = typography.font()
         return self
     }
 
@@ -81,7 +72,7 @@ extension TextLabel {
     }
 
     @discardableResult
-    public func withColor(_ color: UIColor) -> Self {
+    public func withTextColor(_ color: UIColor) -> Self {
         textColor = color
         return self
     }
@@ -97,11 +88,8 @@ extension TextLabel {
         textAlignment = alignment
         return self
     }
-
-    @discardableResult
-    public func withDynamicType(_ enabled: Bool) -> Self {
-        dynamicTypeEnabled = enabled
-        updateFont()
-        return self
-    }
 }
+
+//TODO: Swiftlint
+///UIColor direkt kullanmak YASAK!
+///Swiftlint ile kontrol sağlanacak.
