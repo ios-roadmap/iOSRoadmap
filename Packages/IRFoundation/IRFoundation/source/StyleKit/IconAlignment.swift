@@ -7,7 +7,4 @@
 
 import Foundation
 
-public enum IconAlignment: Int {
-    case leading
-    case trailing
-}
+public enum IconAlignment: Int { case leading, trailing }

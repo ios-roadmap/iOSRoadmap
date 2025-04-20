@@ -5,81 +5,46 @@
 //  Created by Ömer Faruk Öztürk on 17.04.2025.
 //
 
-import Foundation
+import UIKit
 
-public enum ButtonStyle: Equatable {
+public enum ButtonStyle: CaseIterable {
 
-    // Filled -----------------------------------------------------------------
-    case filledPrimary      (iconAlignment: IconAlignment = .leading)
-    case filledSecondary    (iconAlignment: IconAlignment = .leading)
-    case filledSuccess      (iconAlignment: IconAlignment = .leading)
-    case filledWarning      (iconAlignment: IconAlignment = .leading)
-    case filledDestructive  (iconAlignment: IconAlignment = .leading)
+    // Filled --------------------------------------------------------------
+    case filledPrimary, filledSecondary, filledSuccess, filledWarning, filledDestructive
+    // Outlined ------------------------------------------------------------
+    case outlinedPrimary, outlinedSecondary, outlinedDestructive
+    // Ghost ---------------------------------------------------------------
+    case ghost
+    // Link ----------------------------------------------------------------
+    case link, linkUnderlined
+    // Icon‑only -----------------------------------------------------------
+    case iconOnly
 
-    // Outlined ---------------------------------------------------------------
-    case outlinedPrimary    (iconAlignment: IconAlignment = .leading)
-    case outlinedSecondary  (iconAlignment: IconAlignment = .leading)
-    case outlinedDestructive(iconAlignment: IconAlignment = .leading)
+    // MARK: - Tokens
 
-    // Ghost / subtle background ---------------------------------------------
-    case ghost              (iconAlignment: IconAlignment = .leading)
-
-    // Link‑style -------------------------------------------------------------
-    case link                       // plain text link
-    case linkUnderlined             // always underlined
-
-    // Icon‑only --------------------------------------------------------------
-    case iconOnly                   // square, no title
-}
-
-public extension ButtonStyle {
-
-    /// Typography spec
-    var fontSize: FontSize {
+    /// Typography choice per style
+    public var typography: Typography {
         switch self {
-        case .link, .linkUnderlined: return .callout
-        case .iconOnly:              return .callout
-        default:                     return .body
+        case .link, .linkUnderlined, .iconOnly:
+            return .callout
+        case .filledSecondary, .outlinedSecondary, .ghost:
+            return .bodyMedium
+        case .filledPrimary, .filledSuccess, .filledWarning, .filledDestructive,
+             .outlinedPrimary, .outlinedDestructive:
+            return .bodySemibold
         }
     }
 
-    var fontType: FontType {
+    /// Text transform
+    public var textTransform: TextTransform {
         switch self {
-        case .filledPrimary,
-             .filledSuccess,
-             .filledWarning,
-             .filledDestructive,
-             .outlinedPrimary,
-             .outlinedDestructive:
-            return .semibold
-
-        case .filledSecondary,
-             .outlinedSecondary,
-             .ghost:
-            return .medium
-
-        case .link, .linkUnderlined:
-            return .regular
-
-        case .iconOnly:
-            return .regular
-        }
-    }
-
-    /// Text transform policy
-    var textTransform: TextTransform {
-        switch self {
-        case .filledDestructive,
-             .outlinedDestructive:
-            return .uppercase
-
-        default:
-            return .none
+        case .filledDestructive, .outlinedDestructive: return .uppercase
+        default:                                       return .none
         }
     }
 
     /// Horizontal gap between title & icon
-    var spacing: Spacing {
+    public var spacing: Spacing {
         switch self {
         case .link, .linkUnderlined: return .micro
         case .iconOnly:              return .none
@@ -87,82 +52,79 @@ public extension ButtonStyle {
         }
     }
 
-    /// Icon placement (determined once at init)
-    var iconAlignment: IconAlignment {
+    /// Icon placement
+    public var iconAlignment: IconAlignment {
         switch self {
-        case let .filledPrimary(a),
-             let .filledSecondary(a),
-             let .filledSuccess(a),
-             let .filledWarning(a),
-             let .filledDestructive(a),
-             let .outlinedPrimary(a),
-             let .outlinedSecondary(a),
-             let .outlinedDestructive(a),
-             let .ghost(a):
-            return a
-
-        case .link, .linkUnderlined:
-            return .trailing          // textual links read better
-
-        case .iconOnly:
-            return .leading           // N/A but consistent
+        case .link, .linkUnderlined: return .trailing
+        default:                     return .leading
         }
     }
 
-    /// Fixed Auto‑Layout height
-    var height: CGFloat {
-        switch fontSize {
-        case .largeTitle: return 64
-        case .title1:     return 56
-        case .title2:     return 48
-        case .title3:     return 44
-        case .body:       return 40
-        case .callout:    return 36
-        case .footnote:   return 30
-        case .caption:    return 26
+    /// Fixed height (px)
+    public var height: CGFloat {
+        switch typography {
+        case .body, .bodyMedium, .bodySemibold: return 40
+        case .callout:                          return 36
+        default:                                return 30   // caption / micro fall‑back
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Colour & border tokens ↓ keep these as design‑system identifiers
-    // to be mapped to actual UIColor in IRStyleKit.
-    // -----------------------------------------------------------------------
-
-    var backgroundToken: String {
+    /// Background colour
+    public var backgroundColour: UIColor {
         switch self {
-        case .filledPrimary:      return "btnBg/primary"
-        case .filledSecondary:    return "btnBg/secondary"
-        case .filledSuccess:      return "btnBg/success"
-        case .filledWarning:      return "btnBg/warning"
-        case .filledDestructive:  return "btnBg/destructive"
+        case .filledPrimary:      return .systemBlue
+        case .filledSecondary:    return .systemGray
+        case .filledSuccess:      return .systemGreen
+        case .filledWarning:      return .systemOrange
+        case .filledDestructive:  return .systemRed
+        default:                  return .clear
+        }
+    }
 
-        case .ghost:              return "btnBg/ghost"
+    /// Foreground (text & icon) colour
+    public var foregroundColour: UIColor {
+        switch self {
+        case .filledPrimary,
+             .filledSecondary,
+             .filledSuccess,
+             .filledWarning,
+             .filledDestructive:
+            return .white
+
         case .outlinedPrimary,
-             .outlinedSecondary,
-             .outlinedDestructive,
-             .link, .linkUnderlined,
-             .iconOnly:           return "btnBg/clear"
+             .link,
+             .linkUnderlined:     return .systemBlue
+
+        case .outlinedSecondary,
+             .ghost:              return .systemGray
+
+        case .outlinedDestructive: return .systemRed
+
+        case .iconOnly:            return .systemGray
         }
     }
 
-    var titleToken: String {
+    /// Border colour (`nil` ⇒ no border)
+    public var borderColour: UIColor? {
         switch self {
-        case .filledDestructive,
-             .outlinedDestructive: return "txt/destructive"
-
-        case .link,
-             .linkUnderlined:      return "txt/link"
-
-        default:                  return "txt/standard"
-        }
-    }
-
-    var borderToken: String? {
-        switch self {
-        case .outlinedPrimary:     return "border/primary"
-        case .outlinedSecondary:   return "border/secondary"
-        case .outlinedDestructive: return "border/destructive"
+        case .outlinedPrimary:     return .systemBlue
+        case .outlinedSecondary:   return .systemGray
+        case .outlinedDestructive: return .systemRed
         default:                   return nil
+        }
+    }
+
+    /// Corner radius
+    public var cornerRadius: CGFloat {
+        switch self {
+        case .iconOnly:
+            // Full pill for square icon buttons
+            return height / 2
+        case .link, .linkUnderlined:
+            // No background therefore no radius
+            return 0
+        default:
+            return 8
         }
     }
 }
