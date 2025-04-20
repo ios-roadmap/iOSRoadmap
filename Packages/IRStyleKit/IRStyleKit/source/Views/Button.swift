@@ -23,6 +23,7 @@ public final class Button: UIControl {
     private let titleLabel       = TextLabel()
     private let imageView        = UIImageView()
     private let contentStack     = UIStackView()
+    //TODO: bunlar ayrı component'ler olacak!
     private let highlightOverlay = UIView()
 
     // MARK: - Init
@@ -51,14 +52,15 @@ public final class Button: UIControl {
         translatesAutoresizingMaskIntoConstraints = false
 
         // ---- Background & Border
-        backgroundColor         = style.backgroundColour
-        layer.cornerRadius      = style.cornerRadius
-        layer.borderWidth       = style.borderColour == nil ? 0 : 1
-        layer.borderColor       = style.borderColour?.cgColor
+        backgroundColor = style.background
+               layer.cornerRadius = style.cornerRadius
+               layer.borderWidth  = style.border == nil ? 0 : 1
+               layer.borderColor  = style.border?.cgColor
 
         // ---- Highlight Layer
-        highlightOverlay.backgroundColor     = UIColor.black.withAlphaComponent(0.1)
-        highlightOverlay.layer.cornerRadius  = layer.cornerRadius
+        // Highlight overlay now uses token
+               highlightOverlay.backgroundColor = Colors.pressedOverlay
+               highlightOverlay.layer.cornerRadius = style.cornerRadius
         highlightOverlay.isUserInteractionEnabled = false
         highlightOverlay.translatesAutoresizingMaskIntoConstraints = false
         highlightOverlay.alpha = 0
@@ -76,12 +78,12 @@ public final class Button: UIControl {
         titleLabel.withTransform(style.textTransform)
                   .withText(title)
                   .withTypography(style.typography)
-                  .withTextColor(style.foregroundColour)
+                  .withTextColor(style.foreground)
         titleLabel.isUserInteractionEnabled = false
 
         // ---- Icon
         imageView.image       = icon?.withRenderingMode(.alwaysTemplate)
-        imageView.tintColor   = style.foregroundColour
+        imageView.tintColor   = style.foreground
         imageView.contentMode = .scaleAspectFit
         imageView.isUserInteractionEnabled = false
 
@@ -93,7 +95,10 @@ public final class Button: UIControl {
         contentStack.translatesAutoresizingMaskIntoConstraints = false
         contentStack.isUserInteractionEnabled = false
 
-        contentStack.arrangedSubviews.forEach(contentStack.removeArrangedSubview)
+        contentStack.arrangedSubviews.forEach { view in
+            contentStack.removeArrangedSubview(view)
+            view.removeFromSuperview()
+        }
 
         let hasIcon  = icon != nil
         let hasTitle = !(title?.isEmpty ?? true)
@@ -121,7 +126,9 @@ public final class Button: UIControl {
     // MARK: - Interaction
     public override var isHighlighted: Bool {
         didSet {
-            UIView.animate(withDuration: 0.15) {
+            UIView.animate(withDuration: 0.12,
+                           delay: 0,
+                           options: [.allowUserInteraction, .curveEaseInOut]) {
                 self.highlightOverlay.alpha = self.isHighlighted ? 1 : 0
             }
         }

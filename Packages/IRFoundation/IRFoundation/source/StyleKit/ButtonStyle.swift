@@ -68,52 +68,43 @@ public enum ButtonStyle: CaseIterable {
         default:                                return 30   // caption / micro fall‑back
         }
     }
-
-    /// Background colour
-    public var backgroundColour: UIColor {
+    
+    public var background: UIColor {
         switch self {
-        case .filledPrimary:      return .systemBlue
-        case .filledSecondary:    return .systemGray
-        case .filledSuccess:      return .systemGreen
-        case .filledWarning:      return .systemOrange
-        case .filledDestructive:  return .systemRed
+        case .filledPrimary:      return Colors.accentPrimary
+        case .filledSecondary:    return Colors.accentSecondary
+        case .filledSuccess:      return Colors.success
+        case .filledWarning:      return Colors.warning
+        case .filledDestructive:  return Colors.destructive
         default:                  return .clear
         }
     }
-
-    /// Foreground (text & icon) colour
-    public var foregroundColour: UIColor {
+    
+    public var foreground: UIColor {
         switch self {
-        case .filledPrimary,
-             .filledSecondary,
-             .filledSuccess,
-             .filledWarning,
-             .filledDestructive:
+        case .filledPrimary, .filledSecondary, .filledSuccess,
+                .filledWarning, .filledDestructive:
             return .white
-
-        case .outlinedPrimary,
-             .link,
-             .linkUnderlined:     return .systemBlue
-
-        case .outlinedSecondary,
-             .ghost:              return .systemGray
-
-        case .outlinedDestructive: return .systemRed
-
-        case .iconOnly:            return .systemGray
+        case .ghost, .outlinedSecondary:
+            return Colors.accentSecondary
+        case .outlinedPrimary, .link, .linkUnderlined:
+            return Colors.accentPrimary
+        case .outlinedDestructive:
+            return Colors.destructive
+        case .iconOnly:
+            return Colors.accentSecondary
         }
     }
-
-    /// Border colour (`nil` ⇒ no border)
-    public var borderColour: UIColor? {
+    
+    public var border: UIColor? {
         switch self {
-        case .outlinedPrimary:     return .systemBlue
-        case .outlinedSecondary:   return .systemGray
-        case .outlinedDestructive: return .systemRed
+        case .outlinedPrimary:     return Colors.accentPrimary
+        case .outlinedSecondary:   return Colors.accentSecondary
+        case .outlinedDestructive: return Colors.destructive
         default:                   return nil
         }
     }
-
+    
     /// Corner radius
     public var cornerRadius: CGFloat {
         switch self {

@@ -8,12 +8,13 @@
 import UIKit
 
 struct AdaptiveColor {
-    let lightMode: UIColor
-    let darkMode: UIColor
+    let light: UIColor
+    let dark: UIColor
+    //TODO: ömer lightMode, darkMode
     
     var resolvedColor: UIColor {
         UIColor { trait in
-            trait.userInterfaceStyle == .light ? lightMode : darkMode
+            trait.userInterfaceStyle == .light ? light : dark
         }
     }
 }
