@@ -1,15 +1,13 @@
 //
-//  IRJsonPlaceHolderService.swift
-//  IRNetworking
+//  JPHUserListEntity.swift
+//  IRJPH
 //
-//  Created by Ömer Faruk Öztürk on 9.04.2025.
+//  Created by Ömer Faruk Öztürk on 21.04.2025.
 //
 
-import Foundation
+import IRNetworking
 
-public typealias IRJPHUser = IRJsonPlaceHolderModels.User
-
-public enum IRJsonPlaceHolderModels {
+public enum JPHUserListEntity {
     
     public struct Company: Codable {
         public let name: String?
@@ -43,13 +41,13 @@ public enum IRJsonPlaceHolderModels {
 }
 
 @MainActor
-public protocol IRJsonPlaceHolderServiceProtocol {
-    func fetchUsers() async throws -> [IRJPHUser]
+public protocol JsonPlaceHolderServiceProtocol {
+    func fetchUsers() async throws -> [JPHUserListEntity.User]
 }
 
-public final class IRJsonPlaceHolderService: IRBaseService, IRJsonPlaceHolderServiceProtocol {
-    public func fetchUsers() async throws -> [IRJPHUser] {
-        let request = GenericAPIRequest<[IRJPHUser]>(
+public final class JsonPlaceHolderService: IRBaseService, JsonPlaceHolderServiceProtocol {
+    public func fetchUsers() async throws -> [JPHUserListEntity.User] {
+        let request = GenericAPIRequest<[JPHUserListEntity.User]>(
             environment: .jsonPlaceholder,
             path: IREndpoints.JsonPlaceHolder.users.path,
             method: .get,

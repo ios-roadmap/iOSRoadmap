@@ -16,8 +16,8 @@ import IRJPHInterface
 @MainActor
 enum IRDashboardDemoRegistrar {
     static func registerDepencies() {
-        IRDependencyContainer.shared.register(IRJsonPlaceHolderServiceProtocol.self, scope: .service, factory: {
-            IRJsonPlaceHolderService()
+        IRDependencyContainer.shared.register(JsonPlaceHolderServiceProtocol.self, scope: .service, factory: {
+            JsonPlaceHolderService()
         })
         
         IRDependencyContainer.shared.register(IRDashboardInterface.self, scope: .module) { IRDashboardFactory().create() }
