@@ -21,9 +21,8 @@ public final class Button: UIControl {
 
     // MARK: - Subviews
     private let titleLabel       = TextLabel()
-    private let imageView        = UIImageView()
+    private let imageView        = ImageView()
     private let contentStack     = UIStackView()
-    //TODO: bunlar ayrı component'ler olacak!
     private let highlightOverlay = UIView()
 
     // MARK: - Init
@@ -59,8 +58,8 @@ public final class Button: UIControl {
 
         // ---- Highlight Layer
         // Highlight overlay now uses token
-               highlightOverlay.backgroundColor = Colors.pressedOverlay
-               highlightOverlay.layer.cornerRadius = style.cornerRadius
+        highlightOverlay.backgroundColor = Colors.pressedOverlay
+        highlightOverlay.layer.cornerRadius = style.cornerRadius
         highlightOverlay.isUserInteractionEnabled = false
         highlightOverlay.translatesAutoresizingMaskIntoConstraints = false
         highlightOverlay.alpha = 0
@@ -82,10 +81,11 @@ public final class Button: UIControl {
         titleLabel.isUserInteractionEnabled = false
 
         // ---- Icon
-        imageView.image       = icon?.withRenderingMode(.alwaysTemplate)
-        imageView.tintColor   = style.foreground
-        imageView.contentMode = .scaleAspectFit
-        imageView.isUserInteractionEnabled = false
+        imageView
+            .withImage(icon?.withRenderingMode(.alwaysTemplate))
+            .withTintColor(style.foreground)
+            .withContentMode(.scaleAspectFit)
+            .withUserInteraction(false)
 
         // ---- Content Stack
         contentStack.axis         = .horizontal

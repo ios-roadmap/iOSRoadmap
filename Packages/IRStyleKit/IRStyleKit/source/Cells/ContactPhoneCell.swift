@@ -8,108 +8,121 @@
 import UIKit
 
 public final class ContactPhoneCell: IRBaseCell {
-
-    private lazy var avatarImageView: UIImageView = {
-        let view = UIImageView()
-        view.contentMode = .scaleAspectFit
-        view.image = UIImage(systemName: "phone")
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    
+    // MARK: Layout Metrics
+    private enum Metrics {
+        //        static let horizontalPadding: CGFloat = 16
+        //        static let verticalPadding: CGFloat   = 12
+        //        static let avatarSide: CGFloat        = 48
+        //        static let actionSide: CGFloat        = 32
+        static let horizontalSpacing: CGFloat = 8
+        static let verticalSpacing: CGFloat   = 4
+    }
+    
+    // MARK: UI Elements
+    private let avatarImageView = ImageView()
+        .withContentMode(.scaleAspectFit)
+    
+    private lazy var actionButton: Button = {
+        Button(style: .iconOnly,
+               icon: UIImage(systemName: "ellipsis")) { [weak self] in
+            self?.handleAction()
+        }
     }()
     
-    private lazy var verticalStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [titlePhone, labelPhone])
-        stackView.axis = .vertical
-        stackView.spacing = 4
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
+    private let nameLabel = TextLabel()
+        .withTypography(.body)
+        .withTextColor(.label)
+        .withAlignment(.left)
+        .withLines(0)
+    
+    private let phoneLabel = TextLabel()
+        .withTypography(.badge)
+        .withTextColor(.secondaryLabel)
+        .withAlignment(.left)
+        .withLines(0)
+    
+    private lazy var contentStack: StackView = {
+        let vertical = StackView(.vertical(spacing: Metrics.verticalSpacing)) {
+            nameLabel
+            phoneLabel
+        }
+        
+        avatarImageView.setContentHuggingPriority(.required, for: .horizontal)
+        avatarImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+        actionButton.setContentHuggingPriority(.required, for: .horizontal)
+        actionButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        
+        return StackView(.horizontal(spacing: Metrics.horizontalSpacing)) {
+            avatarImageView
+            vertical
+            actionButton
+        }
     }()
     
-    private lazy var titlePhone: UILabel = {
-        let view = UILabel()
-        view.font = .systemFont(ofSize: 17, weight: .medium)
-        view.textColor = .label
-        view.text = "Omer Faruk"
-        view.textAlignment = .left
-        view.numberOfLines = 0
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    private lazy var labelPhone: UILabel = {
-        let view = UILabel()
-        view.font = .systemFont(ofSize: 13, weight: .regular)
-        view.textColor = .secondaryLabel
-        view.text = "+90 543 123 32 32"
-        view.textAlignment = .left
-        view.numberOfLines = 0
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    private lazy var ellipsisButton: UIButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(systemName: "ellipsis")
-        button.setImage(image, for: .normal)
-        button.tintColor = .gray
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    private lazy var horizontalStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [avatarImageView, verticalStackView, ellipsisButton])
-        stackView.axis = .horizontal
-        stackView.spacing = 8
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-
+    // MARK: Lifecycle
     public override func setup() {
         super.setup()
-        
-        contentView.addSubview(horizontalStackView)
-        setupConstraints()
-        
-        ellipsisButton.addAction {
-            print("Triggered ellipsis button action")
-        }
+        contentView.addSubview(contentStack)
+        applyLayout()
     }
     
-    private func setupConstraints() {
+    // MARK: Configuration
+    public override func configureContent(with viewModel: IRBaseCellViewModel) {
+        guard let vm = viewModel as? ContactPhoneCellViewModel else { return }
+        nameLabel.text  = vm.name
+        phoneLabel.text = vm.maskedPhone
+        avatarImageView.image = vm.avatar
+    }
+    
+    // MARK: Private Helpers
+    private func applyLayout() {
         NSLayoutConstraint.activate([
-            horizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            horizontalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            horizontalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            horizontalStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
-
+            contentStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            contentStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            contentStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            contentStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
+            
             avatarImageView.widthAnchor.constraint(equalToConstant: 48),
             avatarImageView.heightAnchor.constraint(equalTo: avatarImageView.widthAnchor),
-
-            ellipsisButton.widthAnchor.constraint(equalToConstant: 32),
-            ellipsisButton.heightAnchor.constraint(equalTo: ellipsisButton.widthAnchor)
+            
+            actionButton.widthAnchor.constraint(equalToConstant: 32),
+            actionButton.heightAnchor.constraint(equalTo: actionButton.widthAnchor)
         ])
     }
-
-    public override func configureContent(with viewModel: IRBaseCellViewModel) {
-        guard let viewModel = viewModel as? ContactPhoneCellViewModel else { return }
-        
+    
+    private func handleAction() {
+        print("Triggered ellipsis button action")
+        // Hook to delegate / closure if required
     }
 }
 
 public final class ContactPhoneCellViewModel: IRBaseCellViewModel {
+    
+    // Exposed data
+    let name: String
+    let maskedPhone: String
+    let avatar: UIImage
+    
+    // Wiring
     public override class var cellClass: IRBaseCell.Type { ContactPhoneCell.self }
-
-    public override init(
+    
+    // Init
+    public init(
+        name: String = "ÖMER",
+        phone: String = "5436176299",
+        avatar: UIImage = UIImage(systemName: "phone")!,
         onSelect: (() -> Void)? = nil,
         onPrefetch: (() -> Void)? = nil,
         swipeActions: [IRSwipeAction]? = nil,
         isSelectionEnabled: Bool = false
     ) {
-        
-        super.init(onSelect: onSelect, onPrefetch: onPrefetch, swipeActions: swipeActions, isSelectionEnabled: isSelectionEnabled)
-    }
-
-    public override func configure(cell: IRBaseCell) {
-        super.configure(cell: cell)
+        self.name        = name
+        self.maskedPhone = phone
+        self.avatar      = avatar
+        super.init(onSelect: onSelect,
+                   onPrefetch: onPrefetch,
+                   swipeActions: swipeActions,
+                   isSelectionEnabled: isSelectionEnabled)
     }
 }
