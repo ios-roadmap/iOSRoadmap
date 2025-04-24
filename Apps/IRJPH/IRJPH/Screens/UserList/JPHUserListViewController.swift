@@ -5,15 +5,18 @@
 //  Created by Ömer Faruk Öztürk on 21.04.2025.
 //
 
-import IRStyleKit
 import UIKit
+import IRStyleKit
+import IRFoundation
 
 final class JPHUserListViewController: IRViewController, JPHUserListViewControllerLogic {
     
     private let interactor: JPHUserListInteractorLogic
+    private let navigator: NavigationLogic
     
-    init(interactor: JPHUserListInteractorLogic) {
+    init(interactor: JPHUserListInteractorLogic, navigator: NavigationLogic) {
         self.interactor = interactor
+        self.navigator = navigator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -30,15 +33,18 @@ final class JPHUserListViewController: IRViewController, JPHUserListViewControll
     }
     
     func displayUserList(usersNames: [JPHUserListEntity.User]) {
-        let items: [IRTextCellViewModel] = usersNames.map { user in
-            IRTextCellViewModel(text: user.name ?? "") {
-                JPHUserListRouter.navigateToDetail(from: self, user: user)
+        let items: [IRBaseCellViewModel] = usersNames.map { user in
+            //TODO: Builder'dan beslenmeli.
+            ContactPhoneCellViewModel(name: (user.name)~, phone: (user.phone)~) { [weak self] in
+                guard let self else { return }
+                navigator.navigateToDetail(from: self, user: user)
             }
         }
         
         update(sections: [.init(items: items)])
     }
     
+    //TODO: Burası customize olarak StyleKit'den gelmeli. Özel bir Alert çalışması. Farklı temalarla birlikte.
     func display(error message: String) {
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         alert.addAction(.init(title: "OK", style: .default))

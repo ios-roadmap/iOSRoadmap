@@ -22,8 +22,8 @@ public final class StackView: UIStackView {
     }
     
     public init(
-        _ kind: Kind, @ArrangedSubviewsBuilder _ views: () -> [UIView]
-    ) {
+        _ kind: Kind, @ArrangedSubviewsBuilder _ views: () throws -> [UIView]
+    ) rethrows {
         super.init(frame: .zero)
         switch kind {
         case .horizontal(let spacing):
@@ -34,8 +34,10 @@ public final class StackView: UIStackView {
             self.spacing = spacing
         }
         translatesAutoresizingMaskIntoConstraints = false
-        views().forEach(addArrangedSubview(_:))
-    }
+        for view in try views() {
+            addArrangedSubview(view)
+        }
+    } 
     
     public required init(coder: NSCoder) {
         fatalError("Use init(_:views:) instead.")

@@ -8,18 +8,12 @@
 import UIKit
 
 @MainActor
-public enum JPHUserListRouter {
-    
-    static func build() -> JPHUserListViewController {
+enum JPHUserListBuild {
+    static func build(with model: JPHUserListEntity.Build) -> JPHUserListViewController {
         let presenter = JPHUserListPresenter()
-        let interactor = JPHUserListInteractor(presenter: presenter)
-        let view = JPHUserListViewController(interactor: interactor)
+        let interactor = JPHUserListInteractor(presenter: presenter, data: model.data)
+        let view = JPHUserListViewController(interactor: interactor, navigator: model.navigator)
         presenter.view = view
         return view
-    }
-    
-    static func navigateToDetail(from vc: UIViewController, user: JPHUserListEntity.User) {
-        let detailVC = IRJPHUserDetailViewController(userName: user.name ?? "")
-        vc.navigationController?.pushViewController(detailVC, animated: true)
     }
 }
