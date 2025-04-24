@@ -5,7 +5,7 @@
 //  Created by Ömer Faruk Öztürk on 21.04.2025.
 //
 
-import Foundation
+import UIKit
 
 @MainActor
 public protocol JPHUserListInteractorLogic: AnyObject {
@@ -21,4 +21,9 @@ public protocol JPHUserListPresenterLogic: AnyObject {
 public protocol JPHUserListViewControllerLogic: AnyObject {
     func displayUserList(usersNames: [JPHUserListEntity.User])
     func display(error message: String)
+}
+
+@MainActor
+protocol JPHUserListRouterLogic {
+    func navigateToDetail(from vc: UIViewController, user: JPHUserListEntity.User)
 }

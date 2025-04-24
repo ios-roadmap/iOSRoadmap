@@ -9,6 +9,15 @@ import IRNetworking
 
 public enum JPHUserListEntity {
     
+    struct Build {
+        var navigator: NavigationLogic
+        var data: JPHUserListData = .init()
+    }
+    
+    struct JPHUserListData {
+        
+    }
+    
     public struct Company: Codable {
         public let name: String?
         public let catchPhrase: String?
@@ -39,6 +48,8 @@ public enum JPHUserListEntity {
         public let company: Company?
     }
 }
+
+//TODO: Burası Service Katmanına taşınmalı ya da modülün service'i ayrı olmalı. Burası düşünülecek.
 
 @MainActor
 public protocol JsonPlaceHolderServiceProtocol {

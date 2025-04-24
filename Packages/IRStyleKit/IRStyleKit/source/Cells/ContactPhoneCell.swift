@@ -99,19 +99,16 @@ public final class ContactPhoneCell: IRBaseCell {
 
 public final class ContactPhoneCellViewModel: IRBaseCellViewModel {
     
-    // Exposed data
     let name: String
     let maskedPhone: String
     let avatar: UIImage
     
-    // Wiring
     public override class var cellClass: IRBaseCell.Type { ContactPhoneCell.self }
     
-    // Init
     public init(
         name: String = "ÖMER",
         phone: String = "5436176299",
-        avatar: UIImage = UIImage(systemName: "phone")!,
+        avatar: UIImage = UIImage(systemName: "person.fill")!, //TODO: Add Circle background image person.fill
         onSelect: (() -> Void)? = nil,
         onPrefetch: (() -> Void)? = nil,
         swipeActions: [IRSwipeAction]? = nil,

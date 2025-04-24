@@ -14,7 +14,7 @@ public final class JPHUserListInteractor: JPHUserListInteractorLogic {
     @IRService private var userService: JsonPlaceHolderServiceProtocol
     private let presenter: JPHUserListPresenterLogic
     
-    init(presenter: JPHUserListPresenterLogic) {
+    init(presenter: JPHUserListPresenterLogic, data: JPHUserListEntity.JPHUserListData? = nil) {
         self.presenter = presenter
     }
     

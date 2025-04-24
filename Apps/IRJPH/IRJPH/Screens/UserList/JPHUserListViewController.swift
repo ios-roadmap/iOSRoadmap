@@ -12,9 +12,11 @@ import IRFoundation
 final class JPHUserListViewController: IRViewController, JPHUserListViewControllerLogic {
     
     private let interactor: JPHUserListInteractorLogic
+    private let navigator: NavigationLogic
     
-    init(interactor: JPHUserListInteractorLogic) {
+    init(interactor: JPHUserListInteractorLogic, navigator: NavigationLogic) {
         self.interactor = interactor
+        self.navigator = navigator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -33,8 +35,9 @@ final class JPHUserListViewController: IRViewController, JPHUserListViewControll
     func displayUserList(usersNames: [JPHUserListEntity.User]) {
         let items: [IRBaseCellViewModel] = usersNames.map { user in
             //TODO: Builder'dan beslenmeli.
-            ContactPhoneCellViewModel(name: (user.name)~, phone: (user.phone)~, avatar: .checkmark) {
-                JPHUserListRouter.navigateToDetail(from: self, user: user)
+            ContactPhoneCellViewModel(name: (user.name)~, phone: (user.phone)~) { [weak self] in
+                guard let self else { return }
+                navigator.navigateToDetail(from: self, user: user)
             }
         }
         
