@@ -7,6 +7,8 @@
 
 import UIKit
 
+//TODO: TableView yapısı değişecek. Ayrı bir component gibi olmalı. Tıpki, StackView gibi.
+
 @MainActor
 public final class IRTableViewAdapter: NSObject {
     private weak var tableView: UITableView?

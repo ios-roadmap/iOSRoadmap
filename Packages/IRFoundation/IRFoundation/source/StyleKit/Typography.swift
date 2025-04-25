@@ -7,155 +7,151 @@
 
 import UIKit
 
-/// Centralised, design‑system source‑of‑truth for every text role your app
-/// should ever need. Keep it self‑contained and resist the urge to hard‑code
-/// ad‑hoc fonts elsewhere.
-public enum Typography: CaseIterable {
+/// Centralised typographic catalogue for the entire app.
+///
+/// Every text role is expressed as a case, grouped by nested enums that capture
+/// natural hierarchies (e.g. *Body*, *Title*, *Control*).
+/// - Keeps one-switch mapping between semantic intent and `UIFont`.
+/// - Plays nicely with Dynamic Type via `UIFontMetrics`.
+/// - Written in British English for consistency across the codebase.
+public enum Typography {
 
-    // MARK: - Display / Hero
-    /// Immersive, billboard‑sized copy for onboarding or hero banners
-    /// – 40 pt Regular
-    case display1
+    // MARK: - Primary categories (public façade)
 
-    // MARK: - Large Titles
-    /// Primary screen heading (large nav bar, Settings root, etc.)
-    /// – 34 pt Regular
+    /// Immersive, billboard-sized copy (e.g. onboarding hero banners).
+    case display(Display)
+
+    /// Large navigation titles (e.g. Settings root, first-class headings).
     case largeTitle
 
-    // MARK: - Titles
-    /// Section header, top hierarchy
-    /// – 28 pt Regular
-    case title1
-    /// Section header, mid hierarchy
-    /// – 22 pt Regular
-    case title2
-    /// Section header, lowest hierarchy
-    /// – 20 pt Regular
-    case title3
+    /// Section headings of varying depths.
+    case title(Title)
 
-    // MARK: - Headlines
-    /// Prominent single‑line heading inside cards or lists
-    /// – 17 pt Semibold
+    /// Prominent single-line heading inside cards or lists.
     case headline
-    /// Secondary heading that follows a headline
-    /// – 15 pt Regular
+
+    /// Secondary heading that follows a headline.
     case subheadline
 
-    // MARK: - Body
-    /// Default paragraph text
-    /// – 17 pt Regular
-    case body
-    /// Body with medium emphasis (subtle highlight)
-    /// – 17 pt Medium
-    case bodyMedium
-    /// Body with strong emphasis (but not full bold)
-    /// – 17 pt Semibold
-    case bodySemibold
+    /// Body text with weight variants for emphasis.
+    case body(Body)
 
-    // MARK: - Callout
-    /// Supporting one‑liners or in‑cell meta
-    /// – 16 pt Regular
+    /// Supporting one-liners or in-cell meta.
     case callout
 
-    // MARK: - Footnotes & Captions
-    /// Disclaimers, timestamps, metadata
-    /// – 13 pt Regular
+    /// Disclaimers, timestamps or metadata.
     case footnote
-    /// Image captions, table headers
-    /// – 12 pt Regular
-    case caption1
-    /// Micro‑labels under controls or icons
-    /// – 11 pt Regular
-    case caption2
 
-    // MARK: - Numerics
-    /// Monospaced digits for timers, code snippets, counters
-    /// – 17 pt Regular (Monospaced)
+    /// Image captions, table headers or micro-labels.
+    case caption(Caption)
+
+    /// Monospaced digits for timers, code snippets or counters.
     case monospacedDigit
 
-    // MARK: - Controls
-    /// Button labels
-    /// – 17 pt Semibold
-    case button
-    /// Tab‑bar item titles
-    /// – 10 pt Regular
-    case tabBar
-    /// Compact navigation‑bar titles / back‑button text
-    /// – 17 pt Regular
-    case navigationBar
+    /// Text on interactive controls such as buttons, tabs or the nav bar.
+    case control(Control)
 
-    // MARK: - Badges
-    /// Pill‑style badge numbers or status pills
-    /// – 13 pt Semibold
-    case badge
-    /// Ultra‑small badge inside icons (network bars, tiny counters)
-    /// – 10 pt Regular
-    case micro
+    /// Pill-style badge numbers or status indicators.
+    case badge(Badge)
 
-    var pointSize: CGFloat {
-        switch self {
-        case .display1:                  return 40
-        case .largeTitle:                return 34
-        case .title1:                    return 28
-        case .title2:                    return 22
-        case .title3:                    return 20
-        case .headline:                  return 17
-        case .subheadline:               return 15
-        case .body, .bodyMedium,
-             .bodySemibold,
-             .monospacedDigit,
-             .button,
-             .navigationBar:             return 17
-        case .callout:                   return 16
-        case .footnote:                  return 13
-        case .caption1:                  return 12
-        case .caption2:                  return 11
-        case .tabBar, .micro:            return 10
-        case .badge:                     return 13
-        }
+    // MARK: - Nested role enums ------------------------------------------------
+
+    /// Display-scale variants.
+    public enum Display: CaseIterable {
+        /// 40 pt Regular hero text.
+        case hero
     }
 
-    var weight: UIFont.Weight {
-        switch self {
-        case .headline, .bodySemibold, .button, .badge:
-            return .semibold
-        case .bodyMedium:
-            return .medium
-        default:
-            return .regular
-        }
+    /// Title hierarchy.
+    public enum Title: CaseIterable {
+        /// 28 pt Regular – top-level section header.
+        case one
+        /// 22 pt Regular – mid-level section header.
+        case two
+        /// 20 pt Regular – low-level section header.
+        case three
     }
 
-    var textStyle: UIFont.TextStyle {
-        switch self {
-        case .display1, .largeTitle:     return .largeTitle
-        case .title1:                    return .title1
-        case .title2:                    return .title2
-        case .title3:                    return .title3
-        case .headline:                  return .headline
-        case .subheadline:               return .subheadline
-        case .body, .bodyMedium,
-             .bodySemibold,
-             .monospacedDigit:           return .body
-        case .callout:                   return .callout
-        case .footnote:                  return .footnote
-        case .caption1:                  return .caption1
-        case .caption2:                  return .caption2
-        case .button:                    return .body         // Dynamic‑Type ties button to .body
-        case .tabBar, .micro:            return .caption2
-        case .navigationBar:             return .headline
-        case .badge:                     return .caption2
-        }
+    /// Body-weight modifiers.
+    public enum Body: CaseIterable {
+        /// 17 pt Regular – default paragraph text.
+        case regular
+        /// 17 pt Medium – subtle highlight.
+        case medium
+        /// 17 pt Semibold – strong emphasis.
+        case semibold
     }
 
-    /// Returns a Dynamic‑Type‑aware `UIFont` for the style.
+    /// Caption sizes.
+    public enum Caption: CaseIterable {
+        /// 12 pt Regular – standard caption.
+        case one
+        /// 11 pt Regular – micro caption.
+        case two
+    }
+
+    /// System control text.
+    public enum Control: CaseIterable {
+        /// 17 pt Semibold – button labels.
+        case button
+        /// 10 pt Regular – tab-bar item titles.
+        case tabBar
+        /// 17 pt Regular – compact nav-bar titles / back button text.
+        case navigationBar
+    }
+
+    /// Badge sizes.
+    public enum Badge: CaseIterable {
+        /// 13 pt Semibold – standard pill badge.
+        case normal
+        /// 10 pt Regular – ultra-small badge inside icons.
+        case micro
+    }
+
+    // MARK: - Font mapping -----------------------------------------------------
+
+    /// Dynamic-Type-aware `UIFont` resolver.
     public func font() -> UIFont {
-        let base: UIFont
-        if self == .monospacedDigit {
-            base = .monospacedSystemFont(ofSize: pointSize, weight: weight)
-        } else {
-            base = .systemFont(ofSize: pointSize, weight: weight)
+        let descriptor: (size: CGFloat,
+                         weight: UIFont.Weight,
+                         style: UIFont.TextStyle,
+                         monospaced: Bool)
+
+        switch self {
+        case .display:                      descriptor = (40, .regular,  .largeTitle, false)
+        case .largeTitle:                   descriptor = (34, .regular,  .largeTitle, false)
+
+        case .title(.one):                  descriptor = (28, .regular,  .title1,     false)
+        case .title(.two):                  descriptor = (22, .regular,  .title2,     false)
+        case .title(.three):                descriptor = (20, .regular,  .title3,     false)
+
+        case .headline:                     descriptor = (17, .semibold, .headline,   false)
+        case .subheadline:                  descriptor = (15, .regular,  .subheadline,false)
+
+        case .body(.regular):               descriptor = (17, .regular,  .body,       false)
+        case .body(.medium):                descriptor = (17, .medium,   .body,       false)
+        case .body(.semibold):              descriptor = (17, .semibold, .body,       false)
+
+        case .callout:                      descriptor = (16, .regular,  .callout,    false)
+        case .footnote:                     descriptor = (13, .regular,  .footnote,   false)
+
+        case .caption(.one):                descriptor = (12, .regular,  .caption1,   false)
+        case .caption(.two):                descriptor = (11, .regular,  .caption2,   false)
+
+        case .monospacedDigit:              descriptor = (17, .regular,  .body,       true)
+
+        case .control(.button):             descriptor = (17, .semibold, .body,       false)
+        case .control(.tabBar):             descriptor = (10, .regular,  .caption2,   false)
+        case .control(.navigationBar):      descriptor = (17, .regular,  .headline,   false)
+
+        case .badge(.normal):               descriptor = (13, .semibold, .caption2,   false)
+        case .badge(.micro):                descriptor = (10, .regular,  .caption2,   false)
         }
-        return UIFontMetrics(forTextStyle: textStyle).scaledFont(for: base)
+
+        let base = descriptor.monospaced
+            ? UIFont.monospacedSystemFont(ofSize: descriptor.size, weight: descriptor.weight)
+            : UIFont.systemFont(ofSize: descriptor.size, weight: descriptor.weight)
+
+        return UIFontMetrics(forTextStyle: descriptor.style).scaledFont(for: base)
     }
 }

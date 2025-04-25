@@ -27,13 +27,13 @@ public final class ContactPhoneCell: IRBaseCell {
         .withCompressionResistance(.required, axis: .horizontal)
     
     private let nameLabel = TextLabel()
-        .withTypography(.body)
+        .withTypography(.body(.semibold))
         .withTextColor(.label)
         .withAlignment(.left)
         .withLines(0)
     
     private let phoneLabel = TextLabel()
-        .withTypography(.badge)
+        .withTypography(.caption(.one))
         .withTextColor(.secondaryLabel)
         .withAlignment(.left)
         .withLines(0)
