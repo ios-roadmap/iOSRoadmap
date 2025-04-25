@@ -22,13 +22,9 @@ public final class ContactPhoneCell: IRBaseCell {
     // MARK: UI Elements
     private let avatarImageView = ImageView()
         .withContentMode(.scaleAspectFit)
-    
-    private lazy var actionButton: Button = {
-        Button(style: .iconOnly,
-               icon: UIImage(systemName: "ellipsis")) { [weak self] in
-            self?.handleAction()
-        }
-    }()
+        .withSize(width: 48)
+        .withContentHugging(.required, axis: .horizontal)
+        .withCompressionResistance(.required, axis: .horizontal)
     
     private let nameLabel = TextLabel()
         .withTypography(.body)
@@ -48,15 +44,9 @@ public final class ContactPhoneCell: IRBaseCell {
             phoneLabel
         }
         
-        avatarImageView.setContentHuggingPriority(.required, for: .horizontal)
-        avatarImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
-        actionButton.setContentHuggingPriority(.required, for: .horizontal)
-        actionButton.setContentCompressionResistancePriority(.required, for: .horizontal)
-        
         return StackView(.horizontal(spacing: Metrics.horizontalSpacing)) {
             avatarImageView
             vertical
-            actionButton
         }
     }()
     
@@ -70,9 +60,9 @@ public final class ContactPhoneCell: IRBaseCell {
     // MARK: Configuration
     public override func configureContent(with viewModel: IRBaseCellViewModel) {
         guard let vm = viewModel as? ContactPhoneCellViewModel else { return }
-        nameLabel.text  = vm.name
-        phoneLabel.text = vm.maskedPhone
-        avatarImageView.image = vm.avatar
+        nameLabel.withText(vm.name)
+        phoneLabel.withText(vm.maskedPhone)
+        avatarImageView.withImage(vm.avatar)
     }
     
     // MARK: Private Helpers
@@ -82,12 +72,6 @@ public final class ContactPhoneCell: IRBaseCell {
             contentStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             contentStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             contentStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
-            
-            avatarImageView.widthAnchor.constraint(equalToConstant: 48),
-            avatarImageView.heightAnchor.constraint(equalTo: avatarImageView.widthAnchor),
-            
-            actionButton.widthAnchor.constraint(equalToConstant: 32),
-            actionButton.heightAnchor.constraint(equalTo: actionButton.widthAnchor)
         ])
     }
     
