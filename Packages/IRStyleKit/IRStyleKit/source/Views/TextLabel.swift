@@ -10,7 +10,7 @@ import IRFoundation
 
 public final class TextLabel: UILabel {
 
-    private var typography: Typography = .body
+    private var typography: Typography = .body(.regular)
     private var textTransform: TextTransform = .none
     private var padding: UIEdgeInsets = .zero
     private var originalText: String?

@@ -7,35 +7,53 @@
 
 import UIKit
 
+/// Semantic, design-system button styles.
+///
+/// Maps each visual style to typographic, colour, spacing and layout tokens.
+/// Works hand-in-glove with the `Typography` nested-enum model.
 public enum ButtonStyle: CaseIterable {
 
-    // Filled --------------------------------------------------------------
+    // MARK: - Filled ------------------------------------------------------
+
+    /// Solid background, brand-coloured.
     case filledPrimary, filledSecondary, filledSuccess, filledWarning, filledDestructive
-    // Outlined ------------------------------------------------------------
+
+    // MARK: - Outlined ----------------------------------------------------
+
+    /// Transparent fill with 1-pt stroke.
     case outlinedPrimary, outlinedSecondary, outlinedDestructive
-    // Ghost ---------------------------------------------------------------
+
+    // MARK: - Ghost -------------------------------------------------------
+
+    /// No stroke, subtle background on highlight.
     case ghost
-    // Link ----------------------------------------------------------------
+
+    // MARK: - Link --------------------------------------------------------
+
+    /// Text-only button, behaves like a hyperlink.
     case link, linkUnderlined
-    // Icon‑only -----------------------------------------------------------
+
+    // MARK: - Icon-only ---------------------------------------------------
+
+    /// Square button containing just an icon.
     case iconOnly
 
-    // MARK: - Tokens
+    // MARK: - Tokens ------------------------------------------------------
 
-    /// Typography choice per style
+    /// Typography token per style.
     public var typography: Typography {
         switch self {
         case .link, .linkUnderlined, .iconOnly:
             return .callout
         case .filledSecondary, .outlinedSecondary, .ghost:
-            return .bodyMedium
+            return .body(.medium)
         case .filledPrimary, .filledSuccess, .filledWarning, .filledDestructive,
              .outlinedPrimary, .outlinedDestructive:
-            return .bodySemibold
+            return .body(.semibold)
         }
     }
 
-    /// Text transform
+    /// Text transform (e.g. uppercase for destructive states).
     public var textTransform: TextTransform {
         switch self {
         case .filledDestructive, .outlinedDestructive: return .uppercase
@@ -43,7 +61,7 @@ public enum ButtonStyle: CaseIterable {
         }
     }
 
-    /// Horizontal gap between title & icon
+    /// Horizontal gap between title and icon.
     public var spacing: Spacing {
         switch self {
         case .link, .linkUnderlined: return .micro
@@ -52,7 +70,7 @@ public enum ButtonStyle: CaseIterable {
         }
     }
 
-    /// Icon placement
+    /// Icon placement relative to the title.
     public var iconAlignment: IconAlignment {
         switch self {
         case .link, .linkUnderlined: return .trailing
@@ -60,30 +78,33 @@ public enum ButtonStyle: CaseIterable {
         }
     }
 
-    /// Fixed height (px)
+    /// Fixed height (pt).
     public var height: CGFloat {
         switch typography {
-        case .body, .bodyMedium, .bodySemibold: return 40
-        case .callout:                          return 36
-        default:                                return 30   // caption / micro fall‑back
+        case .body:                               return 40            // .regular weight
+        case .body(.medium), .body(.semibold):    return 40
+        case .callout:                            return 36
+        default:                                  return 30            // fallback for rare cases
         }
     }
-    
+
+    /// Background colour token.
     public var background: UIColor {
         switch self {
-        case .filledPrimary:      return Colors.accentPrimary
-        case .filledSecondary:    return Colors.accentSecondary
-        case .filledSuccess:      return Colors.success
-        case .filledWarning:      return Colors.warning
-        case .filledDestructive:  return Colors.destructive
-        default:                  return .clear
+        case .filledPrimary:     return Colors.accentPrimary
+        case .filledSecondary:   return Colors.accentSecondary
+        case .filledSuccess:     return Colors.success
+        case .filledWarning:     return Colors.warning
+        case .filledDestructive: return Colors.destructive
+        default:                 return .clear
         }
     }
-    
+
+    /// Foreground (text / icon) colour token.
     public var foreground: UIColor {
         switch self {
         case .filledPrimary, .filledSecondary, .filledSuccess,
-                .filledWarning, .filledDestructive:
+             .filledWarning, .filledDestructive:
             return .white
         case .ghost, .outlinedSecondary:
             return Colors.accentSecondary
@@ -95,7 +116,8 @@ public enum ButtonStyle: CaseIterable {
             return Colors.accentSecondary
         }
     }
-    
+
+    /// Border colour token (nil for borderless styles).
     public var border: UIColor? {
         switch self {
         case .outlinedPrimary:     return Colors.accentPrimary
@@ -104,15 +126,15 @@ public enum ButtonStyle: CaseIterable {
         default:                   return nil
         }
     }
-    
-    /// Corner radius
+
+    /// Corner radius (pt).
     public var cornerRadius: CGFloat {
         switch self {
         case .iconOnly:
-            // Full pill for square icon buttons
+            /// Full pill for square icon buttons.
             return height / 2
         case .link, .linkUnderlined:
-            // No background therefore no radius
+            /// No background; no rounding.
             return 0
         default:
             return 8
