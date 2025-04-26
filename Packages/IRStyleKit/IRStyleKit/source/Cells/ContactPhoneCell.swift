@@ -20,11 +20,7 @@ public final class ContactPhoneCell: IRBaseCell {
     }
     
     // MARK: UI Elements
-    private let avatarImageView = ImageView()
-        .withContentMode(.scaleAspectFit)
-        .withSize(width: 48)
-        .withContentHugging(.required, axis: .horizontal)
-        .withCompressionResistance(.required, axis: .horizontal)
+   
     
     private let nameLabel = TextLabel()
         .withTypography(.body(.semibold))
@@ -45,7 +41,7 @@ public final class ContactPhoneCell: IRBaseCell {
         }
         
         return StackView(.horizontal(spacing: Metrics.horizontalSpacing)) {
-            avatarImageView
+//            avatarImageView
             vertical
         }
     }()
@@ -62,7 +58,7 @@ public final class ContactPhoneCell: IRBaseCell {
         guard let vm = viewModel as? ContactPhoneCellViewModel else { return }
         nameLabel.withText(vm.name)
         phoneLabel.withText(vm.maskedPhone)
-        avatarImageView.withImage(vm.avatar)
+//        avatarImageView.withi (vm.avatar)
     }
     
     // MARK: Private Helpers

@@ -9,9 +9,7 @@ import UIKit
 
 public final class ConfigurableCell: IRBaseCell {
     
-    private lazy var profilImage = ImageView()
-        .withContentMode(.scaleAspectFit)
-        .withSize(width: 48)
+    private let avatarImageView = AvatarInitialView()
         .withContentHugging(.required, axis: .horizontal)
         .withCompressionResistance(.required, axis: .horizontal)
     
@@ -20,7 +18,7 @@ public final class ConfigurableCell: IRBaseCell {
         .withTypography(.body(.semibold))
     
     private lazy var secondaryLabel = TextLabel()
-        .withTypography(.caption(.two))
+        .withTypography(.body(.regular))
     
     private lazy var labelStack = StackView(.vertical()) {
         primaryLabel
@@ -28,7 +26,7 @@ public final class ConfigurableCell: IRBaseCell {
     }
     
     private lazy var contentStack = StackView(.horizontal()) {
-        profilImage
+        avatarImageView
         labelStack
     }
     
@@ -51,9 +49,9 @@ public final class ConfigurableCell: IRBaseCell {
     public override func configureContent(with viewModel: IRBaseCellViewModel) {
         guard let viewModel = viewModel as? ConfigurableCellViewModel else { return }
         
-        profilImage.withImage(.add)
-        primaryLabel.withText("OMER")
-        secondaryLabel.withText("@ING")
+        
+        primaryLabel.withText(viewModel.name)
+        secondaryLabel.withText(viewModel.company)
     }
 }
 
@@ -61,8 +59,12 @@ public final class ConfigurableCellViewModel: IRBaseCellViewModel {
     
     public override class var cellClass: IRBaseCell.Type { ConfigurableCell.self }
     
-    public init() {
-        
+    let name: String
+    let company: String
+    
+    public init(name: String, company: String) {
+        self.name = name
+        self.company = company
         super.init()
     }
 }
