@@ -18,8 +18,8 @@ final class ContactPhoneDemoPageController: IRViewController, ShowcaseListViewCo
         setupSearchBar()
 
         let items: [IRBaseCellViewModel] = [
-            ConfigurableCellViewModel(),
-            ConfigurableCellViewModel()
+            ConfigurableCellViewModel(name: "Leanne Graham", company: "@Bret"),
+            ConfigurableCellViewModel(name: "Clementine Bauch", company: "@Karlanne")
         ]
 
         let section = IRTableSection(header: .title("Contact Phone"), items: items)
