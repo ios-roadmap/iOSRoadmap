@@ -81,10 +81,10 @@ public enum ButtonStyle: CaseIterable {
     /// Fixed height (pt).
     public var height: CGFloat {
         switch typography {
-        case .body:                               return 40            // .regular weight
+        case .body:                               return 40
         case .body(.medium), .body(.semibold):    return 40
         case .callout:                            return 36
-        default:                                  return 30            // fallback for rare cases
+        default:                                  return 30
         }
     }
 

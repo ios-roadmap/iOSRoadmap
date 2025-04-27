@@ -9,9 +9,22 @@ import UIKit
 
 @resultBuilder
 public enum ArrangedSubviewsBuilder {
-    public static func buildBlock(_ components: UIView...) -> [UIView] {
-        components
+
+    public static func buildBlock(_ components: UIView...) -> [UIView] { components }
+
+    /// Accept any number of `[UIView]` collections.
+    public static func buildBlock(_ components: [UIView]...) -> [UIView] {
+        components.flatMap { $0 }
     }
+
+    public static func buildExpression(_ expr: UIView) -> [UIView] { [expr] }
+
+    public static func buildExpression<C: Collection>(_ expr: C) -> [UIView]
+    where C.Element: UIView {
+        Array(expr)
+    }
+
+    public static func buildArray(_ parts: [[UIView]]) -> [UIView] { parts.flatMap { $0 } }
 }
 
 public final class StackView: UIStackView {
@@ -41,5 +54,17 @@ public final class StackView: UIStackView {
     
     public required init(coder: NSCoder) {
         fatalError("Use init(_:views:) instead.")
+    }
+}
+
+public extension UIView {
+    func pinEdges(to other: UIView) {
+        translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            leadingAnchor.constraint(equalTo: other.leadingAnchor),
+            trailingAnchor.constraint(equalTo: other.trailingAnchor),
+            topAnchor.constraint(equalTo: other.topAnchor),
+            bottomAnchor.constraint(equalTo: other.bottomAnchor)
+        ])
     }
 }

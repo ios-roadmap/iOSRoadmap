@@ -42,3 +42,9 @@ extension ContactPhoneDemoPageController: CustomSearchControllerDelegate {
         print("Search cancelled")
     }
 }
+
+extension ContactPhoneDemoPageController: SegmentViewDelegate {
+    func segmentView(_ segmentView: SegmentView, didSelect index: Int) {
+        print("Selected segment at index: \(index)")
+    }
+}

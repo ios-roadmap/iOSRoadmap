@@ -74,9 +74,13 @@ final class ButtonDemoPageController: IRViewController, ShowcaseListViewControll
         title: String? = nil,
         icon: UIImage? = nil
     ) {
-        let button = Button(style: style, title: title, icon: icon) {
-            print("\(style) tapped")
-        }
+        let button = Button()
+            .withStyle(style)
+            .withTitle(title)
+            .withIcon(icon)
+            .withAction {
+                print("\(style) tapped")
+            }
 
         stack.addArrangedSubview(button)
     }
