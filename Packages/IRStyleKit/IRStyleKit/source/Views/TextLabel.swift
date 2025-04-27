@@ -8,84 +8,146 @@
 import UIKit
 import IRFoundation
 
+// MARK: - TextLabel
 public final class TextLabel: UILabel {
-
-    private var typography: Typography = .body(.regular)
-    private var textTransform: TextTransform = .none
-    private var padding: UIEdgeInsets = .zero
-    private var originalText: String?
-
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        setup()
-    }
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        
-        setup()
-    }
     
-    private func setup() {
+    // MARK: Stored state
+    private var typography     : Typography    = .body(.regular)
+    private var transformRule  : TextTransform = .none
+    private var userPadding    : UIEdgeInsets  = .zero
+    private var borderPadding  : CGFloat       = .zero
+    private var cachedText     : String?
+
+    // MARK: Border
+    public enum Shape { case circle, rectangle }
+
+    private var shape   : Shape   = .rectangle
+    private var bColour : UIColor = .clear
+    private var bWidth  : CGFloat = .zero
+
+    private lazy var decoration: UIView = {
+        let v = UIView()
+        v.translatesAutoresizingMaskIntoConstraints = false
+        v.isUserInteractionEnabled = false
+        return v
+    }()
+
+    // MARK: Init
+    public override init(frame: CGRect = .zero) { super.init(frame: frame); configure() }
+    public required init?(coder: NSCoder)      { super.init(coder: coder); configure() }
+
+    private func configure() {
         translatesAutoresizingMaskIntoConstraints = false
         numberOfLines = 0
+        clipsToBounds = false
     }
 
+    // MARK: Layout
     public override func drawText(in rect: CGRect) {
-        super.drawText(in: rect.inset(by: padding))
+        let inset = UIEdgeInsets(
+            top:    userPadding.top    + borderPadding,
+            left:   userPadding.left   + borderPadding,
+            bottom: userPadding.bottom + borderPadding,
+            right:  userPadding.right  + borderPadding
+        )
+        super.drawText(in: rect.inset(by: inset))
     }
 
     public override var intrinsicContentSize: CGSize {
-        let size = super.intrinsicContentSize
-        return CGSize(width: size.width + padding.left + padding.right,
-                      height: size.height + padding.top + padding.bottom)
+        let base = super.intrinsicContentSize
+        let hPad = userPadding.left + userPadding.right + borderPadding * 2
+        let vPad = userPadding.top  + userPadding.bottom + borderPadding * 2
+        return CGSize(width: base.width + hPad, height: base.height + vPad)
+    }
+
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        guard bWidth > .ulpOfOne else { return }
+
+        decoration.layer.borderWidth   = bWidth
+        decoration.layer.borderColor   = bColour.cgColor
+        decoration.layer.masksToBounds = true
+        decoration.layer.cornerRadius  = shape == .circle
+                                       ? min(bounds.width, bounds.height) / 2
+                                       : 0
     }
 }
 
-extension TextLabel {
+// MARK: - Builder API
+public extension TextLabel {
+
     @discardableResult
-    public func withTypography(_ typography: Typography) -> Self {
-        font = typography.font()
+    func withTypography(_ style: Typography) -> Self {
+        typography = style
+        font = style.font()
         return self
     }
 
     @discardableResult
-    public func withText(_ text: String?) -> Self {
-        originalText = text
-        self.text = text.map { textTransform.apply(to: $0) }
+    func withText(_ value: String?) -> Self {
+        cachedText = value
+        text = value.map { transformRule.apply(to: $0) }
         return self
     }
 
     @discardableResult
-    public func withTransform(_ transform: TextTransform) -> Self {
-        textTransform = transform
-        self.text = originalText.map { transform.apply(to: $0) }
+    func withTransform(_ rule: TextTransform) -> Self {
+        transformRule = rule
+        text = cachedText.map { rule.apply(to: $0) }
         return self
     }
 
     @discardableResult
-    public func withPadding(_ spacing: Spacing) -> Self {
-        padding = .init(top: spacing.value, left: spacing.value, bottom: spacing.value, right: spacing.value)
+    func withPadding(_ spacing: Spacing) -> Self {
+        userPadding = .init(
+            top: spacing.value,
+            left: spacing.value,
+            bottom: spacing.value,
+            right: spacing.value
+        )
         setNeedsDisplay()
+        invalidateIntrinsicContentSize()
         return self
     }
 
     @discardableResult
-    public func withTextColor(_ color: UIColor) -> Self {
-        textColor = color
-        return self
+    func withTextColor(_ colour: UIColor) -> Self {
+        textColor = colour; return self
     }
 
     @discardableResult
-    public func withLines(_ count: Int) -> Self {
-        numberOfLines = count
-        return self
+    func withLines(_ n: Int) -> Self {
+        numberOfLines = n; return self
     }
 
     @discardableResult
-    public func withAlignment(_ alignment: NSTextAlignment) -> Self {
-        textAlignment = alignment
+    func withAlignment(_ a: NSTextAlignment) -> Self {
+        textAlignment = a; return self
+    }
+
+    @discardableResult
+    func withBorder(
+        _ shape: Shape,
+        colour: UIColor,
+        width: CGFloat = 1.0
+    ) -> Self {
+        self.shape  = shape
+        bColour     = colour
+        bWidth      = width
+        borderPadding = width + 4
+
+        if decoration.superview == nil {
+            insertSubview(decoration, at: 0)
+            NSLayoutConstraint.activate([
+                decoration.topAnchor.constraint(equalTo: topAnchor),
+                decoration.leadingAnchor.constraint(equalTo: leadingAnchor),
+                decoration.trailingAnchor.constraint(equalTo: trailingAnchor),
+                decoration.bottomAnchor.constraint(equalTo: bottomAnchor)
+            ])
+        }
+
+        setNeedsLayout()
+        invalidateIntrinsicContentSize()
         return self
     }
 }

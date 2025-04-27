@@ -18,6 +18,7 @@ public final class AvatarInitialView: UIView {
         .withTypography(.title(.two))
         .withAlignment(.center)
         .withTextColor(.label)
+        .withBorder(.circle, colour: .gray)
     
     public override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -30,12 +31,6 @@ public final class AvatarInitialView: UIView {
     }
     
     private func setupView() {
-        imageView
-            .withImage(nil)
-        
-        initialsLabel
-            .withText("OO")
-        
         addSubviews(imageView, initialsLabel)
         
         NSLayoutConstraint.activate([
@@ -47,21 +42,25 @@ public final class AvatarInitialView: UIView {
             initialsLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             initialsLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
+        
+        configure(hasImage: false)
     }
     
-    /// Supply a UIImage. If `image == nil`, the view falls back to initials.
     @discardableResult
     public func withImage(_ image: UIImage?) -> Self {
         imageView.withImage(image)
         configure(hasImage: image != nil)
         return self
     }
-
-    /// Supply the full name to derive initials (diacritics stripped, e.g. “Ö” → “O”).
+    
     @discardableResult
-    public func withName(_ fullName: String) -> Self {
-        initialsLabel.withText(fullName.normalised.initials)
-        configure(hasImage: false)
+    public func withNameInitials(_ initials: String) -> Self {
+        initialsLabel.withText(initials)
         return self
+    }
+    
+    private func configure(hasImage: Bool) {
+        imageView.isHidden = !hasImage
+        initialsLabel.isHidden = hasImage
     }
 }

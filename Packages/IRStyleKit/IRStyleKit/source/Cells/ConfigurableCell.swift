@@ -13,7 +13,6 @@ public final class ConfigurableCell: IRBaseCell {
         .withContentHugging(.required, axis: .horizontal)
         .withCompressionResistance(.required, axis: .horizontal)
     
-    //TODO: BOLD'luk vs. değişebilmeli nested enum
     private lazy var primaryLabel = TextLabel()
         .withTypography(.body(.semibold))
     
@@ -52,6 +51,9 @@ public final class ConfigurableCell: IRBaseCell {
         
         primaryLabel.withText(viewModel.name)
         secondaryLabel.withText(viewModel.company)
+        avatarImageView
+            .withImage(nil)
+            .withNameInitials(viewModel.name.normalised.initials)
     }
 }
 
