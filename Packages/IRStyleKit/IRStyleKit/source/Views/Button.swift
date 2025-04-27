@@ -14,94 +14,101 @@ import IRFoundation
 /// UIControl: State yönetimi içerir (isEnabled, isSelected, isHighlighted).
 /// UIResponder - UIView - UIControl - UIButton
 
+// MARK: – Button
 public final class Button: UIControl {
 
-    // MARK: - Public API
-    public var tapHandler: VoidHandler?
+    // MARK: Stored state
+    private var style     : ButtonStyle = .filledPrimary
+    private var titleText : String?
+    private var iconImage : UIImage?
+    public  var tapHandler: VoidHandler?
 
-    // MARK: - Subviews
+    // MARK: Subviews
     private let titleLabel       = TextLabel()
     private let imageView        = ImageView()
     private let contentStack     = UIStackView()
     private let highlightOverlay = UIView()
 
-    // MARK: - Init
-    public init(style: ButtonStyle,
-                title: String? = nil,
-                icon: UIImage? = nil,
-                tapHandler: VoidHandler? = nil) {
-        self.tapHandler = tapHandler
-        super.init(frame: .zero)
-
-        configure(style: style, title: title, icon: icon)
-        addTarget(self, action: #selector(tapped), for: .touchUpInside)
+    // MARK: Init
+    public override init(frame: CGRect = .zero) {
+        super.init(frame: frame)
+        commonInit()
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    public required init?(coder: NSCoder) {
         fatalError("init(coder:) is not supported")
     }
 
-    // MARK: - Configure
-    private func configure(style: ButtonStyle,
-                           title: String?,
-                           icon: UIImage?) {
-        isUserInteractionEnabled = true
-        clipsToBounds = true
+    // MARK: Private helpers
+    private func commonInit() {
         translatesAutoresizingMaskIntoConstraints = false
+        clipsToBounds = true
+        addTarget(self, action: #selector(tapped), for: .touchUpInside)
+        rebuild()
+    }
 
-        // ---- Background & Border
-        backgroundColor = style.background
-               layer.cornerRadius = style.cornerRadius
-               layer.borderWidth  = style.border == nil ? 0 : 1
-               layer.borderColor  = style.border?.cgColor
+    private func rebuild() {
+        // ---- Container styling
+        backgroundColor    = style.background
+        layer.cornerRadius = style.cornerRadius
+        layer.borderWidth  = style.border == nil ? 0 : 1
+        layer.borderColor  = style.border?.cgColor
 
-        // ---- Highlight Layer
-        // Highlight overlay now uses token
+        // ---- Highlight overlay
+        if highlightOverlay.superview == nil {
+            highlightOverlay.isUserInteractionEnabled = false
+            highlightOverlay.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(highlightOverlay)
+            NSLayoutConstraint.activate([
+                highlightOverlay.leadingAnchor.constraint(equalTo: leadingAnchor),
+                highlightOverlay.trailingAnchor.constraint(equalTo: trailingAnchor),
+                highlightOverlay.topAnchor.constraint(equalTo: topAnchor),
+                highlightOverlay.bottomAnchor.constraint(equalTo: bottomAnchor)
+            ])
+        }
         highlightOverlay.backgroundColor = Colors.pressedOverlay
         highlightOverlay.layer.cornerRadius = style.cornerRadius
-        highlightOverlay.isUserInteractionEnabled = false
-        highlightOverlay.translatesAutoresizingMaskIntoConstraints = false
-        highlightOverlay.alpha = 0
 
-        addSubview(highlightOverlay)
+        // ---- Title / Icon
+        titleLabel
+            .withTransform(style.textTransform)
+            .withTypography(style.typography)
+            .withText(titleText)
+            .withTextColor(style.foreground)
 
-        NSLayoutConstraint.activate([
-            highlightOverlay.leadingAnchor.constraint(equalTo: leadingAnchor),
-            highlightOverlay.trailingAnchor.constraint(equalTo: trailingAnchor),
-            highlightOverlay.topAnchor.constraint(equalTo: topAnchor),
-            highlightOverlay.bottomAnchor.constraint(equalTo: bottomAnchor)
-        ])
-
-        // ---- Title Label
-        titleLabel.withTransform(style.textTransform)
-                  .withText(title)
-                  .withTypography(style.typography)
-                  .withTextColor(style.foreground)
-        titleLabel.isUserInteractionEnabled = false
-
-        // ---- Icon
         imageView
-            .withImage(icon?.withRenderingMode(.alwaysTemplate))
+            .withImage(iconImage?.withRenderingMode(.alwaysTemplate))
             .withTintColor(style.foreground)
             .withContentMode(.scaleAspectFit)
             .withUserInteraction(false)
 
-        // ---- Content Stack
+        // ---- Content stack
+        if contentStack.superview == nil {
+            contentStack.translatesAutoresizingMaskIntoConstraints = false
+            contentStack.isUserInteractionEnabled = false
+            addSubview(contentStack)
+            NSLayoutConstraint.activate([
+                contentStack.leadingAnchor.constraint(equalTo: leadingAnchor,
+                                                      constant: Spacing.tiny.value),
+                contentStack.trailingAnchor.constraint(equalTo: trailingAnchor,
+                                                       constant: -Spacing.tiny.value),
+                contentStack.topAnchor.constraint(equalTo: topAnchor),
+                contentStack.bottomAnchor.constraint(equalTo: bottomAnchor)
+            ])
+        }
         contentStack.axis         = .horizontal
         contentStack.spacing      = style.spacing.value
         contentStack.alignment    = .center
         contentStack.distribution = .fill
-        contentStack.translatesAutoresizingMaskIntoConstraints = false
-        contentStack.isUserInteractionEnabled = false
 
-        contentStack.arrangedSubviews.forEach { view in
-            contentStack.removeArrangedSubview(view)
-            view.removeFromSuperview()
+        contentStack.arrangedSubviews.forEach {
+            contentStack.removeArrangedSubview($0)
+            $0.removeFromSuperview()
         }
 
-        let hasIcon  = icon != nil
-        let hasTitle = !(title?.isEmpty ?? true)
+        let hasIcon  = iconImage != nil
+        let hasTitle = !(titleText?.isEmpty ?? true)
 
         switch style.iconAlignment {
         case .leading:
@@ -112,29 +119,59 @@ public final class Button: UIControl {
             if hasIcon  { contentStack.addArrangedSubview(imageView) }
         }
 
-        addSubview(contentStack)
-
-        NSLayoutConstraint.activate([
-            contentStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Spacing.tiny.value),
-            contentStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Spacing.tiny.value),
-            contentStack.topAnchor.constraint(equalTo: topAnchor),
-            contentStack.bottomAnchor.constraint(equalTo: bottomAnchor),
-            heightAnchor.constraint(equalToConstant: style.height)
-        ])
-    }
-
-    // MARK: - Interaction
-    public override var isHighlighted: Bool {
-        didSet {
-            UIView.animate(withDuration: 0.12,
-                           delay: 0,
-                           options: [.allowUserInteraction, .curveEaseInOut]) {
-                self.highlightOverlay.alpha = self.isHighlighted ? 1 : 0
-            }
+        if !(constraints.contains { $0.firstAttribute == .height }) {
+            heightAnchor.constraint(equalToConstant: style.height).isActive = true
         }
     }
 
-    @objc private func tapped() {
-        tapHandler?()
+    // MARK: Interaction
+    // TODO: ömer - Hatalı çalışyor. İlgileceneğim.
+//    public override var isHighlighted: Bool {
+//        didSet {
+//            UIView.animate(withDuration: 0.12,
+//                           delay: 0,
+//                           options: [.allowUserInteraction, .curveEaseInOut]) {
+//                self.highlightOverlay.alpha = self.isHighlighted ? 1 : 0
+//            }
+//        }
+//    }
+
+    @objc private func tapped() { tapHandler?() }
+}
+
+// MARK: – Builder API
+public extension Button {
+
+    @discardableResult
+    func withStyle(_ style: ButtonStyle) -> Self {
+        self.style = style
+        rebuild()
+        return self
+    }
+
+    @discardableResult
+    func withTitle(_ title: String?) -> Self {
+        titleText = title
+        rebuild()
+        return self
+    }
+
+    @discardableResult
+    func withIcon(_ image: UIImage?) -> Self {
+        iconImage = image
+        rebuild()
+        return self
+    }
+
+    @discardableResult
+    func withAction(_ handler: VoidHandler?) -> Self {
+        tapHandler = handler
+        return self
+    }
+    
+    @discardableResult
+    func withTag(_ tag: Int) -> Self {
+        self.tag = tag
+        return self
     }
 }

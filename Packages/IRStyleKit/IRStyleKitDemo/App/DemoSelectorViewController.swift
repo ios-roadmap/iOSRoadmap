@@ -10,14 +10,6 @@ import SwiftUI
 import IRStyleKit
 
 final class DemoSelectorViewController: IRViewController {
-
-    private lazy var uikitButton = Button(style: .outlinedPrimary, title: "UIKit") { [weak self] in
-        self?.showUIKitDemo()
-    }
-    
-    private lazy var swiftUIButton = Button(style: .outlinedPrimary, title: "SwiftUI") { [weak self] in
-        self?.showSwiftUIDemo()
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,6 +17,21 @@ final class DemoSelectorViewController: IRViewController {
     }
 
     override func setup() {
+        let uikitButton = Button()
+            .withStyle(.outlinedPrimary)
+            .withTitle("UIKit")
+            .withAction { [weak self] in
+                self?.showUIKitDemo()
+            }
+        
+        let swiftUIButton = Button()
+            .withStyle(.outlinedPrimary)
+            .withTitle("SwiftUI")
+            .withAction { [weak self] in
+                self?.showSwiftUIDemo()
+            }
+        
+        
         let stackView = StackView(.vertical(spacing: 24)) {
             uikitButton
             swiftUIButton
