@@ -25,7 +25,6 @@ final class ShowcaseListViewController: IRViewController {
         CoachmarkDemoPageController.self,
         ContactPhoneDemoPageController.self,
         TableDemoPageController.self,
-        SpacerDemoPageController.self,
         TextLabelDemoPageController.self,
         ButtonDemoPageController.self,
     ]
