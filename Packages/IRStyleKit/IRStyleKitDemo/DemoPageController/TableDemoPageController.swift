@@ -12,8 +12,6 @@ final class TableDemoPageController: IRViewController, ShowcaseListViewControlle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let tv = TableView()
-        
         let action = TableSwipeAction(
             title: "Delete",
             style: .destructive,
@@ -108,7 +106,8 @@ final class TableDemoPageController: IRViewController, ShowcaseListViewControlle
         ]
 
         let section = TableSection(header: .title("Custom Layout"), items: items)
-        tv.update(sections: [section])
+        let tv = TableView()
+            .withSections([section])
         
         view.fit(subView: tv)
     }

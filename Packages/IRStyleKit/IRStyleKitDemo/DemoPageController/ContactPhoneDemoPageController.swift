@@ -15,8 +15,6 @@ final class ContactPhoneDemoPageController: IRViewController, ShowcaseListViewCo
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let tv = TableView()
-        
         setupSearchBar()
 
         let items: [BaseCellViewModel] = [
@@ -25,7 +23,11 @@ final class ContactPhoneDemoPageController: IRViewController, ShowcaseListViewCo
         ]
 
         let section = TableSection(header: .title("Contact Phone"), items: items)
-        tv.update(sections: [section])
+        
+        let tv = TableView()
+            .withSections([section])
+        
+        view.fit(subView: tv)
     }
     
     
