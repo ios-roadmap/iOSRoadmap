@@ -30,6 +30,7 @@ public final class TableView: UITableView {
     // MARK: - Private
     private func setupUI() {
         translatesAutoresizingMaskIntoConstraints = false
+        sectionHeaderTopPadding = 0
         dataSource         = self
         delegate           = self
         prefetchDataSource = self
