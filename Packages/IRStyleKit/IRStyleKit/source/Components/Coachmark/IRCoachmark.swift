@@ -20,6 +20,7 @@ public protocol IRCoachmarkProtocol {
 @MainActor
 public extension IRCoachmarkProtocol {
     var hasBeenShown: Bool {
+        //TODO: ömer IRDefaults enum'ı eklenecek UserDefaults kullanımları için.
 //        UserDefaults.standard.bool(forKey: "\(CoachmarkManager.Constants.baseKey)\(key)")
         return false
     }

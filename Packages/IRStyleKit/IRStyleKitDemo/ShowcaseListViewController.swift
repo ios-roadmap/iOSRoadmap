@@ -50,7 +50,7 @@ final class ShowcaseListViewController: IRViewController {
                 print("Reached bottom, load more!")
             }
 
-        view.fit(subView: tv)
+        view.fit(tv)
     }
 
 }

@@ -109,6 +109,6 @@ final class TableDemoPageController: IRViewController, ShowcaseListViewControlle
         let tv = TableView()
             .withSections([section])
         
-        view.fit(subView: tv)
+        view.fit(tv)
     }
 }

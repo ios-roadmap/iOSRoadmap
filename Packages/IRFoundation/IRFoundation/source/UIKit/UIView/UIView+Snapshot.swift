@@ -1,24 +1,24 @@
 //
 //  UIView+Snapshot.swift
-//  IRStyleKit
+//  IRFoundation
 //
-//  Created by Ömer Faruk Öztürk on 13.04.2025.
+//  Created by Ömer Faruk Öztürk on 29.04.2025.
 //
 
 import UIKit
 
+/// Use cases:
+/// - Create shareable visuals (cards, charts, certificates).
+/// - Perform smooth animations using snapshots instead of heavy views.
+/// - Display quick placeholders for unloaded content.
+/// - Compare screenshots during UI testing.
+/// - Animate custom transitions using a static copy of the view.
+/// - Blur the screen when the app moves to background.
+/// - Cache complex view hierarchies as images for performance gains.
 private final class IRSnapshotView: UIImageView { }
 
-public extension UIView {
-    
-    //MARK: Snapshot Noktaları. Müsait bir zamanda denenecek
-    /// - Paylaşılabilir görseller (kart, grafik, sertifika) oluşturmak için kullanılır.
-    /// - Ağır view’lar yerine snapshot ile akıcı animasyonlar yapılabilir.
-    /// - Yüklenmemiş içerikler için hızlı placeholder göstermek mümkündür.
-    /// - UI testlerinde ekran çıktısını karşılaştırmak için snapshot alınabilir.
-    /// - Özel geçiş animasyonlarında view’ın kopyası ile animasyon yapılabilir.
-    /// - Uygulama arka plana giderken ekranın blur’lu hali gösterilebilir.
-    /// - View hiyerarşisini `UIImage` olarak cache’leyip performans kazanabilirsin.
+public extension UIView {    
+    /// Captures the current view hierarchy as a `UIImage`.
     var snapshotImage: UIImage? {
         let renderer = UIGraphicsImageRenderer(size: bounds.size)
         return renderer.image { [weak self] _ in
@@ -27,6 +27,11 @@ public extension UIView {
         }
     }
     
+    /// Adds a snapshot of a given view to the current view with optional margins.
+    /// - Parameters:
+    ///   - view: The target view to snapshot.
+    ///   - margin: Optional padding to expand the snapshot frame.
+    /// - Returns: The snapshot `UIView` instance if successful, otherwise `nil`.
     @discardableResult
     func addSnapshot(of view: UIView, with margin: UIEdgeInsets? = nil) -> UIView? {
         guard let snapshot = view.snapshotImage,
@@ -57,13 +62,14 @@ public extension UIView {
         return imageView
     }
     
+    /// Removes all snapshot views (`IRSnapshotView`) from the view with a fade-out animation.
     func removeSnapshots() {
         subviews
             .lazy
             .filter { $0 is IRSnapshotView }
-            .forEach { snapShowView in
-                snapShowView.fadeOut {
-                    snapShowView.removeFromSuperview()
+            .forEach { snapshotView in
+                snapshotView.fadeOut {
+                    snapshotView.removeFromSuperview()
                 }
             }
     }

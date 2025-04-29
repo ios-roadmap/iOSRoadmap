@@ -27,7 +27,7 @@ final class ContactPhoneDemoPageController: IRViewController, ShowcaseListViewCo
         let tv = TableView()
             .withSections([section])
         
-        view.fit(subView: tv)
+        view.fit(tv)
     }
     
     
