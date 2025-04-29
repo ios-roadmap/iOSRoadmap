@@ -35,13 +35,20 @@ final class ShowcaseListViewController: IRViewController {
     }
 
     override func setup() {
-        update(sections: [
-            IRTableSection(header: .title("Pages"), items: demoPages.map { pageType in
+        let tv = TableView()
+        tv.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tv)  // Bunu mutlaka ekle!
+        
+        tv.update(sections: [
+            TableSection(header: .title("Pages"), items: demoPages.map { pageType in
                 IRTextCellViewModel(text: pageType.demoTitle) { [weak self] in
                     let vc = pageType.init()
                     self?.navigationController?.pushViewController(vc, animated: true)
                 }
             })
         ])
+        
+        view.fit(subView: tv)
     }
+
 }

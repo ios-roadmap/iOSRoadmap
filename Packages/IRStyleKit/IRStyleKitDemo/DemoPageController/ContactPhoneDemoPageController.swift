@@ -15,15 +15,17 @@ final class ContactPhoneDemoPageController: IRViewController, ShowcaseListViewCo
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let tv = TableView()
+        
         setupSearchBar()
 
-        let items: [IRBaseCellViewModel] = [
+        let items: [BaseCellViewModel] = [
             ConfigurableCellViewModel(name: "Leanne Graham", company: "@Bret"),
             ConfigurableCellViewModel(name: "Clementine Bauch", company: "@Karlanne")
         ]
 
-        let section = IRTableSection(header: .title("Contact Phone"), items: items)
-        update(sections: [section])
+        let section = TableSection(header: .title("Contact Phone"), items: items)
+        tv.update(sections: [section])
     }
     
     
