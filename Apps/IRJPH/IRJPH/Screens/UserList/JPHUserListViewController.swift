@@ -33,15 +33,15 @@ final class JPHUserListViewController: IRViewController, JPHUserListViewControll
     }
     
     func displayUserList(usersNames: [JPHUserListEntity.User]) {
-        let items: [IRBaseCellViewModel] = usersNames.map { user in
-            //TODO: Builder'dan beslenmeli.
-            ContactPhoneCellViewModel(name: (user.name)~, phone: (user.phone)~) { [weak self] in
-                guard let self else { return }
-                navigator.navigateToDetail(from: self, user: user)
-            }
+        let items: [BaseCellViewModel] = usersNames.map { user in
+            ConfigurableCellViewModel(name: (user.name)~, company: (user.phone)~)
+            
+            //navigator.navigateToDetail(from: self, user: user)
         }
+        let tv = TableView()
+            .withSections([.init(items: items)])
         
-        update(sections: [.init(items: items)])
+        view.fit(tv)
     }
     
     //TODO: Burası customize olarak StyleKit'den gelmeli. Özel bir Alert çalışması. Farklı temalarla birlikte.

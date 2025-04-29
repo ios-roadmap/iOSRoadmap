@@ -7,7 +7,7 @@
 
 import UIKit
 
-public final class ConfigurableCell: IRBaseCell {
+public final class ConfigurableCell: BaseCell {
     
     private let avatarImageView = AvatarInitialView()
         .withContentHugging(.required, axis: .horizontal)
@@ -45,7 +45,7 @@ public final class ConfigurableCell: IRBaseCell {
         ])
     }
     
-    public override func configureContent(with viewModel: IRBaseCellViewModel) {
+    public override func configureContent(with viewModel: BaseCellViewModel) {
         guard let viewModel = viewModel as? ConfigurableCellViewModel else { return }
         
         
@@ -57,9 +57,9 @@ public final class ConfigurableCell: IRBaseCell {
     }
 }
 
-public final class ConfigurableCellViewModel: IRBaseCellViewModel {
+public final class ConfigurableCellViewModel: BaseCellViewModel {
     
-    public override class var cellClass: IRBaseCell.Type { ConfigurableCell.self }
+    public override class var cellClass: BaseCell.Type { ConfigurableCell.self }
     
     let name: String
     let company: String

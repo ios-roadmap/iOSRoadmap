@@ -7,4 +7,11 @@
 
 import Foundation
 
-public enum IconAlignment: Int { case leading, trailing }
+public enum IconAlignment: Int {
+    
+    /// Icon appears before the content (e.g., left side in LTR languages).
+    case leading
+    
+    /// Icon appears after the content (e.g., right side in LTR languages).
+    case trailing
+}

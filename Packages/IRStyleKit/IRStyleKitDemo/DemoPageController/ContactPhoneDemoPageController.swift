@@ -17,13 +17,17 @@ final class ContactPhoneDemoPageController: IRViewController, ShowcaseListViewCo
         
         setupSearchBar()
 
-        let items: [IRBaseCellViewModel] = [
+        let items: [BaseCellViewModel] = [
             ConfigurableCellViewModel(name: "Leanne Graham", company: "@Bret"),
             ConfigurableCellViewModel(name: "Clementine Bauch", company: "@Karlanne")
         ]
 
-        let section = IRTableSection(header: .title("Contact Phone"), items: items)
-        update(sections: [section])
+        let section = TableSection(header: .title("Contact Phone"), items: items)
+        
+        let tv = TableView()
+            .withSections([section])
+        
+        view.fit(tv)
     }
     
     

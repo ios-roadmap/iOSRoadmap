@@ -11,14 +11,14 @@ final class TableDemoPageController: IRViewController, ShowcaseListViewControlle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        let action = IRSwipeAction(
+        
+        let action = TableSwipeAction(
             title: "Delete",
             style: .destructive,
-            backgroundColor: .systemRed,
-            image: UIImage(systemName: "trash"),
-            handler: { print("Deleted tapped") }
-        )
+            colour: .systemRed,
+            image: .init(systemName: "trash")) {
+                print("Delete tapped")
+            }
 
         let items = [
             IRTextCellViewModel(text: "Lazy Load 1", swipeActions: [action], isSelectionEnabled: false),
@@ -105,7 +105,10 @@ final class TableDemoPageController: IRViewController, ShowcaseListViewControlle
             IRTextCellViewModel(text: "Lazy Load 82", swipeActions: [action]),
         ]
 
-        let section = IRTableSection(header: .title("Custom Layout"), items: items)
-        update(sections: [section])
+        let section = TableSection(header: .title("Custom Layout"), items: items)
+        let tv = TableView()
+            .withSections([section])
+        
+        view.fit(tv)
     }
 }

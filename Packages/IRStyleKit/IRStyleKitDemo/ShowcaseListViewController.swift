@@ -25,7 +25,6 @@ final class ShowcaseListViewController: IRViewController {
         CoachmarkDemoPageController.self,
         ContactPhoneDemoPageController.self,
         TableDemoPageController.self,
-        SpacerDemoPageController.self,
         TextLabelDemoPageController.self,
         ButtonDemoPageController.self,
     ]
@@ -36,13 +35,22 @@ final class ShowcaseListViewController: IRViewController {
     }
 
     override func setup() {
-        update(sections: [
-            IRTableSection(header: .title("Pages"), items: demoPages.map { pageType in
+        let sections = [
+            TableSection(header: .title("Pages"), items: demoPages.map { pageType in
                 IRTextCellViewModel(text: pageType.demoTitle) { [weak self] in
                     let vc = pageType.init()
                     self?.navigationController?.pushViewController(vc, animated: true)
                 }
             })
-        ])
+        ]
+        
+        let tv = TableView()
+            .withSections(sections)
+            .withScrollToBottomHandler {
+                print("Reached bottom, load more!")
+            }
+
+        view.fit(tv)
     }
+
 }

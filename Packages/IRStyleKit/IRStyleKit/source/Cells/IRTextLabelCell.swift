@@ -7,7 +7,7 @@
 
 import UIKit
 
-public final class IRTextCell: IRBaseCell {
+public final class IRTextCell: BaseCell {
     
     private lazy var labelView = TextLabel()
 
@@ -23,7 +23,7 @@ public final class IRTextCell: IRBaseCell {
         ])
     }
 
-    public override func configureContent(with viewModel: IRBaseCellViewModel) {
+    public override func configureContent(with viewModel: BaseCellViewModel) {
         guard let viewModel = viewModel as? IRTextCellViewModel else { return }
         
         labelView
@@ -31,8 +31,8 @@ public final class IRTextCell: IRBaseCell {
     }
 }
 
-public final class IRTextCellViewModel: IRBaseCellViewModel {
-    public override class var cellClass: IRBaseCell.Type { IRTextCell.self }
+public final class IRTextCellViewModel: BaseCellViewModel {
+    public override class var cellClass: BaseCell.Type { IRTextCell.self }
 
     public let text: String
 
@@ -40,14 +40,14 @@ public final class IRTextCellViewModel: IRBaseCellViewModel {
         text: String,
         onSelect: (() -> Void)? = nil,
         onPrefetch: (() -> Void)? = nil,
-        swipeActions: [IRSwipeAction]? = nil,
+        swipeActions: [TableSwipeAction]? = nil,
         isSelectionEnabled: Bool = true
     ) {
         self.text = text
-        super.init(onSelect: onSelect, onPrefetch: onPrefetch, swipeActions: swipeActions, isSelectionEnabled: isSelectionEnabled)
+        super.init(onSelect: onSelect, onPrefetch: onPrefetch, swipeActions: swipeActions, isSelectable: isSelectionEnabled)
     }
 
-    public override func configure(cell: IRBaseCell) {
+    public override func configure(cell: BaseCell) {
         super.configure(cell: cell)
     }
 }

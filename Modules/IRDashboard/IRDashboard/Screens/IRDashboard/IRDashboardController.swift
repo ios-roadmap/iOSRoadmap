@@ -16,13 +16,16 @@ final class IRDashboardController: IRViewController {
         super.viewDidLoad()
         
         
-        let section = IRTableSection(items: [
+        let section = TableSection(items: [
             IRTextCellViewModel(text: "Json Place Holder", onSelect: { [weak self] in
                 self?.navigator.navigateToJPHApp()
             })
         ])
         
-        update(sections: [section])
+        let tv = TableView()
+            .withSections([section])
+        
+        view.fit(tv)
     }
 }
 
