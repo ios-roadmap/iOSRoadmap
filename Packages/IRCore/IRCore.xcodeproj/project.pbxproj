@@ -7,11 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6415BD4C2DAFD40300C6D6DB /* IRCoreLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 6415BD4B2DAFD40300C6D6DB /* IRCoreLibrary */; };
+		647758D22DC4061000D67582 /* IRFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 647758D12DC4061000D67582 /* IRFoundation */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		6415BD4A2DAFD3FC00C6D6DB /* IRCoreLibrary */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = IRCoreLibrary; sourceTree = "<group>"; };
 		646E720C2D646E56002CA668 /* IRCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -28,7 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6415BD4C2DAFD40300C6D6DB /* IRCoreLibrary in Frameworks */,
+				647758D22DC4061000D67582 /* IRFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,7 +37,6 @@
 		646E72022D646E56002CA668 = {
 			isa = PBXGroup;
 			children = (
-				6415BD4A2DAFD3FC00C6D6DB /* IRCoreLibrary */,
 				646E720E2D646E56002CA668 /* IRCore */,
 				646E72302D646E72002CA668 /* Frameworks */,
 				646E720D2D646E56002CA668 /* Products */,
@@ -91,7 +89,7 @@
 			);
 			name = IRCore;
 			packageProductDependencies = (
-				6415BD4B2DAFD40300C6D6DB /* IRCoreLibrary */,
+				647758D12DC4061000D67582 /* IRFoundation */,
 			);
 			productName = IRCore;
 			productReference = 646E720C2D646E56002CA668 /* IRCore.framework */;
@@ -122,6 +120,9 @@
 			);
 			mainGroup = 646E72022D646E56002CA668;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				647758D02DC4061000D67582 /* XCRemoteSwiftPackageReference "IRFoundation" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 646E720D2D646E56002CA668 /* Products */;
 			projectDirPath = "";
@@ -370,10 +371,22 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		647758D02DC4061000D67582 /* XCRemoteSwiftPackageReference "IRFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ios-roadmap/IRFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
-		6415BD4B2DAFD40300C6D6DB /* IRCoreLibrary */ = {
+		647758D12DC4061000D67582 /* IRFoundation */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = IRCoreLibrary;
+			package = 647758D02DC4061000D67582 /* XCRemoteSwiftPackageReference "IRFoundation" */;
+			productName = IRFoundation;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
