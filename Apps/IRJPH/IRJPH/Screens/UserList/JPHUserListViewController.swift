@@ -34,9 +34,10 @@ final class JPHUserListViewController: IRViewController, JPHUserListViewControll
     
     func displayUserList(usersNames: [JPHUserListEntity.User]) {
         let items: [BaseCellViewModel] = usersNames.map { user in
-            ConfigurableCellViewModel(name: (user.name)~, company: (user.phone)~)
-            
-            //navigator.navigateToDetail(from: self, user: user)
+            ConfigurableCellViewModel(name: (user.name)~, company: (user.phone)~) { [weak self] in
+                guard let self else { return }
+                self.navigator.navigateToDetail(from: self, user: user)
+            }
         }
         let tv = TableView()
             .withSections([.init(items: items)])
