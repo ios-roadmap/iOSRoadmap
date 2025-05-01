@@ -20,15 +20,23 @@ public final class ConfigurableCell: BaseCell {
     private lazy var secondaryLabel = TextLabel()
         .withTypography(.body(.regular))
     
-    private lazy var labelStack = StackView(.vertical()) {
+    // Label stack ─ vertical, 4-pt default spacing
+    private lazy var labelStack = StackView {
         primaryLabel
         secondaryLabel
     }
-    
-    private lazy var contentStack = StackView(.horizontal()) {
+    .axis(.vertical)
+    .spacing(4)               // matches previous Kind.default
+
+    // Content stack ─ horizontal, 8-pt default spacing
+    private lazy var contentStack = StackView {
         avatarImageView
         labelStack
     }
+    .axis(.horizontal)
+    .spacing(8)
+    .alignment(.center)       // keep avatar + labels nicely centred
+
     
     public override func setup() {
         super.setup()

@@ -18,24 +18,27 @@ final class DemoSelectorViewController: IRViewController {
 
     override func setup() {
         let uikitButton = Button()
-            .withStyle(.outlinedPrimary)
+            .withStyle(.ghost)
             .withTitle("UIKit")
             .withAction { [weak self] in
                 self?.showUIKitDemo()
             }
         
         let swiftUIButton = Button()
-            .withStyle(.outlinedPrimary)
+            .withStyle(.ghost)
             .withTitle("SwiftUI")
             .withAction { [weak self] in
                 self?.showSwiftUIDemo()
             }
         
         
-        let stackView = StackView(.vertical(spacing: 24)) {
+        let stackView = StackView {
             uikitButton
             swiftUIButton
         }
+        .axis(.vertical)
+        .spacing(24)
+
 
         view.addSubview(stackView)
 

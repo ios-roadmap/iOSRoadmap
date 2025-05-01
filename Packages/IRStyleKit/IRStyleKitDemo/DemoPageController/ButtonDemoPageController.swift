@@ -38,35 +38,32 @@ final class ButtonDemoPageController: IRViewController, ShowcaseListViewControll
     }
     
     private func populateButtons() {
-        // Filled ----------------------------------------------------------------
-        add(.filledPrimary,     title: "Primary")
-        add(.filledSecondary,   title: "Secondary")
-        add(.filledSuccess,     title: "Success")
-        add(.filledWarning,     title: "Warning ⚠︎")
-        add(.filledDestructive, title: "Delete", icon: .init(systemName: "trash"))
-
+        // ––––– Filled –––––
+        add(.filled, title: "Filled")
+        add(.filled, title: "Filled + Icon", icon: UIImage(systemName: "bolt.fill"))
         addSpacer()
 
-        // Outlined --------------------------------------------------------------
-        add(.outlinedPrimary,     title: "Outlined Primary")
-        add(.outlinedSecondary,   title: "Outlined Secondary")
-        add(.outlinedDestructive, title: "Outlined Delete", icon: .init(systemName: "trash"))
-
+        // ––––– Outlined –––––
+        add(.outlined, title: "Outlined")
+        add(.outlined, title: "Outlined + Icon", icon: UIImage(systemName: "heart"))
         addSpacer()
 
-        // Ghost -----------------------------------------------------------------
+        // ––––– Ghost –––––
         add(.ghost, title: "Ghost")
-
+        add(.ghost, title: "Ghost + Icon", icon: UIImage(systemName: "hand.point.right.fill"))
         addSpacer()
 
-        // Link ------------------------------------------------------------------
-        add(.link,           title: "Plain Link")
-        add(.linkUnderlined, title: "Underlined Link", icon: .init(systemName: "arrow.up.right"))
-
+        // ––––– Link (trailing icon) –––––
+        add(.link, title: "Link")
+        add(.link, title: "Link + Icon", icon: UIImage(systemName: "arrow.right"))
         addSpacer()
 
-        // Icon‑only -------------------------------------------------------------
-        add(.iconOnly, icon: .init(systemName: "star.fill"))
+        // ––––– Icon-only (square) –––––
+        add(.icon, icon: UIImage(systemName: "star.fill"))
+        addSpacer()
+
+        // ––––– Pure text –––––
+        add(.onlyText, title: "Only Text")
     }
 
     private func add(

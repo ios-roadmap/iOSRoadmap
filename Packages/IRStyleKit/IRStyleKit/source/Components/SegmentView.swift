@@ -8,65 +8,114 @@
 import UIKit
 import IRFoundation
 
-public protocol SegmentViewDelegate: AnyObject {
-    func segmentView(_ segmentView: SegmentView, didSelect index: Int)
-}
-
-// MARK: – SegmentView
+/// A horizontally‑scrolling segment control that utilises `Button` and `StackView`.
+/// Selection is visualised by an independent `IndicatorView`.
 public final class SegmentView: UIView {
 
-    // MARK: Public surface
-    public weak var delegate: SegmentViewDelegate?
+    // MARK: - Public
+
+    public struct Segment {
+        public let title: String
+        public init(title: String) { self.title = title }
+    }
+
+    public var onSelectionChanged: ((Int) -> Void)?
+
     public private(set) var selectedIndex: Int = 0 {
-        didSet { guard oldValue != selectedIndex else { return }
-                 applyAppearance()
-                 delegate?.segmentView(self, didSelect: selectedIndex) }
+        didSet { updateSelection(animated: true) }
     }
 
-    // MARK: Private state
-    private let items: [String]
-    // MARK: UI
-    private lazy var buttons: [Button] = items.enumerated().map { idx, title in
-        Button()
-            .withTitle(title)
-            .withTag(idx)
-            .withStyle(.outlinedPrimary)
-            .withAction { [weak self] in self?.select(at: idx) }
-    }
+    // MARK: - Private
 
-    private lazy var stackView: StackView = {
-        StackView(.horizontal()) { buttons }   // <- arranges every Button
-    }()
+    private let segments: [Segment]
+    private var buttons: [Button] = []
+    private var stackView: StackView!
 
-    // MARK: Init
-    public init(items: [String]) {
-        self.items = items
+    private let indicator = IndicatorView()
+    private var indicatorLeading: NSLayoutConstraint!
+    private var indicatorWidth: NSLayoutConstraint!
+
+    // MARK: - Init
+
+    public init(segments: [Segment]) {
+        self.segments = segments
         super.init(frame: .zero)
-        configure()
-        applyAppearance()
+        translatesAutoresizingMaskIntoConstraints = false
+        setup()
     }
+    
 
-    @available(*, unavailable) public required init?(coder: NSCoder) {
-        fatalError("Use init(items:) instead.")
-    }
+    @available(*, unavailable)
+    public required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
-    // MARK: Layout
-    private func configure() {
-        addSubview(stackView)
-        stackView.pinEdges(to: self)
-        select(at: 0)
-    }
+    // MARK: - Setup
 
-    // MARK: Styling
-    private func applyAppearance() {
-        buttons.enumerated().forEach { idx, button in
-            button.withStyle(idx == selectedIndex ? .filledPrimary : .outlinedPrimary)
+    private func setup() {
+        // Build buttons
+        buttons = segments.enumerated().map { index, segment in
+            Button()
+                .withStyle(.onlyText)
+                .withTitle(segment.title)
+                .withTag(index)
+                .withAction { [weak self] in
+                    guard let self else { return }
+                    selectedIndex = index
+                    onSelectionChanged?(selectedIndex)
+                }
         }
+
+        // Build stack view with all buttons
+        stackView = StackView { buttons }
+            .axis(.horizontal)
+            .spacing(0)
+            .distribution(.fillEqually)
+
+        addSubview(stackView)
+
+        NSLayoutConstraint.activate([
+            stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            stackView.topAnchor.constraint(equalTo: topAnchor),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -4)
+        ])
+
+        // Add indicator
+        addSubview(indicator)
+        indicatorLeading = indicator.leadingAnchor.constraint(equalTo: leadingAnchor)
+        indicatorWidth   = indicator.widthAnchor.constraint(equalToConstant: 20)
+        NSLayoutConstraint.activate([
+            indicatorLeading,
+            indicatorWidth,
+            indicator.bottomAnchor.constraint(equalTo: bottomAnchor),
+            indicator.heightAnchor.constraint(equalToConstant: 3)
+        ])
+
+        // Force layout before calculating indicator frame
+        layoutIfNeeded()
+
+        // Initial selection (with accurate frame info)
+        updateSelection(animated: false)
     }
 
-    // MARK: Public API
-    public func select(at index: Int) {
-        guard (0..<buttons.count).contains(index), index != selectedIndex else { return }
-        selectedIndex = index
+
+    // MARK: - Selection handling
+
+    private func updateSelection(animated: Bool) {
+        buttons.enumerated().forEach { i, btn in
+            let isSelected = i == selectedIndex
+            //TODO: deneme olarak aldım tintColor builder'dan gelmeli.
+            _ = btn.tintColor = isSelected ? .red : .orange
+        }
+
+        // Ensure layout is up‑to‑date before querying frames.
+        layoutIfNeeded()
+
+        let selectedButton = buttons[selectedIndex]
+        let frameInSelf    = selectedButton.convert(selectedButton.bounds, to: self)
+        indicatorLeading.constant = frameInSelf.minX
+        indicatorWidth.constant   = frameInSelf.width
+
+        guard animated else { return }
+        UIView.animate(withDuration: 0.25) { self.layoutIfNeeded() }
     }
 }

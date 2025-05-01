@@ -132,11 +132,14 @@ final class TextLabelDemoPageController: IRViewController, ShowcaseListViewContr
             valueLabel.layer.borderColor  = UIColor.systemGray4.cgColor
         }
         
-        return StackView(.horizontal()) {
+        return StackView {
             keyLabel
             SpacerView()
             valueLabel
         }
+        .axis(.horizontal)
+        .spacing(0) // or customise if needed
+
     }
 
     /// Flattens every `Typography` variant into an array for demo purposes.
