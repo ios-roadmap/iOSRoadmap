@@ -34,14 +34,4 @@ final class SegmentDemoPageController: IRViewController, ShowcaseListViewControl
             segmentView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
         ])
     }
-    
-    private var didTriggerInitialSelection = false
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-
-        guard !didTriggerInitialSelection else { return }
-        didTriggerInitialSelection = true
-    }
-
 }
