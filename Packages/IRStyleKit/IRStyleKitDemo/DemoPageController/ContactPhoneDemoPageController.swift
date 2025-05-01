@@ -18,9 +18,29 @@ final class ContactPhoneDemoPageController: IRViewController, ShowcaseListViewCo
         setupSearchBar()
 
         let items: [BaseCellViewModel] = [
-            ConfigurableCellViewModel(name: "Leanne Graham", company: "@Bret"),
-            ConfigurableCellViewModel(name: "Clementine Bauch", company: "@Karlanne")
+            ConfigurableCellViewModel(
+                name: "Leanne Graham",
+                company: "@Bret",
+                swipeActions: [
+                    .init(
+                        title: "Call Leanne",
+//                        style: .destructive,
+                        colour: .orange,
+//                        image: .init(systemName: "person"),
+                        handler: {
+                            print("☎️ Call Leanne")
+                        }
+                    )
+                ],
+                isSelectable: false
+            ),
+            ConfigurableCellViewModel(
+                name: "Clementine Bauch",
+                company: "@Karlanne",
+                onSelect: { print("ÖMER FARUK") }
+            )
         ]
+
 
         let section = TableSection(header: .title("Contact Phone"), items: items)
         

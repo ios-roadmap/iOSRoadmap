@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import IRFoundation
 
 public final class ConfigurableCell: BaseCell {
     
@@ -58,15 +59,27 @@ public final class ConfigurableCell: BaseCell {
 }
 
 public final class ConfigurableCellViewModel: BaseCellViewModel {
-    
+
     public override class var cellClass: BaseCell.Type { ConfigurableCell.self }
-    
+
     let name: String
     let company: String
-    
-    public init(name: String, company: String) {
-        self.name = name
+
+    public init(
+        name: String,
+        company: String,
+        onSelect: VoidHandler? = nil,
+        onPrefetch: VoidHandler? = nil,
+        swipeActions: [TableSwipeAction]? = nil,
+        isSelectable: Bool = true
+    ) {
+        self.name    = name
         self.company = company
-        super.init()
+        super.init(
+            onSelect:     onSelect,
+            onPrefetch:   onPrefetch,
+            swipeActions: swipeActions,
+            isSelectable: isSelectable
+        )
     }
 }

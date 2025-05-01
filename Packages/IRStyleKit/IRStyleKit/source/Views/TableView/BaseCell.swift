@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import IRFoundation
 
 // MARK: – Cell-ViewModel Contract
 @MainActor
@@ -21,14 +22,14 @@ open class BaseCellViewModel: CellViewModelProtocol {
     open class var cellClass: BaseCell.Type { BaseCell.self }
     open var reuseIdentifier: String { String(describing: Self.cellClass) }
 
-    public let onSelect      : (() -> Void)?
-    public let onPrefetch    : (() -> Void)?
+    public let onSelect      : VoidHandler?
+    public let onPrefetch    : VoidHandler?
     public let swipeActions  : [TableSwipeAction]?
     public let isSelectable  : Bool
 
     public init(
-        onSelect     : (() -> Void)? = nil,
-        onPrefetch   : (() -> Void)? = nil,
+        onSelect     : VoidHandler? = nil,
+        onPrefetch   : VoidHandler? = nil,
         swipeActions : [TableSwipeAction]? = nil,
         isSelectable : Bool = true
     ) {
@@ -46,7 +47,6 @@ open class BaseCellViewModel: CellViewModelProtocol {
 // MARK: – UITableViewCell Base
 @MainActor
 open class BaseCell: UITableViewCell {
-    private(set) var onSelect    : (() -> Void)?
     private(set) var swipeActions: [UIContextualAction]?
 
     public override init(style: UITableViewCell.CellStyle = .default,
@@ -62,7 +62,6 @@ open class BaseCell: UITableViewCell {
     open func configureContent(with viewModel: BaseCellViewModel) { /* override */ }
 
     public final func bind(viewModel: BaseCellViewModel) {
-        onSelect      = viewModel.onSelect
         swipeActions  = viewModel.swipeActions?.map { $0.toContextualAction() }
         selectionStyle = viewModel.isSelectable ? .default : .none
         configureContent(with: viewModel)
@@ -70,7 +69,6 @@ open class BaseCell: UITableViewCell {
 
     open override func prepareForReuse() {
         super.prepareForReuse()
-        onSelect     = nil
         swipeActions = nil
     }
 }
