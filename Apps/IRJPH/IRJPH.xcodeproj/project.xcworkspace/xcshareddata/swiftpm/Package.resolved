@@ -1,0 +1,15 @@
+{
+  "originHash" : "b076025aebd156237b9f25c906e355f870135bdb93545312e2d961fb1e7f078c",
+  "pins" : [
+    {
+      "identity" : "irfoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ios-roadmap/IRFoundation.git",
+      "state" : {
+        "revision" : "e20c595128c35e52acdcc15acd913a9c518e386e",
+        "version" : "0.0.1"
+      }
+    }
+  ],
+  "version" : 3
+}

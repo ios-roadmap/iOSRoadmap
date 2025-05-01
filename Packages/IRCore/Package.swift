@@ -8,20 +8,18 @@ let package = Package(
     defaultLocalization: "en",
     platforms: [.iOS(.v18)],
     products: [
-        .library(
-            name: "IRCore",
-            targets: ["IRCore"]),
+        .library(name: "IRCore", targets: ["IRCore"])
     ],
     dependencies: [
-        .package(name: "IRFoundation", path: "../IRFoundation"),
+        .package(url: "https://github.com/ios-roadmap/IRFoundation.git", from: "0.0.1")
     ],
     targets: [
         .target(
             name: "IRCore",
             dependencies: [
-                "IRFoundation"
+                .product(name: "IRFoundation", package: "IRFoundation")
             ],
             path: "IRCore"
-        ),
+        )
     ]
 )

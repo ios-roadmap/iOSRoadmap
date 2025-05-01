@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 public enum IRMaskFormatterType {
     case generic
     
