@@ -14,7 +14,7 @@ import UIKit
 /// - Keeps one-switch mapping between semantic intent and `UIFont`.
 /// - Plays nicely with Dynamic Type via `UIFontMetrics`.
 /// - Written in British English for consistency across the codebase.
-public enum Typography {
+public enum Typography: Equatable {
     
     // MARK: - Primary categories (public façade)
     

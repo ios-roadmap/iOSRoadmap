@@ -67,8 +67,8 @@ extension ContactPhoneDemoPageController: CustomSearchControllerDelegate {
     }
 }
 
-extension ContactPhoneDemoPageController: SegmentViewDelegate {
-    func segmentView(_ segmentView: SegmentView, didSelect index: Int) {
-        print("Selected segment at index: \(index)")
-    }
-}
+//extension ContactPhoneDemoPageController: SegmentViewDelegate {
+//    func segmentView(_ segmentView: SegmentView, didSelect index: Int) {
+//        print("Selected segment at index: \(index)")
+//    }
+//}

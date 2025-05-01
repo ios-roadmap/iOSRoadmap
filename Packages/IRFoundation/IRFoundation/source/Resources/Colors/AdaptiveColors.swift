@@ -19,7 +19,7 @@ enum Adaptive {
     enum BG {
         static let `default` = AdaptiveColor(light: Palette.black8,
                                              dark:  Palette.black82)
-        static let elevated  = AdaptiveColor(light: Palette.white,
+        static let elevated  = AdaptiveColor(light: Palette.black15, //DENEME
                                              dark:  Palette.black78)
     }
 

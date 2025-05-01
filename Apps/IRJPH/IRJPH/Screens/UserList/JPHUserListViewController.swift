@@ -32,6 +32,21 @@ final class JPHUserListViewController: IRViewController, JPHUserListViewControll
         interactor.fetchUserList()
     }
     
+    func setupSegmentView() {
+        let items: [SegmentItem] = [
+            .init(title: "All", action: {
+                print("all")
+            }),
+            .init(title: "Favorites", action: {
+                print("favorites")
+            })
+        ]
+        
+        let segmentView = SegmentView
+            .withItems(.withInitialIndex(<#T##self: SegmentView##SegmentView#>))
+        
+    }
+    
     func displayUserList(usersNames: [JPHUserListEntity.User]) {
         let items: [BaseCellViewModel] = usersNames.map { user in
             ConfigurableCellViewModel(name: (user.name)~, company: (user.phone)~) { [weak self] in

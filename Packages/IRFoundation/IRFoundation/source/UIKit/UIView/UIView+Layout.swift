@@ -37,4 +37,15 @@ public extension UIView {
         self.setContentCompressionResistancePriority(priority, for: axis)
         return self
     }
+    
+    /// Pins the view's edges (top, bottom, leading, trailing) to match the given view's edges.
+    func pinEdges(to other: UIView) {
+        translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            leadingAnchor.constraint(equalTo: other.leadingAnchor),
+            trailingAnchor.constraint(equalTo: other.trailingAnchor),
+            topAnchor.constraint(equalTo: other.topAnchor),
+            bottomAnchor.constraint(equalTo: other.bottomAnchor)
+        ])
+    }
 }
