@@ -13,7 +13,7 @@ let package = Package(
             targets: ["IRJPHInterface"]),
     ],
     dependencies: [
-        .package(name: "IRCore", path: "../../../Packages/IRCore")
+        .package(name: "IRCore", path: "../IRCore")
     ],
     targets: [
         .target(
