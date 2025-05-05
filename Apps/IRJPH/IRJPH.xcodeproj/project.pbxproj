@@ -92,11 +92,6 @@
 			path = IRJPHDemo;
 			sourceTree = "<group>";
 		};
-		64ED9A2C2DA85067000B5679 /* IRJPHTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = IRJPHTests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,7 +128,6 @@
 				6453EB562D86E0DC0007DD63 /* IRJPHLibrary */,
 				6453EB2D2D86E0320007DD63 /* IRJPH */,
 				6453EB3C2D86E0540007DD63 /* IRJPHDemo */,
-				64ED9A2C2DA85067000B5679 /* IRJPHTests */,
 				6453EB502D86E0640007DD63 /* Frameworks */,
 				6453EB2C2D86E0320007DD63 /* Products */,
 			);
@@ -230,9 +224,6 @@
 			dependencies = (
 				64ED9A312DA85067000B5679 /* PBXTargetDependency */,
 				64ED9A362DA85081000B5679 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				64ED9A2C2DA85067000B5679 /* IRJPHTests */,
 			);
 			name = IRJPHTests;
 			packageProductDependencies = (
