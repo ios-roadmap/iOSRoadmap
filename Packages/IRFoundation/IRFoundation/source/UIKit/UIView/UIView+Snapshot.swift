@@ -15,62 +15,110 @@ import UIKit
 /// - Animate custom transitions using a static copy of the view.
 /// - Blur the screen when the app moves to background.
 /// - Cache complex view hierarchies as images for performance gains.
-private final class IRSnapshotView: UIImageView { }
 
-public extension UIView {    
-    /// Captures the current view hierarchy as a `UIImage`.
-    var snapshotImage: UIImage? {
-        let renderer = UIGraphicsImageRenderer(size: bounds.size)
-        return renderer.image { [weak self] _ in
-            guard let self else { return }
-            self.drawHierarchy(in: bounds, afterScreenUpdates: false)
-        }
+private final class IRSnapshotView: UIImageView {}
+
+public extension UIView {
+
+    func snapshotImage(
+        trim: UIEdgeInsets = .zero,
+        expand: UIEdgeInsets = .zero
+    ) -> UIImage? {
+        guard bounds.width > 0, bounds.height > 0 else { return nil }
+
+        let expandedSize = CGSize(
+            width: bounds.width + expand.left + expand.right,
+            height: bounds.height + expand.top + expand.bottom
+        )
+
+        let format = UIGraphicsImageRendererFormat(for: traitCollection)
+        format.scale = UIScreen.main.scale
+        let renderer = UIGraphicsImageRenderer(size: expandedSize, format: format)
+
+        return renderer.image { _ in
+            let origin = CGPoint(x: expand.left, y: expand.top)
+            drawHierarchy(in: CGRect(origin: origin, size: bounds.size), afterScreenUpdates: false)
+        }.cropped(by: trim)
     }
-    
-    /// Adds a snapshot of a given view to the current view with optional margins.
-    /// - Parameters:
-    ///   - view: The target view to snapshot.
-    ///   - margin: Optional padding to expand the snapshot frame.
-    /// - Returns: The snapshot `UIView` instance if successful, otherwise `nil`.
+
     @discardableResult
-    func addSnapshot(of view: UIView, with margin: UIEdgeInsets? = nil) -> UIView? {
-        guard let snapshot = view.snapshotImage,
-              let globalPoint = view.superview?.convert(view.frame.origin, to: nil) else {
-            return nil
-        }
+    func addSnapshot(
+        of view: UIView,
+        margin: UIEdgeInsets? = nil,
+        crop rc: UIEdgeInsets? = nil
+    ) -> UIView? {
+        let rc = rc ?? .zero
 
-        var updatedPoint = globalPoint
-        var updatedSize = view.frame.size
-        
-        if let margin {
-            updatedPoint.x -= margin.left
-            updatedPoint.y -= margin.top
-            
-            updatedSize.width += (margin.right + margin.left)
-            updatedSize.height += (margin.top + margin.bottom)
-        }
-        
-        let imageView = IRSnapshotView(image: snapshot)
-        imageView.frame = CGRect(origin: updatedPoint, size: updatedSize)
-        imageView.contentMode = .center
-        imageView.backgroundColor = .yellow
-        imageView.layer.cornerRadius = 6
-        
-        addSubviews(imageView)
-        imageView.fadeIn()
-        
-        return imageView
+        // NEW semantics → negative = trim, positive = expand.
+        let trim = UIEdgeInsets(
+            top:    max(-rc.top,    0),
+            left:   max(-rc.left,   0),
+            bottom: max(-rc.bottom, 0),
+            right:  max(-rc.right,  0)
+        )
+        let expand = UIEdgeInsets(
+            top:    max(rc.top,    0),
+            left:   max(rc.left,   0),
+            bottom: max(rc.bottom, 0),
+            right:  max(rc.right,  0)
+        )
+
+        guard let image = view.snapshotImage(trim: trim, expand: expand),
+              let superOrigin = view.superview?.convert(view.frame.origin, to: self)
+        else { return nil }
+
+        let m = margin ?? .zero
+        let origin = CGPoint(
+            x: superOrigin.x + trim.left - m.left - expand.left,
+            y: superOrigin.y + trim.top  - m.top  - expand.top
+        )
+
+        let size = CGSize(
+            width:  view.bounds.width  - trim.left - trim.right
+                  + m.left + m.right + expand.left + expand.right,
+            height: view.bounds.height - trim.top  - trim.bottom
+                  + m.top  + m.bottom + expand.top + expand.bottom
+        )
+
+        let iv = IRSnapshotView(image: image)
+        iv.frame = CGRect(origin: origin, size: size)
+        iv.contentMode = .scaleAspectFit
+        iv.layer.cornerRadius = 6
+        iv.clipsToBounds = true
+
+        addSubviews(iv)
+        iv.fadeIn()
+        return iv
     }
-    
-    /// Removes all snapshot views (`IRSnapshotView`) from the view with a fade-out animation.
+
+    /// Removes all `IRSnapshotView`s from the receiver with a fade‑out animation.
     func removeSnapshots() {
         subviews
             .lazy
-            .filter { $0 is IRSnapshotView }
-            .forEach { snapshotView in
-                snapshotView.fadeOut {
-                    snapshotView.removeFromSuperview()
-                }
+            .compactMap { $0 as? IRSnapshotView }
+            .forEach { snapshot in
+                snapshot.fadeOut { snapshot.removeFromSuperview() }
             }
+    }
+}
+
+// MARK: - UIImage Cropping Extension
+
+private extension UIImage {
+    /// Returns a new image cropped by the supplied **positive** insets (points).
+    /// Negative insets **expand** the canvas.
+    func cropped(by insets: UIEdgeInsets) -> UIImage? {
+        guard insets != .zero else { return self }
+
+        let newSize = CGSize(
+            width:  size.width  - insets.left - insets.right,
+            height: size.height - insets.top  - insets.bottom
+        )
+        guard newSize.width > 0, newSize.height > 0 else { return nil }
+
+        let format = imageRendererFormat
+        return UIGraphicsImageRenderer(size: newSize, format: format).image { _ in
+            draw(at: CGPoint(x: -insets.left, y: -insets.top))
+        }
     }
 }

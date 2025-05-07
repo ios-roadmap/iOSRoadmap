@@ -31,6 +31,13 @@ final class CoachmarkDemoPageController: IRViewController, ShowcaseListViewContr
         box.widthAnchor.constraint(equalToConstant: 100).isActive = true
         return box
     }()
+    
+    private let fullWidthBar: UIView = {
+        let bar = UIView()
+        bar.backgroundColor = .systemOrange
+        bar.translatesAutoresizingMaskIntoConstraints = false
+        return bar
+    }()
 
     // MARK: - Lifecycle
 
@@ -58,6 +65,15 @@ final class CoachmarkDemoPageController: IRViewController, ShowcaseListViewContr
             bottomBox.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
             bottomBox.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
         ])
+        
+        view.addSubview(fullWidthBar)
+
+        NSLayoutConstraint.activate([
+            fullWidthBar.topAnchor.constraint(equalTo: topBox.bottomAnchor, constant: 60),
+            fullWidthBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            fullWidthBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            fullWidthBar.heightAnchor.constraint(equalToConstant: 150)
+        ])
     }
 
     // MARK: - Coachmark Display
@@ -77,15 +93,15 @@ final class CoachmarkDemoPageController: IRViewController, ShowcaseListViewContr
                 ownerView: bottomBox,
                 title: "Lower Box",
                 message: "This is the lower box – tap here for more details.",
-                snapshotMargin: UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4),
+                snapshotMargin: UIEdgeInsets(top: 40, left: 40, bottom: 40, right: 40),
                 direction: .bottom
             ),
             IRCoachmark(
-                key: "topBoxCoachmark",
-                ownerView: topBox,
-                title: "Upper Box",
-                message: "This is the upper box – it displays key information.",
-                snapshotMargin: UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4),
+                key: "fullWidthBar",
+                ownerView: fullWidthBar,
+                title: "fullWidthBar",
+                message: "fullWidthBar fullWidthBar fullWidthBar fullWidthBar",
+                snapshotCrop: .init(top: -25, left: -20, bottom: -25, right: -30),
                 direction: .top
             ),
         ]

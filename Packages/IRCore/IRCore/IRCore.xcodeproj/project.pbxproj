@@ -12,7 +12,6 @@
 
 /* Begin PBXFileReference section */
 		646E720C2D646E56002CA668 /* IRCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IRCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		64D3BB272DCAA16A00EC38D9 /* IRCore.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = IRCore.xcodeproj; path = IRCore/IRCore.xcodeproj; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -57,13 +56,6 @@
 			children = (
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		64D3BB2A2DCAA16A00EC38D9 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -134,12 +126,6 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 646E720D2D646E56002CA668 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 64D3BB2A2DCAA16A00EC38D9 /* Products */;
-					ProjectRef = 64D3BB272DCAA16A00EC38D9 /* IRCore.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				646E720B2D646E56002CA668 /* IRCore */,

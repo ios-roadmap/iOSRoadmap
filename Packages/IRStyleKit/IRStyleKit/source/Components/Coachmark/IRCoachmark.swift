@@ -14,6 +14,7 @@ public protocol IRCoachmarkProtocol {
     var title: String { get }
     var message: String { get }
     var snapshotMargin: UIEdgeInsets { get }
+    var snapshotCrop: UIEdgeInsets { get }
     var direction: IRCoachmarkDirection { get }
 }
 
@@ -30,7 +31,7 @@ public extension IRCoachmarkProtocol {
     }
     
     func addSnapshot(to parentView: UIView) -> UIView? {
-        parentView.addSnapshot(of: ownerView, with: snapshotMargin)
+        parentView.addSnapshot(of: ownerView, margin: snapshotMargin, crop: snapshotCrop)
     }
 }
 
@@ -40,14 +41,16 @@ public struct IRCoachmark: IRCoachmarkProtocol {
     public let title: String
     public let message: String
     public let snapshotMargin: UIEdgeInsets
+    public let snapshotCrop: UIEdgeInsets
     public let direction: IRCoachmarkDirection
     
-    public init(key: String, ownerView: UIView, title: String, message: String, snapshotMargin: UIEdgeInsets, direction: IRCoachmarkDirection) {
+    public init(key: String, ownerView: UIView, title: String, message: String, snapshotMargin: UIEdgeInsets = .zero, snapshotCrop: UIEdgeInsets = .zero, direction: IRCoachmarkDirection) {
         self.key = key
         self.ownerView = ownerView
         self.title = title
         self.message = message
         self.snapshotMargin = snapshotMargin
+        self.snapshotCrop = snapshotCrop
         self.direction = direction
     }
 }
