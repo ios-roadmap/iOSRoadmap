@@ -49,7 +49,6 @@ public extension UIView {
     ) -> UIView? {
         let rc = rc ?? .zero
 
-        // NEW semantics → negative = trim, positive = expand.
         let trim = UIEdgeInsets(
             top:    max(-rc.top,    0),
             left:   max(-rc.left,   0),
