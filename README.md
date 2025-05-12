@@ -18,5 +18,5 @@ This marks the initial phase of building a modular iOS SuperApp architecture usi
 This is not a playground—this is an opinionated, production-quality showcase of modular UIKit at scale.
 
 ## Module Design
-![FigJam basics](https://github.com/user-attachments/assets/07986721-f39a-4954-8bcc-390284b9db6a)
+![FigJam basics](https://github.com/user-attachments/assets/07986721-f39a-4954-8bcc-390284b9db6a)m
   
