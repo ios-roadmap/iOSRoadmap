@@ -20,18 +20,32 @@ public protocol IRCoachmarkProtocol {
 
 @MainActor
 public extension IRCoachmarkProtocol {
+
+    // MARK: – Private Helper
+    private func makeFlag() -> InsecurePersistent<Bool> {
+        InsecurePersistent(
+            key: .init(
+                id: "Coachmark_\(key)",
+                defaultValue: false,
+                suitName: "omerfarukozturk.com"
+            )
+        )
+    }
+
+    // MARK: – Public API
     var hasBeenShown: Bool {
-        //TODO: ömer IRDefaults enum'ı eklenecek UserDefaults kullanımları için.
-//        UserDefaults.standard.bool(forKey: "\(CoachmarkManager.Constants.baseKey)\(key)")
-        return false
+        makeFlag().wrappedValue ?? false
     }
-    
+
     func markAsShown() {
-//        UserDefaults.standard.set(true, forKey: "\(CoachmarkManager.Constants.baseKey)\(key)")
+        var flag = makeFlag()
+        flag.wrappedValue = true
     }
-    
+
     func addSnapshot(to parentView: UIView) -> UIView? {
-        parentView.addSnapshot(of: ownerView, margin: snapshotMargin, crop: snapshotCrop)
+        parentView.addSnapshot(of: ownerView,
+                               margin: snapshotMargin,
+                               crop: snapshotCrop)
     }
 }
 
