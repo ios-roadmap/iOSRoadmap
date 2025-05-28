@@ -1,7 +1,6 @@
 import UIKit
 
 private extension String {
-    /// Returns the rendered width of the string with the given font.
     func renderedWidth(using font: UIFont) -> CGFloat {
         let size = (self as NSString)
             .size(withAttributes: [.font: font])
@@ -10,48 +9,45 @@ private extension String {
 }
 
 extension UILabel {
-
-    /// Inserts `\n` so that *every* line’s width ≤ `maxWidth`.
-    /// Greedy pack-per-line; does **not** break words.
-    ///
-    /// - Parameter maxWidth: Maximum allowed width for a single line, in points.
+    /// Inserts “\n” so that every line’s width ≤ `maxWidth`.
+    /// Resets its width-counter at each new line.
     func wrapWords(to maxWidth: CGFloat) {
         guard
-            var raw = text?.trimmingCharacters(in: .whitespacesAndNewlines),
-            !raw.isEmpty
+            let text = self.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+            !text.isEmpty
         else { return }
 
-        let font = self.font ?? .systemFont(ofSize: 17)
+        let font = self.font ?? .systemFont(ofSize: UIFont.systemFontSize)
 
-        // Whole string fits—nothing to do.
-        if raw.renderedWidth(using: font) <= maxWidth { return }
+        // Honour any existing line breaks, then re-wrap each paragraph.
+        let paragraphs = text.components(separatedBy: .newlines)
+        var wrappedLines: [String] = []
 
-        let words = raw.split(separator: " ")
-        var lines: [String] = []
-        var currentLine = ""
+        for paragraph in paragraphs {
+            let words = paragraph
+                .split(separator: " ", omittingEmptySubsequences: true)
+                .map(String.init)
 
-        for wordSub in words {
-            let word = String(wordSub)
+            var currentLine = ""
+            for word in words {
+                let candidate = currentLine.isEmpty
+                    ? word
+                    : "\(currentLine) \(word)"
 
-            if currentLine.isEmpty {
-                currentLine = word
-                continue
+                if candidate.renderedWidth(using: font) <= maxWidth {
+                    currentLine = candidate
+                } else {
+                    // flush previous line, reset width for new one
+                    wrappedLines.append(currentLine)
+                    currentLine = word
+                }
             }
-
-            let candidate = currentLine + " " + word
-            if candidate.renderedWidth(using: font) <= maxWidth {
-                currentLine = candidate
-            } else {
-                lines.append(currentLine)
-                currentLine = word
+            if !currentLine.isEmpty {
+                wrappedLines.append(currentLine)
             }
         }
 
-        // Flush last line.
-        if !currentLine.isEmpty { lines.append(currentLine) }
-
-        raw = lines.joined(separator: "\n")
-        text = raw
-        numberOfLines = 0
+        self.text = wrappedLines.joined(separator: "\n")
+        self.numberOfLines = 0
     }
 }
