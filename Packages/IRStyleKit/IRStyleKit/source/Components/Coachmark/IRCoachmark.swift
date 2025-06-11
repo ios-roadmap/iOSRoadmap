@@ -35,6 +35,7 @@ public extension IRCoachmarkProtocol {
     // MARK: – Public API
     var hasBeenShown: Bool {
         makeFlag().wrappedValue ?? false
+        return false
     }
 
     func markAsShown() {
