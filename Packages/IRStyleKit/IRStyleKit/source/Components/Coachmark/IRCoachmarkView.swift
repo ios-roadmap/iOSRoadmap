@@ -345,40 +345,33 @@ extension IRCoachmarkView {
 }
 /*
 // replace only this method
-func drawTriangle(in view: UIView, direction: IRCoachmarkDirection) {
-    let layer          = CAShapeLayer()
-    layer.fillColor    = Constants.Color.backgroundColor.cgColor   // same colour as card
-    let r: CGFloat     = 2                                         // ⬅️ corner radius at the tip
-    let w              = view.bounds.width
-    let h              = view.bounds.height
-    let path           = UIBezierPath()
+ func drawTriangle(in view: UIView, direction: IRCoachmarkDirection) {
+     let layer = CAShapeLayer()
+     layer.fillColor = Constants.Color.backgroundColor.cgColor
+     let r: CGFloat = 2
+     let w = view.bounds.width
+     let h = view.bounds.height
+     let path = UIBezierPath()
 
-    switch direction {
-    case .top:
-        path.move(to: .init(x: 0,  y: h))
-        path.addLine(to: .init(x: w,  y: h))
-        path.addLine(to: .init(x: w/2 + r, y: r))
-        path.addArc(  withCenter: .init(x: w/2, y: r),
-                      radius: r,
-                      startAngle: 0,
-                      endAngle: .pi,
-                      clockwise: true)
-        path.addLine(to: .init(x: w/2 - r, y: r))
+     switch direction {
+     case .top:
+         path.move(to: .init(x: 0, y: h))
+         path.addLine(to: .init(x: w / 2 - r, y: r))
+         path.addQuadCurve(to: .init(x: w / 2 + r, y: r),
+                           controlPoint: .init(x: w / 2, y: 0))
+         path.addLine(to: .init(x: w, y: h))
 
-    case .bottom:
-        path.move(to: .init(x: 0,  y: 0))
-        path.addLine(to: .init(x: w,  y: 0))
-        path.addLine(to: .init(x: w/2 + r, y: h - r))
-        path.addArc(  withCenter: .init(x: w/2, y: h - r),
-                      radius: r,
-                      startAngle: 0,
-                      endAngle: .pi,
-                      clockwise: false)
-        path.addLine(to: .init(x: w/2 - r, y: h - r))
-    }
+     case .bottom:
+         path.move(to: .init(x: 0, y: 0))
+         path.addLine(to: .init(x: w / 2 - r, y: h - r))
+         path.addQuadCurve(to: .init(x: w / 2 + r, y: h - r),
+                           controlPoint: .init(x: w / 2, y: h))
+         path.addLine(to: .init(x: w, y: 0))
+     }
 
-    path.close()
-    layer.path = path.cgPath
-    view.layer.sublayers = [layer]      // wipe any previous shape
-}
+     path.close()
+     layer.path = path.cgPath
+     view.layer.sublayers = [layer]
+ }
+
 */
