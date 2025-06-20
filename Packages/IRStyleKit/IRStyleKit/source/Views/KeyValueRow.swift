@@ -16,17 +16,23 @@ public final class KeyValueRowView: UIView {
         let title: String
         let description: String?
         let value: Value
+        let leadingImage: UIImage?
         
-        public init(title: String, description: String?, value: Value) {
+        public init(
+            title: String,
+            description: String?,
+            value: Value,
+            leadingImage: UIImage? = nil
+        ) {
             self.title = title
             self.description = description
             self.value = value
+            self.leadingImage = leadingImage
         }
     }
 
     public enum Value {
         case text(String)
-        case image(UIImage)
         case button(title: String, action: () -> Void)
     }
 
@@ -34,6 +40,10 @@ public final class KeyValueRowView: UIView {
         titleLabel.text = model.title
         descriptionLabel.text = model.description
         descriptionLabel.isHidden = model.description == nil
+        
+        iconView.image = model.leadingImage
+        iconView.isHidden = model.leadingImage == nil   // yoksa yer kaplamasın
+        
         configureRightStack(for: model.value)
     }
 
@@ -80,16 +90,39 @@ public final class KeyValueRowView: UIView {
         sv.alignment = .trailing
         return sv
     }()
-
+    
+    private let iconView: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleAspectFit
+        iv.setContentHuggingPriority(.required, for: .horizontal)
+        iv.setContentCompressionResistancePriority(.required, for: .horizontal)
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            iv.widthAnchor.constraint(equalToConstant: 20),
+            iv.heightAnchor.constraint(equalTo: iv.widthAnchor)
+        ])
+        return iv
+    }()
+    
+    private lazy var leftCompositeStack: UIStackView = {
+        // [iconView] + [titleStack]
+        let sv = UIStackView(arrangedSubviews: [iconView, leftStack])
+        sv.axis = .horizontal
+        sv.spacing = 8
+        sv.alignment = .center
+        return sv
+    }()
+    
     private lazy var rootStack: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [leftStack, rightStack])
+        let sv = UIStackView(arrangedSubviews: [leftCompositeStack, rightStack])
         sv.axis = .horizontal
         sv.alignment = .center
         sv.distribution = .fill
         sv.spacing = 12
         return sv
     }()
-
+    
     private func setUpViews() {
         addSubview(rootStack)
         rootStack.translatesAutoresizingMaskIntoConstraints = false
@@ -120,13 +153,7 @@ public final class KeyValueRowView: UIView {
             label.textAlignment = .right
             label.text = text
             rightStack.addArrangedSubview(label)
-
-        case .image(let image):
-            let imageView = UIImageView(image: image)
-            imageView.contentMode = .scaleAspectFit
-            imageView.setContentHuggingPriority(.required, for: .vertical)
-            rightStack.addArrangedSubview(imageView)
-
+            
         case .button(let title, let action):
             let button = UIButton(type: .system)
             button.setTitle(title, for: .normal)
