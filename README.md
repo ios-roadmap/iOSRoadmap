@@ -3,7 +3,7 @@
 ## Project Notes
 
 - We should avoid using external libraries as much as possible. However, in certain cases, we can **temporarily** integrate some libraries into the project.
-- The goal should not be to make the library a dependency, but to add the useful parts of it to the project.
+- The goal should not be to make the library a dependency, but to add the useful parts of it to the project.   
 
 This marks the initial phase of building a modular iOS SuperApp architecture using UIKit. The goal is to develop two distinct sample applications within the same project: one leveraging the JSONPlaceholder API, and the other built on the Rick and Morty public API. These apps will serve as real-world demonstrations to validate and establish a robust, clean UIKit-based foundation.
 
