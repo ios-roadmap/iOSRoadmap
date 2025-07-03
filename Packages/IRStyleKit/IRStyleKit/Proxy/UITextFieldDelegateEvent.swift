@@ -123,17 +123,17 @@ extension UITextField {
 /// because UIKit does not retain (own) its delegate.
 ///
 /// ✅ Correct usage: keep the proxy as a class-level property
-class MyViewController: UIViewController {
-    private var textFieldProxy: UITextFieldDelegateProxy?
-
-    func setupTextField() {
-        let proxy = UITextFieldDelegateProxy(originalDelegate: textField.delegate)
-
-        proxy.intercept(.didBeginEditing { textField in
-            print("Keyboard opened")
-        })
-
-        textField.delegate = proxy
-        self.textFieldProxy = proxy /// Stored here so it won’t be deallocated
-    }
-}
+//class MyViewController: UIViewController {
+//    private var textFieldProxy: UITextFieldDelegateProxy?
+//
+//    func setupTextField() {
+//        let proxy = UITextFieldDelegateProxy(originalDelegate: textField.delegate)
+//
+//        proxy.intercept(.didBeginEditing { textField in
+//            print("Keyboard opened")
+//        })
+//
+//        textField.delegate = proxy
+//        self.textFieldProxy = proxy /// Stored here so it won’t be deallocated
+//    }
+//}
