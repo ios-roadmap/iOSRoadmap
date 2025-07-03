@@ -115,3 +115,25 @@ extension UITextField {
         objc_setAssociatedObject(self, &proxyKey, proxy, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 }
+
+/// UITextFieldDelegateProxy must always be stored as a property, otherwise it gets deallocated immediately.
+/// If you declare it only as a local variable (for example `let proxy = …`),
+/// ARC (Automatic Reference Counting) will deallocate it when the scope ends.
+/// Even if you set `textField.delegate = proxy`, that alone is not enough,
+/// because UIKit does not retain (own) its delegate.
+///
+/// ✅ Correct usage: keep the proxy as a class-level property
+class MyViewController: UIViewController {
+    private var textFieldProxy: UITextFieldDelegateProxy?
+
+    func setupTextField() {
+        let proxy = UITextFieldDelegateProxy(originalDelegate: textField.delegate)
+
+        proxy.intercept(.didBeginEditing { textField in
+            print("Keyboard opened")
+        })
+
+        textField.delegate = proxy
+        self.textFieldProxy = proxy /// Stored here so it won’t be deallocated
+    }
+}
