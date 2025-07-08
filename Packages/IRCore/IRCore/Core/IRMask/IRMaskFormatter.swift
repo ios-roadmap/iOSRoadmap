@@ -20,13 +20,15 @@ public enum IRMaskFormatterType {
 }
 
 @MainActor
-protocol IRMaskFormatter {
+public protocol IRMaskFormatter {
     func format(text: String, with definition: IRMaskDefinition) -> String
 }
 
-final class GenericMaskFormatter: IRMaskFormatter {
+public final class GenericMaskFormatter: IRMaskFormatter {
     
-    func format(text: String, with definition: IRMaskDefinition) -> String {
+    public init() { }
+    
+    public func format(text: String, with definition: IRMaskDefinition) -> String {
         let cleanDigits = text.onlyDigits()
         var formattedText = ""
         var digitIndex = 0

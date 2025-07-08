@@ -20,7 +20,7 @@ public enum IRMaskPatternType {
          iban,
          custom(String)
     
-    var format: String {
+    public var format: String {
         switch self {
         case .creditCardNumber:
             return "nnnn nnnn nnnn nnnn"
