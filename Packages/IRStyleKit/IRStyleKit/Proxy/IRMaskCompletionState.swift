@@ -227,6 +227,14 @@ final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
         return false
     }
     
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        guard let start = textField.selectedTextRange?.start else { return }
+        let offset = textField.offset(from: textField.beginningOfDocument, to: start)
+        if offset < prefix.count {
+            textField.setCursorPosition(offset: prefix.count)
+        }
+    }
+    
     //────────────────────────────────────────
     // MARK: Public setters
     //────────────────────────────────────────
