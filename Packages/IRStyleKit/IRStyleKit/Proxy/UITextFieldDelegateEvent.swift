@@ -137,3 +137,97 @@ extension UITextField {
 //        self.textFieldProxy = proxy /// Stored here so it won’t be deallocated
 //    }
 //}
+
+// MARK: - CRTelephoneInputFieldComponentView ⇢ CRInputFieldDelegate
+extension CRTelephoneInputFieldComponentView: CRInputFieldDelegate {
+
+    // --------------------------------------------------------------------
+    // Extra caret-math helpers (pure Swift, no Foundation tricks)
+    // --------------------------------------------------------------------
+    /// How many digits are in `s` *before* the given UTF-16 offset.
+    private func digitCount(in s: String, upToUTF16 offset: Int) -> Int {
+        var count = 0, pos = 0
+        for ch in s {
+            pos += ch.utf16.count
+            if pos > offset { break }
+            if ch.isWholeNumber { count += 1 }
+        }
+        return count
+    }
+
+    /// UTF-16 offset of the digit at `index` (0-based) or of the first
+    /// non-digit after the last digit if `index` is past the end.
+    private func utf16Offset(ofDigit index: Int, in s: String) -> Int {
+        var count = 0, pos = 0
+        for ch in s {
+            if ch.isWholeNumber {
+                if count == index { return pos }
+                count += 1
+            }
+            pos += ch.utf16.count
+        }
+        return pos
+    }
+
+    // --------------------------------------------------------------------
+    // Delegate
+    // --------------------------------------------------------------------
+    public func shouldChangeCharacters(inputField: CRInputField,
+                                       in range: NSRange,
+                                       with replacement: String) -> Bool {
+
+        // 0. Basic safety
+        guard let current = inputField.text,
+              let swiftRange = Range(range, in: current) else { return true }
+
+        // 1. Convert “delete a space” into “delete the digit before it”
+        var effRange      = range
+        var effSwiftRange = swiftRange     // effective ranges we will use
+        if replacement.isEmpty, range.length == 1,
+           current[swiftRange].allSatisfy({ !$0.isWholeNumber }) {
+
+            // Step left until we hit a digit or the prefix
+            var idx = current.index(before: effSwiftRange.lowerBound)
+            while idx > current.startIndex,
+                  !current[idx].isWholeNumber {
+                idx = current.index(before: idx)
+            }
+
+            guard current[idx].isWholeNumber else { return false }  // hit prefix
+            let loc = current.utf16.distance(from: current.startIndex, to: idx)
+            effRange      = NSRange(location: loc, length: 1)
+            effSwiftRange = Range(effRange, in: current)!
+        }
+
+        // 2. Caret position in “digit coordinates”
+        let digitPosBefore = digitCount(in: current, upToUTF16: effRange.location)
+
+        // 3. Build the *unformatted* candidate string
+        let candidate = current.replacingCharacters(in: effSwiftRange, with: replacement)
+        let local     = localDigits(from: candidate)
+        guard local.count <= 10 else { return false }          // max 10 local digits
+
+        // 4. Apply your formatter
+        let code   = telephoneInputField?.selectedCountryCode.phoneCode ?? ""
+        let target = formatted(code: code, local: local)
+
+        // 5. If the formatter changed something, commit & restore caret
+        if inputField.text != target {
+
+            let removedDigits  = current[effSwiftRange].filter(\.isWholeNumber).count
+            let insertedDigits = replacement.filter(\.isWholeNumber).count
+            let digitPosAfter  = digitPosBefore + insertedDigits - removedDigits
+
+            inputField.text = target
+
+            let caretUTF16  = utf16Offset(ofDigit: digitPosAfter, in: target)
+            inputField.setCursorPosition(offset: caretUTF16)
+
+            // (Notify view-model etc. here if you need to.)
+            return false                          // we handled the edit
+        }
+
+        // 6. Nothing reformatted → let UIKit do the default thing
+        return true
+    }
+}
