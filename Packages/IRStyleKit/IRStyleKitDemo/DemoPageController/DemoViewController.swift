@@ -87,65 +87,32 @@ final class IRMaskedDemoPageController: UIViewController, ShowcaseListViewContro
 
 
 
-
-
-
-
-
-/// Phone-specific mask presets
-private enum PhoneMaskPattern {
-    /// “nnn nnn nn nn”  → Turkish 10-digit format
-    case tr
-    /// “nnnnnnnnnn”     → plain 10 digits for every other country
-    case generic
-    
-    /// Converts to an IRMaskDefinition for GenericMaskFormatter
-    var definition: IRMaskDefinition {
-        switch self {
-        case .tr:      return IRMaskDefinition(patternType: .custom("nnn nnn nn nn"))
-        case .generic: return IRMaskDefinition(patternType: .custom("nnnnnnnnnn"))
-        }
-    }
-}
-
-
-
-
-
-
-
 //
 //  IRPhoneMaskedInputFieldDelegate.swift
 //  IRViews
-//
-//  Created: 08.07.2025  —  Updated: 10.07.2025
+//  Created: 08.07.2025 — Updated: 10.07.2025
 //
 
 import UIKit
 import Foundation
 
 /// Formats a phone-number field while preserving the immutable prefix “(+<code>) ”.
-/// • Country code “90”  →  mask `nnn nnn nn nn` (3-3-2-2 grouping)
-/// • Any other code     →  mask `nnnnnnnnnn`   (plain 10 digits)
-/// Caret behaviour:
-/// • Drag caret anywhere → insert/delete works in-place
-/// • Backspacing on a separator deletes the digit to its left
-/// • After delete, if caret lands on a space it is auto-nudged one char left
+/// • TR (“90”) → mask `nnn nnn nn nn`   → 10 hane
+/// • Diğer     → mask `nnnnnnnnnn`       → 10 hane
+/// Caret davranışı: ekle/sil, ayırıcı üstünde backspace vb.
 public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
     
-    // MARK: – Public
+    // MARK: Public
     
-    /// Notifies when the digit count is empty / incomplete / complete.
     public var onCompletionStateChanged: ((IRMaskCompletionState) -> Void)?
     
-    // MARK: – Private
+    // MARK: Private
     
     private var countryCode: String
-    
-    /// Always-updated prefix based on current country code.
+    private var lastCompletionState: IRMaskCompletionState = .empty   // spam koruması
     private var prefix: String { "(+\(countryCode)) " }
     
-    // MARK: – Init
+    // MARK: Init
     
     public init(countryCode: String,
                 onCompletionStateChanged: ((IRMaskCompletionState) -> Void)? = nil) {
@@ -154,7 +121,7 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
         super.init()
     }
     
-    // MARK: – UITextFieldDelegate
+    // MARK: UITextFieldDelegate
     
     public func textFieldDidBeginEditing(_ tf: UITextField) {
         ensurePrefix(in: tf)
@@ -166,7 +133,7 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
                           replacementString string: String) -> Bool {
         guard let full = tf.text else { return false }
         
-        // Ensure prefix always present
+        // Prefix bozulmasın
         guard full.utf16.count >= prefix.utf16.count else {
             tf.text = prefix
             tf.setCursorPosition(offset: prefix.count)
@@ -174,18 +141,29 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
             return false
         }
         
-        // Extract body safely
-        let bodyStartIdx = full.index(full.startIndex, offsetBy: prefix.count)
-        var body = String(full[bodyStartIdx...])
+        // Body + dijit dizisi
+        let bodyStart = full.index(full.startIndex, offsetBy: prefix.count)
+        var body   = String(full[bodyStart...])
         var digits = body.filter(\.isNumber)
         
-        // Block edits inside prefix
+        // Prefix içinde düzenlemeyi engelle
         if range.location < prefix.count { return false }
+        
+        // Maskeye göre maksimum hane
+        let mask      = currentMask()
+        let maxDigits = mask.requiredDigits
+        
+        // ── EKLEME BLOĞU KISITI ──
+        if !string.isEmpty, string.contains(where: \.isNumber), digits.count >= maxDigits {
+            return false
+        }
+        // ─────────────────────────
         
         // DELETE
         if string.isEmpty {
             var delBodyIdx = range.location - prefix.count
-            while delBodyIdx > 0 && !body[body.index(body.startIndex, offsetBy: delBodyIdx)].isNumber {
+            while delBodyIdx > 0 &&
+                  !body[body.index(body.startIndex, offsetBy: delBodyIdx)].isNumber {
                 delBodyIdx -= 1
             }
             let digitPositions = Self.digitPositions(in: body)
@@ -196,28 +174,28 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
             body = formatted.body
             tf.text = prefix + body
             
-            var caretOffset = delDigitIdx < formatted.digitPos.count
+            var caret = delDigitIdx < formatted.digitPos.count
                 ? formatted.digitPos[delDigitIdx]
                 : body.count
-            if caretOffset > 0,
-               body[body.index(body.startIndex, offsetBy: caretOffset - 1)] == " " {
-                caretOffset -= 1
+            if caret > 0,
+               body[body.index(body.startIndex, offsetBy: caret - 1)] == " " {
+                caret -= 1
             }
-            tf.setCursorPosition(offset: prefix.count + caretOffset)
+            tf.setCursorPosition(offset: prefix.count + caret)
             notifyCompletionState(for: tf.text ?? "")
             return false
         }
         
-        // INSERT (digits only)
+        // INSERT (yalnızca rakam)
         let ins = string.filter(\.isNumber)
         guard !ins.isEmpty else { return false }
         
-        let caretInBody = range.location - prefix.count
+        let caretInBody   = range.location - prefix.count
         let digitPositions = Self.digitPositions(in: body)
-        let idxInDigits = digitPositions.filter { $0 < caretInBody }.count
+        let idxInDigits    = digitPositions.filter { $0 < caretInBody }.count
         
-        // Cap at 10 digits
-        let space = max(0, 10 - digits.count)
+        // Kalan boşluk
+        let space    = max(0, maxDigits - digits.count)
         let fragment = ins.prefix(space)
         let insertIdx = digits.index(digits.startIndex, offsetBy: idxInDigits)
         digits.insert(contentsOf: fragment, at: insertIdx)
@@ -227,8 +205,8 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
         tf.text = prefix + body
         
         let lastDigitIdx = idxInDigits + fragment.count - 1
-        let caretDigit = lastDigitIdx + 1
-        let caretOffset = caretDigit < formatted.digitPos.count
+        let caretDigit   = lastDigitIdx + 1
+        let caretOffset  = caretDigit < formatted.digitPos.count
             ? formatted.digitPos[caretDigit]
             : body.count
         tf.setCursorPosition(offset: prefix.count + caretOffset)
@@ -237,17 +215,16 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
         return false
     }
     
-    // MARK: – Public helper
+    // MARK: Public helper
     
-    /// Call when the country code changes to re-apply mask and prefix.
     public func updateCountryCode(to newCode: String, in textField: UITextField) {
-        self.countryCode = newCode
+        countryCode = newCode
         textField.text = prefix
         textField.setCursorPosition(offset: prefix.count)
         notifyCompletionState(for: textField.text ?? "")
     }
     
-    // MARK: – Private helpers
+    // MARK: Private helpers
     
     private func ensurePrefix(in tf: UITextField) {
         if tf.text?.hasPrefix(prefix) != true {
@@ -256,48 +233,77 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
         tf.setCursorPosition(offset: prefix.count)
     }
     
+    private func currentMask() -> PhoneMaskPattern {
+        countryCode == "90" ? .tr : .generic
+    }
+    
     private func format(_ digits: String) -> (body: String, digitPos: [Int]) {
-        // 1. Choose pattern from the enum
-        let mask: PhoneMaskPattern = (countryCode == "90") ? .tr : .generic
-        
-        // 2. Format through the shared GenericMaskFormatter
+        let mask = currentMask()
         let formatter = IRMaskFormatterType.generic.instance
         var body = formatter.format(text: digits, with: mask.definition)
         
-        // 3. Trim trailing padding blanks so behaviour matches the original
+        // Sondaki boşlukları temizle
         while body.last == " " { body.removeLast() }
         
-        // 4. Return the string plus digit-index map for caret logic
-        let digitPos = Self.digitPositions(in: body)
-        return (body, digitPos)
+        let positions = Self.digitPositions(in: body)
+        return (body, positions)
     }
-
     
     private static func digitPositions(in s: String) -> [Int] {
         s.enumerated().compactMap { $0.element.isNumber ? $0.offset : nil }
     }
     
     private func notifyCompletionState(for fullText: String) {
-        let bodyText: String = fullText.hasPrefix(prefix)
+        let bodyText = fullText.hasPrefix(prefix)
             ? String(fullText.dropFirst(prefix.count))
             : fullText
         let digitCount = bodyText.filter(\.isNumber).count
-        let required = 10
+        let required   = currentMask().requiredDigits
+        
         let state: IRMaskCompletionState
         switch digitCount {
-        case 0:                   state = .empty
-        case 1..<required:        state = .incomplete
-        default:                  state = .complete
+        case 0:            state = .empty
+        case 1..<required: state = .incomplete
+        default:           state = .complete
         }
-        onCompletionStateChanged?(state)
+        
+        if state != lastCompletionState {
+            lastCompletionState = state
+            onCompletionStateChanged?(state)
+        }
     }
 }
 
-// MARK: – Mini helpers
+// MARK: UITextField helper
 
 private extension UITextField {
     func setCursorPosition(offset: Int) {
         guard let p = position(from: beginningOfDocument, offset: offset) else { return }
         selectedTextRange = textRange(from: p, to: p)
+    }
+}
+
+// MARK: Mask enum
+
+private enum PhoneMaskPattern {
+    case tr
+    case generic
+    
+    /// Örn. "nnn nnn nn nn"
+    var patternString: String {
+        switch self {
+        case .tr:      "nnn nnn nn nn"
+        case .generic: "nnnnnnnnnn"
+        }
+    }
+    
+    /// Kaç “n” varsa o kadar hane gerekir
+    var requiredDigits: Int {
+        patternString.filter { $0 == "n" }.count
+    }
+    
+    /// IRMaskDefinition’e dönüştür
+    var definition: IRMaskDefinition {
+        IRMaskDefinition(patternType: .custom(patternString))
     }
 }
