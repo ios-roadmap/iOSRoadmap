@@ -138,96 +138,92 @@ extension UITextField {
 //    }
 //}
 
-// MARK: - CRTelephoneInputFieldComponentView ⇢ CRInputFieldDelegate
-extension CRTelephoneInputFieldComponentView: CRInputFieldDelegate {
+class PhoneFormatterViewController: UIViewController, CRInputFieldDelegate {
 
-    // --------------------------------------------------------------------
-    // Extra caret-math helpers (pure Swift, no Foundation tricks)
-    // --------------------------------------------------------------------
-    /// How many digits are in `s` *before* the given UTF-16 offset.
-    private func digitCount(in s: String, upToUTF16 offset: Int) -> Int {
-        var count = 0, pos = 0
-        for ch in s {
-            pos += ch.utf16.count
-            if pos > offset { break }
-            if ch.isWholeNumber { count += 1 }
-        }
-        return count
+    @IBOutlet weak var telephoneInputField: CRInputField!
+    private var isFormatting = false
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        telephoneInputField.delegate = self
+        telephoneInputField.keyboardType = .phonePad
     }
 
-    /// UTF-16 offset of the digit at `index` (0-based) or of the first
-    /// non-digit after the last digit if `index` is past the end.
-    private func utf16Offset(ofDigit index: Int, in s: String) -> Int {
-        var count = 0, pos = 0
-        for ch in s {
-            if ch.isWholeNumber {
-                if count == index { return pos }
-                count += 1
-            }
-            pos += ch.utf16.count
+    // Helpers omitted for brevity: prefix(for:), firstLocalUTF16Index(for:), localDigits(from:), formatted(code:local:)
+
+    func shouldChangeCharacters(inputField: CRInputField,
+                                in range: NSRange,
+                                with replacement: String) -> Bool {
+        // 1. If we’re already formatting, let the change through unmodified
+        if isFormatting {
+            return true
         }
-        return pos
-    }
 
-    // --------------------------------------------------------------------
-    // Delegate
-    // --------------------------------------------------------------------
-    public func shouldChangeCharacters(inputField: CRInputField,
-                                       in range: NSRange,
-                                       with replacement: String) -> Bool {
-
-        // 0. Basic safety
         guard let current = inputField.text,
-              let swiftRange = Range(range, in: current) else { return true }
-
-        // 1. Convert “delete a space” into “delete the digit before it”
-        var effRange      = range
-        var effSwiftRange = swiftRange     // effective ranges we will use
-        if replacement.isEmpty, range.length == 1,
-           current[swiftRange].allSatisfy({ !$0.isWholeNumber }) {
-
-            // Step left until we hit a digit or the prefix
-            var idx = current.index(before: effSwiftRange.lowerBound)
-            while idx > current.startIndex,
-                  !current[idx].isWholeNumber {
-                idx = current.index(before: idx)
-            }
-
-            guard current[idx].isWholeNumber else { return false }  // hit prefix
-            let loc = current.utf16.distance(from: current.startIndex, to: idx)
-            effRange      = NSRange(location: loc, length: 1)
-            effSwiftRange = Range(effRange, in: current)!
+              let swiftRange = Range(range, in: current) else {
+            return true
         }
 
-        // 2. Caret position in “digit coordinates”
-        let digitPosBefore = digitCount(in: current, upToUTF16: effRange.location)
+        let code = telephoneInputField.selectedCountryCode.phoneCode
+        let prefixText = prefix(for: code)
+        let prefixLen = prefixText.utf16.count
 
-        // 3. Build the *unformatted* candidate string
-        let candidate = current.replacingCharacters(in: effSwiftRange, with: replacement)
-        let local     = localDigits(from: candidate)
-        guard local.count <= 10 else { return false }          // max 10 local digits
+        // 2. Special-case deleting the very first local digit
+        if replacement.isEmpty,
+           range.length == 1,
+           range.location <= prefixLen {
+            isFormatting = true
+            inputField.text = prefixText
+            inputField.setCursorPosition(offset: prefixLen)
+            isFormatting = false
+            viewModel.viewModelDelegate?.currentPhoneNumber(from: phoneNumber)
+            return false
+        }
 
-        // 4. Apply your formatter
-        let code   = telephoneInputField?.selectedCountryCode.phoneCode ?? ""
+        // 3. Compute the “next” raw string and strip to digits
+        let next = current.replacingCharacters(in: swiftRange, with: replacement)
+        let local = localDigits(from: next)
+        guard local.count <= 10 else { return false }
+
+        // 4. Calculate where the cursor was in the unformatted digits
+        let beforeEdit = String(current[..<swiftRange.lowerBound])
+        let cursorInLocal = localDigits(from: beforeEdit).count
+
+        // 5. Build the formatted string
         let target = formatted(code: code, local: local)
 
-        // 5. If the formatter changed something, commit & restore caret
-        if inputField.text != target {
-
-            let removedDigits  = current[effSwiftRange].filter(\.isWholeNumber).count
-            let insertedDigits = replacement.filter(\.isWholeNumber).count
-            let digitPosAfter  = digitPosBefore + insertedDigits - removedDigits
-
+        // 6. If formatting changed the visible text, apply it
+        if target != current {
+            isFormatting = true
             inputField.text = target
 
-            let caretUTF16  = utf16Offset(ofDigit: digitPosAfter, in: target)
-            inputField.setCursorPosition(offset: caretUTF16)
+            // Recompute cursor offset in the formatted string
+            var offset = prefixLen
+            var rem = cursorInLocal
+            let groups = code == "90" ? [3,3,2,2] : []
+            if groups.isEmpty {
+                offset += rem
+            } else {
+                for g in groups {
+                    if rem > g {
+                        offset += g + 1 // +1 for the space
+                        rem -= g
+                    } else {
+                        offset += rem
+                        rem = 0
+                        break
+                    }
+                }
+                if rem > 0 { offset += rem }
+            }
+            inputField.setCursorPosition(offset: offset)
 
-            // (Notify view-model etc. here if you need to.)
-            return false                          // we handled the edit
+            isFormatting = false
+            viewModel.viewModelDelegate?.currentPhoneNumber(from: phoneNumber)
+            return false
         }
 
-        // 6. Nothing reformatted → let UIKit do the default thing
+        // 7. No formatting change: let it through
         return true
     }
 }
