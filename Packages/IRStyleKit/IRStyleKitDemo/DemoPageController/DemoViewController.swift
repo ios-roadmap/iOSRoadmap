@@ -99,7 +99,6 @@ final class IRMaskedDemoPageController: UIViewController, ShowcaseListViewContro
 
 
 
-
 //
 //  IRPhoneMaskedInputFieldDelegate.swift
 //  IRViews
@@ -109,12 +108,12 @@ final class IRMaskedDemoPageController: UIViewController, ShowcaseListViewContro
 
 import UIKit
 
-/// Formats a phone‑number field while preserving the immutable prefix
+/// Formats a phone-number field while preserving the immutable prefix
 /// “(+<code>) ”.
-/// • TR (“90”) ⇒ 3‑3‑2‑2 grouping, no trailing blanks
-/// • Others ⇒ plain 10‑digit limit
+/// • TR (“90”) ⇒ 3-3-2-2 grouping, no trailing blanks
+/// • Others ⇒ plain 10-digit limit
 /// Caret behaviour:
-/// • Drag caret anywhere → insert/delete works in‑place
+/// • Drag caret anywhere → insert/delete works in-place
 /// • Backspacing on a separator deletes the digit to its left
 /// • After delete, if caret lands on a space it is auto-nudged one char left
 public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
@@ -126,15 +125,21 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
 
     // MARK: – Private
     
-    private let countryCode: String
-    private let prefix: String
+    private var countryCode: String {
+        didSet {
+            // Ensure prefix updates when countryCode changes
+            // Reset text if needed
+        }
+    }
+
+    /// Computed prefix based on current country code
+    private var prefix: String { "(+\(countryCode)) " }
 
     // MARK: – Init
     
     public init(countryCode: String,
                 onCompletionStateChanged: ((IRMaskCompletionState) -> Void)? = nil) {
         self.countryCode = countryCode
-        self.prefix = "(+\(countryCode)) "
         self.onCompletionStateChanged = onCompletionStateChanged
         super.init()
     }
@@ -142,6 +147,7 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
     // MARK: – UITextFieldDelegate
     
     public func textFieldDidBeginEditing(_ tf: UITextField) {
+        // Ensure prefix
         if tf.text?.hasPrefix(prefix) == false {
             tf.text = prefix
         }
@@ -154,10 +160,18 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
                           replacementString string: String) -> Bool {
 
         guard let full = tf.text else { return false }
-        let bodyRange = NSRange(location: prefix.count,
-                                length: full.utf16.count - prefix.count)
-        var body = (full as NSString).substring(with: bodyRange)
-        var digits = body.digitsOnly
+        // Prevent crashes when text shorter than prefix
+        guard full.utf16.count >= prefix.utf16.count else {
+            tf.text = prefix
+            tf.setCursorPosition(offset: prefix.count)
+            notifyCompletionState(for: tf.text ?? "")
+            return false
+        }
+
+        // Extract body safely
+        let bodyStart = full.index(full.startIndex, offsetBy: prefix.count)
+        var body = String(full[bodyStart...])
+        var digits = body.filter(\.isNumber)
 
         // Block edits inside prefix
         if range.location < prefix.count {
@@ -166,28 +180,22 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
 
         // DELETE
         if string.isEmpty {
-            // Absolute pos in body
             var delBodyIdx = range.location - prefix.count
-            // Walk left to nearest digit
-            while delBodyIdx > 0,
-                  !body[body.index(body.startIndex, offsetBy: delBodyIdx)].isNumber {
+            while delBodyIdx > 0 && !body[body.index(body.startIndex, offsetBy: delBodyIdx)].isNumber {
                 delBodyIdx -= 1
             }
             let digitPos = Self.digitPositions(in: body)
             guard let delDigitIdx = digitPos.firstIndex(of: delBodyIdx) else {
                 return false
             }
-            // Remove digit
             let rmIndex = digits.index(digits.startIndex, offsetBy: delDigitIdx)
             digits.remove(at: rmIndex)
 
-            // Reformat
             let formatted = format(digits)
             body = formatted.body
             tf.text = prefix + body
 
-            // Caret position
-            var caretOffset = (delDigitIdx < formatted.digitPos.count)
+            var caretOffset = delDigitIdx < formatted.digitPos.count
                 ? formatted.digitPos[delDigitIdx]
                 : body.count
             if caretOffset > 0,
@@ -200,14 +208,13 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
         }
 
         // INSERT (digits only)
-        let ins = string.digitsOnly
+        let ins = string.filter(\.isNumber)
         guard !ins.isEmpty else { return false }
 
         let caretInBody = range.location - prefix.count
         let digitPos = Self.digitPositions(in: body)
         let idxInDigits = digitPos.filter { $0 < caretInBody }.count
 
-        // Cap at 10
         let room = max(0, 10 - digits.count)
         let fragment = ins.prefix(room)
         let insPt = digits.index(digits.startIndex, offsetBy: idxInDigits)
@@ -217,10 +224,9 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
         body = formatted.body
         tf.text = prefix + body
 
-        // Caret after last inserted digit
         let lastIdx = idxInDigits + fragment.count - 1
         let caretDig = lastIdx + 1
-        let caretOff = (caretDig < formatted.digitPos.count)
+        let caretOff = caretDig < formatted.digitPos.count
             ? formatted.digitPos[caretDig]
             : body.count
         tf.setCursorPosition(offset: prefix.count + caretOff)
@@ -275,6 +281,7 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
         onCompletionStateChanged?(state)
     }
 }
+
 
 // Mini helpers
 
