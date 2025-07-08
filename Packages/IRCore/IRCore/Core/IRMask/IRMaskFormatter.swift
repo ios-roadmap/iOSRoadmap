@@ -11,7 +11,7 @@ import Foundation
 public enum IRMaskFormatterType {
     case generic
     
-    var instance: IRMaskFormatter {
+    public var instance: IRMaskFormatter {
         switch self {
         case .generic:
             return GenericMaskFormatter()

@@ -77,58 +77,95 @@ final class IRMaskedDemoPageController: UIViewController, ShowcaseListViewContro
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/// Phone-specific mask presets
+private enum PhoneMaskPattern {
+    /// “nnn nnn nn nn”  → Turkish 10-digit format
+    case tr
+    /// “nnnnnnnnnn”     → plain 10 digits for every other country
+    case generic
+    
+    /// Converts to an IRMaskDefinition for GenericMaskFormatter
+    var definition: IRMaskDefinition {
+        switch self {
+        case .tr:      return IRMaskDefinition(patternType: .custom("nnn nnn nn nn"))
+        case .generic: return IRMaskDefinition(patternType: .custom("nnnnnnnnnn"))
+        }
+    }
+}
+
+
+
+
+
+
+
 //
 //  IRPhoneMaskedInputFieldDelegate.swift
 //  IRViews
 //
-//  Created: 08.07.2025  —  Polished: 10.07.2025
+//  Created: 08.07.2025  —  Updated: 10.07.2025
 //
 
 import UIKit
+import Foundation
 
-/// Formats a phone-number field while preserving the immutable prefix
-/// “(+<code>) ”.
-/// • TR (“90”) ⇒ 3-3-2-2 grouping, no trailing blanks
-/// • Others ⇒ plain 10-digit limit
+/// Formats a phone-number field while preserving the immutable prefix “(+<code>) ”.
+/// • Country code “90”  →  mask `nnn nnn nn nn` (3-3-2-2 grouping)
+/// • Any other code     →  mask `nnnnnnnnnn`   (plain 10 digits)
 /// Caret behaviour:
 /// • Drag caret anywhere → insert/delete works in-place
 /// • Backspacing on a separator deletes the digit to its left
 /// • After delete, if caret lands on a space it is auto-nudged one char left
 public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
-
+    
     // MARK: – Public
-
+    
     /// Notifies when the digit count is empty / incomplete / complete.
     public var onCompletionStateChanged: ((IRMaskCompletionState) -> Void)?
-
+    
     // MARK: – Private
-
+    
     private var countryCode: String
-
-    /// Always updated prefix based on current country code
+    
+    /// Always-updated prefix based on current country code.
     private var prefix: String { "(+\(countryCode)) " }
-
+    
     // MARK: – Init
-
+    
     public init(countryCode: String,
                 onCompletionStateChanged: ((IRMaskCompletionState) -> Void)? = nil) {
         self.countryCode = countryCode
         self.onCompletionStateChanged = onCompletionStateChanged
         super.init()
     }
-
+    
     // MARK: – UITextFieldDelegate
-
+    
     public func textFieldDidBeginEditing(_ tf: UITextField) {
         ensurePrefix(in: tf)
         notifyCompletionState(for: tf.text ?? "")
     }
-
+    
     public func textField(_ tf: UITextField,
                           shouldChangeCharactersIn range: NSRange,
                           replacementString string: String) -> Bool {
         guard let full = tf.text else { return false }
-
+        
         // Ensure prefix always present
         guard full.utf16.count >= prefix.utf16.count else {
             tf.text = prefix
@@ -136,15 +173,15 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
             notifyCompletionState(for: tf.text ?? "")
             return false
         }
-
+        
         // Extract body safely
         let bodyStartIdx = full.index(full.startIndex, offsetBy: prefix.count)
         var body = String(full[bodyStartIdx...])
         var digits = body.filter(\.isNumber)
-
+        
         // Block edits inside prefix
         if range.location < prefix.count { return false }
-
+        
         // DELETE
         if string.isEmpty {
             var delBodyIdx = range.location - prefix.count
@@ -152,15 +189,13 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
                 delBodyIdx -= 1
             }
             let digitPositions = Self.digitPositions(in: body)
-            guard let delDigitIdx = digitPositions.firstIndex(of: delBodyIdx) else {
-                return false
-            }
+            guard let delDigitIdx = digitPositions.firstIndex(of: delBodyIdx) else { return false }
             digits.remove(at: digits.index(digits.startIndex, offsetBy: delDigitIdx))
-
+            
             let formatted = format(digits)
             body = formatted.body
             tf.text = prefix + body
-
+            
             var caretOffset = delDigitIdx < formatted.digitPos.count
                 ? formatted.digitPos[delDigitIdx]
                 : body.count
@@ -172,87 +207,76 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
             notifyCompletionState(for: tf.text ?? "")
             return false
         }
-
+        
         // INSERT (digits only)
         let ins = string.filter(\.isNumber)
         guard !ins.isEmpty else { return false }
-
+        
         let caretInBody = range.location - prefix.count
         let digitPositions = Self.digitPositions(in: body)
         let idxInDigits = digitPositions.filter { $0 < caretInBody }.count
-
+        
         // Cap at 10 digits
         let space = max(0, 10 - digits.count)
         let fragment = ins.prefix(space)
         let insertIdx = digits.index(digits.startIndex, offsetBy: idxInDigits)
         digits.insert(contentsOf: fragment, at: insertIdx)
-
+        
         let formatted = format(digits)
         body = formatted.body
         tf.text = prefix + body
-
+        
         let lastDigitIdx = idxInDigits + fragment.count - 1
         let caretDigit = lastDigitIdx + 1
         let caretOffset = caretDigit < formatted.digitPos.count
             ? formatted.digitPos[caretDigit]
             : body.count
         tf.setCursorPosition(offset: prefix.count + caretOffset)
-
+        
         notifyCompletionState(for: tf.text ?? "")
         return false
     }
-
+    
     // MARK: – Public helper
-
-    /// Call when the country code changes to reapply mask and prefix.
+    
+    /// Call when the country code changes to re-apply mask and prefix.
     public func updateCountryCode(to newCode: String, in textField: UITextField) {
-        // 1) Update the countryCode property
         self.countryCode = newCode
-
-        // 2) Set the text to the new prefix only
         textField.text = prefix
-
-        // 3) Move the caret to the end of the prefix
         textField.setCursorPosition(offset: prefix.count)
-
-        // 4) Notify about empty/incomplete state
         notifyCompletionState(for: textField.text ?? "")
     }
-
-
-
+    
     // MARK: – Private helpers
-
+    
     private func ensurePrefix(in tf: UITextField) {
         if tf.text?.hasPrefix(prefix) != true {
             tf.text = prefix
         }
         tf.setCursorPosition(offset: prefix.count)
     }
-
+    
     private func format(_ digits: String) -> (body: String, digitPos: [Int]) {
-        countryCode == "90" ? Self.formatTR(digits) : (digits, Array(0..<digits.count))
+        // 1. Choose pattern from the enum
+        let mask: PhoneMaskPattern = (countryCode == "90") ? .tr : .generic
+        
+        // 2. Format through the shared GenericMaskFormatter
+        let formatter = IRMaskFormatterType.generic.instance
+        var body = formatter.format(text: digits, with: mask.definition)
+        
+        // 3. Trim trailing padding blanks so behaviour matches the original
+        while body.last == " " { body.removeLast() }
+        
+        // 4. Return the string plus digit-index map for caret logic
+        let digitPos = Self.digitPositions(in: body)
+        return (body, digitPos)
     }
 
-    private static func formatTR(_ d: String) -> (String, [Int]) {
-        var out = "", pos: [Int] = []
-        var cur = 0
-        for (i, ch) in d.enumerated() {
-            if i == 3 || i == 6 || i == 8 {
-                out.append(" ")
-                cur += 1
-            }
-            out.append(ch)
-            pos.append(cur)
-            cur += 1
-        }
-        return (out, pos)
-    }
-
+    
     private static func digitPositions(in s: String) -> [Int] {
         s.enumerated().compactMap { $0.element.isNumber ? $0.offset : nil }
     }
-
+    
     private func notifyCompletionState(for fullText: String) {
         let bodyText: String = fullText.hasPrefix(prefix)
             ? String(fullText.dropFirst(prefix.count))
@@ -269,7 +293,7 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
     }
 }
 
-// Mini helpers
+// MARK: – Mini helpers
 
 private extension UITextField {
     func setCursorPosition(offset: Int) {
