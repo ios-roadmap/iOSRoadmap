@@ -22,7 +22,9 @@ final class IRMaskedDemoPageController: UIViewController, ShowcaseListViewContro
     }()
     
     private let phoneTextField = UITextField()
-       private let maskDelegate = IRPhoneMaskedInputFieldDelegate(countryCode: "90")  // or any other code
+    private let maskDelegate = IRPhoneMaskedInputFieldDelegate(countryCode: "90") { result in
+        print(result)
+    }  // or any other code
 
 
     // MARK: - Mask Delegate
@@ -97,6 +99,7 @@ final class IRMaskedDemoPageController: UIViewController, ShowcaseListViewContro
 
 
 
+
 //
 //  IRPhoneMaskedInputFieldDelegate.swift
 //  IRViews
@@ -106,140 +109,174 @@ final class IRMaskedDemoPageController: UIViewController, ShowcaseListViewContro
 
 import UIKit
 
-/// Formats a phone‐number field while preserving the immutable prefix
+/// Formats a phone‑number field while preserving the immutable prefix
 /// “(+<code>) ”.
-/// • **TR (“90”)** ⇒ 3-3-2-2 grouping, no trailing blanks
-/// • **Others**     ⇒ plain 10-digit limit
+/// • TR (“90”) ⇒ 3‑3‑2‑2 grouping, no trailing blanks
+/// • Others ⇒ plain 10‑digit limit
 /// Caret behaviour:
-/// • Drag caret anywhere → insert / delete works in-place
+/// • Drag caret anywhere → insert/delete works in‑place
 /// • Backspacing on a separator deletes the digit to its left
 /// • After delete, if caret lands on a space it is auto-nudged one char left
 public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
+
+    // MARK: – Public
     
+    /// Notifies when the digit count is empty / incomplete / complete.
+    public var onCompletionStateChanged: ((IRMaskCompletionState) -> Void)?
+
+    // MARK: – Private
+    
+    private let countryCode: String
+    private let prefix: String
+
     // MARK: – Init
     
-    public init(countryCode: String) {
+    public init(countryCode: String,
+                onCompletionStateChanged: ((IRMaskCompletionState) -> Void)? = nil) {
         self.countryCode = countryCode
-        self.prefix      = "(+\(countryCode)) "
+        self.prefix = "(+\(countryCode)) "
+        self.onCompletionStateChanged = onCompletionStateChanged
         super.init()
     }
-    
+
     // MARK: – UITextFieldDelegate
     
     public func textFieldDidBeginEditing(_ tf: UITextField) {
-        if tf.text?.hasPrefix(prefix) == false { tf.text = prefix }
+        if tf.text?.hasPrefix(prefix) == false {
+            tf.text = prefix
+        }
         tf.setCursorPosition(offset: prefix.count)
+        notifyCompletionState(for: tf.text ?? "")
     }
-    
+
     public func textField(_ tf: UITextField,
                           shouldChangeCharactersIn range: NSRange,
                           replacementString string: String) -> Bool {
-        
+
         guard let full = tf.text else { return false }
-        let bodyRange  = NSRange(location: prefix.count,
-                                 length: full.utf16.count - prefix.count)
-        var body   = (full as NSString).substring(with: bodyRange)
+        let bodyRange = NSRange(location: prefix.count,
+                                length: full.utf16.count - prefix.count)
+        var body = (full as NSString).substring(with: bodyRange)
         var digits = body.digitsOnly
-        
+
         // Block edits inside prefix
-        if range.location < prefix.count { return false }
-        
-        // --------------------------------------------------------------------
+        if range.location < prefix.count {
+            return false
+        }
+
         // DELETE
-        // --------------------------------------------------------------------
         if string.isEmpty {
-            // Absolute pos **in body** where ⌫ acts
+            // Absolute pos in body
             var delBodyIdx = range.location - prefix.count
-            
-            // If on space, walk left to nearest digit
+            // Walk left to nearest digit
             while delBodyIdx > 0,
                   !body[body.index(body.startIndex, offsetBy: delBodyIdx)].isNumber {
                 delBodyIdx -= 1
             }
-            // Which digit is that?
             let digitPos = Self.digitPositions(in: body)
-            guard let delDigitIdx = digitPos.firstIndex(of: delBodyIdx) else { return false }
-            
+            guard let delDigitIdx = digitPos.firstIndex(of: delBodyIdx) else {
+                return false
+            }
             // Remove digit
-            let rm = digits.index(digits.startIndex, offsetBy: delDigitIdx)
-            digits.remove(at: rm)
-            
+            let rmIndex = digits.index(digits.startIndex, offsetBy: delDigitIdx)
+            digits.remove(at: rmIndex)
+
             // Reformat
             let formatted = format(digits)
             body = formatted.body
             tf.text = prefix + body
-            
-            // Caret: before the digit that slid left
+
+            // Caret position
             var caretOffset = (delDigitIdx < formatted.digitPos.count)
                 ? formatted.digitPos[delDigitIdx]
                 : body.count
-            
-            // ---- NEW: if caret sits on space, pull it one step left
-            if caretOffset > 0 &&
+            if caretOffset > 0,
                body[body.index(body.startIndex, offsetBy: caretOffset - 1)] == " " {
                 caretOffset -= 1
             }
-            // ----
-            
             tf.setCursorPosition(offset: prefix.count + caretOffset)
+            notifyCompletionState(for: tf.text ?? "")
             return false
         }
-        
-        // --------------------------------------------------------------------
-        // INSERT ­(digits only)
-        // --------------------------------------------------------------------
+
+        // INSERT (digits only)
         let ins = string.digitsOnly
         guard !ins.isEmpty else { return false }
-        
+
         let caretInBody = range.location - prefix.count
-        let digitPos    = Self.digitPositions(in: body)
+        let digitPos = Self.digitPositions(in: body)
         let idxInDigits = digitPos.filter { $0 < caretInBody }.count
-        
+
         // Cap at 10
         let room = max(0, 10 - digits.count)
         let fragment = ins.prefix(room)
         let insPt = digits.index(digits.startIndex, offsetBy: idxInDigits)
         digits.insert(contentsOf: fragment, at: insPt)
-        
+
         let formatted = format(digits)
         body = formatted.body
         tf.text = prefix + body
-        
+
         // Caret after last inserted digit
-        let lastIdx   = idxInDigits + fragment.count - 1
-        let caretDig  = lastIdx + 1
-        let caretOff  = (caretDig < formatted.digitPos.count)
+        let lastIdx = idxInDigits + fragment.count - 1
+        let caretDig = lastIdx + 1
+        let caretOff = (caretDig < formatted.digitPos.count)
             ? formatted.digitPos[caretDig]
             : body.count
         tf.setCursorPosition(offset: prefix.count + caretOff)
+
+        notifyCompletionState(for: tf.text ?? "")
         return false
     }
-    
+
     // MARK: – Private helpers
-    
-    private let countryCode: String
-    private let prefix:      String
-    
+
     private func format(_ digits: String) -> (body: String, digitPos: [Int]) {
         countryCode == "90" ? Self.formatTR(digits) : (digits, Array(0..<digits.count))
     }
-    
+
     private static func formatTR(_ d: String) -> (String, [Int]) {
-        var out = "", pos: [Int] = []; var cur = 0
-        for (i,ch) in d.enumerated() {
-            if i == 3 || i == 6 || i == 8 { out.append(" "); cur += 1 }
-            out.append(ch); pos.append(cur); cur += 1
+        var out = "", pos: [Int] = []
+        var cur = 0
+        for (i, ch) in d.enumerated() {
+            if i == 3 || i == 6 || i == 8 {
+                out.append(" ")
+                cur += 1
+            }
+            out.append(ch)
+            pos.append(cur)
+            cur += 1
         }
         return (out, pos)
     }
-    
+
     private static func digitPositions(in s: String) -> [Int] {
         s.enumerated().compactMap { $0.element.isNumber ? $0.offset : nil }
     }
+
+    private func notifyCompletionState(for fullText: String) {
+        let bodyText: String
+        if fullText.hasPrefix(prefix) {
+            bodyText = String(fullText.dropFirst(prefix.count))
+        } else {
+            bodyText = fullText
+        }
+        let digitCount = bodyText.filter(\.isNumber).count
+        let required = 10
+        let state: IRMaskCompletionState
+        switch digitCount {
+        case 0:
+            state = .empty
+        case 1..<required:
+            state = .incomplete
+        default:
+            state = .complete
+        }
+        onCompletionStateChanged?(state)
+    }
 }
 
-
-// MARK: – Mini helpers
+// Mini helpers
 
 private extension String {
     var digitsOnly: String { filter(\.isNumber) }
