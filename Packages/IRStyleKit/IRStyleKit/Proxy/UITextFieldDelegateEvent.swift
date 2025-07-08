@@ -138,92 +138,112 @@ extension UITextField {
 //    }
 //}
 
-class PhoneFormatterViewController: UIViewController, CRInputFieldDelegate {
+private func prefix(for code: String) -> String {
+       "+\(code) "
+   }
 
-    @IBOutlet weak var telephoneInputField: CRInputField!
-    private var isFormatting = false
+   private func firstLocalUTF16Index(for code: String) -> Int {
+       prefix(for: code).utf16.count
+   }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        telephoneInputField.delegate = self
-        telephoneInputField.keyboardType = .phonePad
-    }
+   private func localDigits(from text: String) -> String {
+       text.onlyDigits()
+   }
 
-    // Helpers omitted for brevity: prefix(for:), firstLocalUTF16Index(for:), localDigits(from:), formatted(code:local:)
+   private func formatted(code: String, local: String) -> String {
+       let trimmed = String(local.prefix(10))
+       let groups = code == "90" ? [3,3,2,2] : []
+       var out = ""
+       var idx = trimmed.startIndex
 
-    func shouldChangeCharacters(inputField: CRInputField,
-                                in range: NSRange,
-                                with replacement: String) -> Bool {
-        // 1. If we’re already formatting, let the change through unmodified
-        if isFormatting {
-            return true
-        }
+       for len in groups where idx < trimmed.endIndex {
+           let end = trimmed.index(idx, offsetBy: len, limitedBy: trimmed.endIndex) ?? trimmed.endIndex
+           out += (out.isEmpty ? "" : " ") + trimmed[idx..<end]
+           idx = end
+       }
+       if idx < trimmed.endIndex {
+           out += (out.isEmpty ? "" : " ") + trimmed[idx...]
+       }
+       return prefix(for: code) + out
+   }
 
-        guard let current = inputField.text,
-              let swiftRange = Range(range, in: current) else {
-            return true
-        }
+   public func shouldChangeCharacters(inputField: CRInputField,
+                                      in range: NSRange,
+                                      with replacement: String) -> Bool {
+       guard let current = inputField.text,
+             let swiftRange = Range(range, in: current) else {
+           return true
+       }
 
-        let code = telephoneInputField.selectedCountryCode.phoneCode
-        let prefixText = prefix(for: code)
-        let prefixLen = prefixText.utf16.count
+       let code = telephoneInputField?.selectedCountryCode.phoneCode ?? ""
+       let prefixText = prefix(for: code)
+       let prefixLen = prefixText.utf16.count
 
-        // 2. Special-case deleting the very first local digit
-        if replacement.isEmpty,
-           range.length == 1,
-           range.location <= prefixLen {
-            isFormatting = true
-            inputField.text = prefixText
-            inputField.setCursorPosition(offset: prefixLen)
-            isFormatting = false
-            viewModel.viewModelDelegate?.currentPhoneNumber(from: phoneNumber)
-            return false
-        }
+       // 1) İlk yerel basamağı silme ⇒ sadece prefix, imleç orada kalır
+       if replacement.isEmpty,
+          range.length == 1,
+          range.location == prefixLen {
 
-        // 3. Compute the “next” raw string and strip to digits
-        let next = current.replacingCharacters(in: swiftRange, with: replacement)
-        let local = localDigits(from: next)
-        guard local.count <= 10 else { return false }
+           inputField.text = prefixText
+           inputField.setCursorPosition(offset: prefixLen)
 
-        // 4. Calculate where the cursor was in the unformatted digits
-        let beforeEdit = String(current[..<swiftRange.lowerBound])
-        let cursorInLocal = localDigits(from: beforeEdit).count
+           telephoneInputField?.delegate = nil
+           _ = telephoneInputField?.shouldChangeCharacters(in: range, with: replacement)
+           telephoneInputField?.delegate = self
+           viewModel.viewModelDelegate?.currentPhoneNumber(from: phoneNumber)
+           return false
+       }
 
-        // 5. Build the formatted string
-        let target = formatted(code: code, local: local)
+       // 2) Normal akış: metni güncelle − sadece rakamları al − uzunluk sınırı
+       let next = current.replacingCharacters(in: swiftRange, with: replacement)
+       let local = localDigits(from: next)
+       guard local.count <= 10 else { return false }
 
-        // 6. If formatting changed the visible text, apply it
-        if target != current {
-            isFormatting = true
-            inputField.text = target
+       // 3) Edit öncesi local içindeki caret pozisyonu
+       let before = String(current[..<swiftRange.lowerBound])
+       let cursorInLocal = localDigits(from: before).count
 
-            // Recompute cursor offset in the formatted string
-            var offset = prefixLen
-            var rem = cursorInLocal
-            let groups = code == "90" ? [3,3,2,2] : []
-            if groups.isEmpty {
-                offset += rem
-            } else {
-                for g in groups {
-                    if rem > g {
-                        offset += g + 1 // +1 for the space
-                        rem -= g
-                    } else {
-                        offset += rem
-                        rem = 0
-                        break
-                    }
-                }
-                if rem > 0 { offset += rem }
-            }
-            inputField.setCursorPosition(offset: offset)
+       // 4) Format uygula
+       let target = formatted(code: code, local: local)
+       if target != current {
+           inputField.text = target
 
-            isFormatting = false
-            viewModel.viewModelDelegate?.currentPhoneNumber(from: phoneNumber)
-            return false
-        }
+           // 5) İmleci yeniden hesapla
+           var offset = prefixLen
+           var rem = cursorInLocal
+           let groups = code == "90" ? [3,3,2,2] : []
 
-        // 7. No formatting change: let it through
-        return true
-    }
+           if groups.isEmpty {
+               offset += rem
+           } else {
+               for g in groups {
+                   if rem > g {
+                       offset += g + 1   // g rakam + 1 space
+                       rem -= g
+                   } else {
+                       offset += rem
+                       rem = 0
+                       break
+                   }
+               }
+               // kalan rem, gruplar toplamını aşarsa (nadiren)
+               if rem > 0 {
+                   offset += rem
+               }
+           }
+           inputField.setCursorPosition(offset: offset)
+
+           telephoneInputField?.delegate = nil
+           _ = telephoneInputField?.shouldChangeCharacters(in: range, with: replacement)
+           telephoneInputField?.delegate = self
+           viewModel.viewModelDelegate?.currentPhoneNumber(from: phoneNumber)
+           return false
+       }
+
+       // 6) Format değişmediyse sadece forward et
+       telephoneInputField?.delegate = nil
+       let should = telephoneInputField?.shouldChangeCharacters(in: range, with: replacement) ?? true
+       telephoneInputField?.delegate = self
+       return should
+   }
 }
