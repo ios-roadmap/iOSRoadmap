@@ -248,8 +248,7 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
     }
     
     private func format(_ digits: String, with mask: PhoneMaskPattern) -> (body: String, digitPos: [Int]) {
-        let formatter = IRMaskFormatterType.generic.instance
-        let body = formatter.format(text: digits, with: mask.definition)
+        let body = mask.definition.format(raw: digits)
             .trimmingCharacters(in: .whitespaces)
         let positions = Self.digitPositions(in: body)
         return (body, positions)
@@ -295,8 +294,8 @@ private enum PhoneMaskPattern {
         return patternString.filter { $0 == "n" }.count
     }
     
-    var definition: IRMaskDefinition {
-        return IRMaskDefinition(patternType: .custom(patternString))
+    var definition: IRMaskPatternType {
+        return .custom(patternString)
     }
 }
 

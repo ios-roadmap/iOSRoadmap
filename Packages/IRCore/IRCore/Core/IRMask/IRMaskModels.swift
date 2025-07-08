@@ -7,13 +7,13 @@
 
 import Foundation
 
-public struct IRMaskDefinition {
-    public let patternType: IRMaskPatternType
-    
-    public init(patternType: IRMaskPatternType) {
-        self.patternType = patternType
-    }
-}
+//public struct IRMaskDefinition {
+//    public let patternType: IRMaskPatternType
+//    
+//    public init(patternType: IRMaskPatternType) {
+//        self.patternType = patternType
+//    }
+//}
 
 public enum IRMaskPatternType {
     case creditCardNumber,
@@ -58,3 +58,4 @@ public enum IRMaskCompletionState {
     case incomplete
     case complete
 }
+

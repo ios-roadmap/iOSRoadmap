@@ -8,26 +8,23 @@
 import UIKit
 
 public class IRMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
-    private let formatter: IRMaskFormatterType
-    private let maskDefinition: IRMaskDefinition
+    private let maskDefinition: IRMaskPatternType
     private var lastCursorOffset: Int = 0
     
     public var onCompletionStateChanged: ((IRMaskCompletionState) -> Void)?
 
     public var placeholder: String {
-        return formatter.instance.format(text: "", with: maskDefinition)
+        return maskDefinition.format(raw: "")
     }
     
     private var allowedIndexes: [Int] {
-        return maskDefinition.patternType.format.indices(for: "n")
+        return maskDefinition.format.indices(for: "n")
     }
     
     public init(
-        formatter: IRMaskFormatterType,
-        maskDefinition: IRMaskDefinition,
+        maskDefinition: IRMaskPatternType,
         onCompletionStateChanged: ((IRMaskCompletionState) -> Void)? = nil
     ) {
-        self.formatter = formatter
         self.maskDefinition = maskDefinition
         self.onCompletionStateChanged = onCompletionStateChanged
     }
@@ -61,11 +58,11 @@ public class IRMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
         }
         
         let cleanDigits = currentText.onlyDigits()
-        let maxDigits = maskDefinition.patternType.format.filter { $0 == "n" }.count
+        let maxDigits = maskDefinition.format.filter { $0 == "n" }.count
         if cleanDigits.count >= maxDigits { return false }
         
         let updatedText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        textField.text = formatter.instance.format(text: updatedText, with: maskDefinition)
+        textField.text = maskDefinition.format(raw: updatedText)
 
         if string.count > 1 {
             lastCursorOffset = lastInsertedNIndex(in: textField.text ?? "")
@@ -96,7 +93,7 @@ extension IRMaskedInputFieldDelegate {
         guard let indexToRemove = text.lastDigitIndex() else { return false }
         
         text.remove(at: text.index(text.startIndex, offsetBy: indexToRemove))
-        textField.text = formatter.instance.format(text: text, with: maskDefinition)
+        textField.text = maskDefinition.format(raw: text)
         lastCursorOffset = min(indexToRemove, textField.text?.count ?? 0)
         textField.setCursorPosition(offset: lastCursorOffset)
         
@@ -108,7 +105,7 @@ extension IRMaskedInputFieldDelegate {
     func updateCursorPosition(in textField: UITextField,
                               range: NSRange,
                               replacementString string: String) {
-        let pattern = maskDefinition.patternType.format
+        let pattern = maskDefinition.format
         var newOffset = range.location + string.count
         
         if string.isEmpty {
@@ -139,7 +136,7 @@ extension IRMaskedInputFieldDelegate {
 
     private func notifyCompletionState(text: String) {
         let digitCount = text.onlyDigits().count
-        let requiredDigits = maskDefinition.patternType.format.filter { $0 == "n" }.count
+        let requiredDigits = maskDefinition.format.filter { $0 == "n" }.count
         
         let state: IRMaskCompletionState
         if digitCount == 0 {
