@@ -30,6 +30,27 @@ public enum IRMaskPatternType {
             return pattern
         }
     }
+    
+    public func format(raw: String) -> String {
+        let cleanDigits = raw.onlyDigits()
+        var formattedText = ""
+        var digitIndex = 0
+        
+        for maskChar in format {
+            if maskChar == "n" {
+                if digitIndex < cleanDigits.count {
+                    let index = cleanDigits.index(cleanDigits.startIndex, offsetBy: digitIndex)
+                    formattedText.append(cleanDigits[index])
+                    digitIndex += 1
+                } else {
+                    formattedText.append(" ")
+                }
+            } else {
+                formattedText.append(maskChar)
+            }
+        }
+        return formattedText
+    }
 }
 
 public enum IRMaskCompletionState {
