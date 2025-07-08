@@ -12,87 +12,65 @@ import IRCore
 
 final class IRMaskedDemoPageController: UIViewController, ShowcaseListViewControllerProtocol {
     // MARK: - UI
-    private let cardTextField: UITextField = {
-        let tf = UITextField()
-        tf.translatesAutoresizingMaskIntoConstraints = false
-        tf.borderStyle = .roundedRect
-        tf.keyboardType = .numberPad
-        tf.font = .monospacedDigitSystemFont(ofSize: 18, weight: .regular)
-        return tf
+    private let phoneTextField = UITextField()
+    private let randomButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.setTitle("Random Country", for: .normal)
+        return btn
     }()
     
-    private let phoneTextField = UITextField()
+    // your existing mask delegate, start with "90"
     private let maskDelegate = IRPhoneMaskedInputFieldDelegate(countryCode: "90") { result in
         print(result)
-    }  // or any other code
+    }
 
+    // list of some country codes you want to support
+    private let countryCodes = ["1", "44", "49", "33", "81", "90", "61", "91", "86", "7"]
 
-    // MARK: - Mask Delegate
-    private var maskedDelegate: IRMaskedInputFieldDelegate?
-
-    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
         configureMaskDelegate()
     }
 
-    // MARK: - Setup Helpers
     private func configureUI() {
-        // Configure text field
-               phoneTextField.borderStyle = .roundedRect
-               phoneTextField.keyboardType = .numberPad
-               phoneTextField.placeholder = "Enter phone number"
-               phoneTextField.delegate = maskDelegate
-               
-               // Add & layout
-               phoneTextField.translatesAutoresizingMaskIntoConstraints = false
-               view.addSubview(phoneTextField)
-               NSLayoutConstraint.activate([
-                   phoneTextField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-                   phoneTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-                   phoneTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-                   phoneTextField.heightAnchor.constraint(equalToConstant: 44)
-               ])
-        
-        
-        title = "Masked Input Demo"
         view.backgroundColor = .systemBackground
-//        view.addSubview(cardTextField)
-//
-//        NSLayoutConstraint.activate([
-//            cardTextField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-//            cardTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-//            cardTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-//            cardTextField.heightAnchor.constraint(equalToConstant: 50)
-//        ])
+        title = "Masked Input Demo"
+
+        // phoneTextField
+        phoneTextField.borderStyle = .roundedRect
+        phoneTextField.keyboardType = .numberPad
+        phoneTextField.placeholder = "Enter phone number"
+        phoneTextField.delegate = maskDelegate
+        phoneTextField.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(phoneTextField)
+
+        // randomButton
+        randomButton.addTarget(self, action: #selector(didTapRandom), for: .touchUpInside)
+        view.addSubview(randomButton)
+
+        NSLayoutConstraint.activate([
+            phoneTextField.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -30),
+            phoneTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            phoneTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            phoneTextField.heightAnchor.constraint(equalToConstant: 44),
+
+            randomButton.topAnchor.constraint(equalTo: phoneTextField.bottomAnchor, constant: 20),
+            randomButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
     }
 
     private func configureMaskDelegate() {
-        // Define the custom mask pattern
-        let maskDefinition = IRMaskDefinition(patternType: .custom("nnnn nn** **** nnnn"))
+        // already set as delegate in configureUI()
+        // no changes needed here
+    }
 
-        // Initialise the delegate with a completion‑state callback
-        maskedDelegate = IRMaskedInputFieldDelegate(
-            formatter: .generic,
-            maskDefinition: maskDefinition,
-            onCompletionStateChanged: { [weak self] state in
-                guard let self = self else { return }
-                switch state {
-                case .complete:
-                    self.cardTextField.layer.borderColor = UIColor.systemGreen.cgColor
-                    self.cardTextField.layer.borderWidth = 1
-                case .incomplete:
-                    self.cardTextField.layer.borderColor = UIColor.systemYellow.cgColor
-                    self.cardTextField.layer.borderWidth = 1
-                case .empty:
-                    self.cardTextField.layer.borderWidth = 0
-                }
-            }
-        )
-
-        cardTextField.delegate = maskedDelegate
-        cardTextField.placeholder = maskedDelegate?.placeholder
+    @objc private func didTapRandom() {
+        // pick a random code
+        let newCode = countryCodes.randomElement()!
+        // update mask
+        maskDelegate.updateCountryCode(to: newCode, in: phoneTextField)
     }
 }
 
@@ -119,24 +97,19 @@ import UIKit
 public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
 
     // MARK: – Public
-    
+
     /// Notifies when the digit count is empty / incomplete / complete.
     public var onCompletionStateChanged: ((IRMaskCompletionState) -> Void)?
 
     // MARK: – Private
-    
-    private var countryCode: String {
-        didSet {
-            // Ensure prefix updates when countryCode changes
-            // Reset text if needed
-        }
-    }
 
-    /// Computed prefix based on current country code
+    private var countryCode: String
+
+    /// Always updated prefix based on current country code
     private var prefix: String { "(+\(countryCode)) " }
 
     // MARK: – Init
-    
+
     public init(countryCode: String,
                 onCompletionStateChanged: ((IRMaskCompletionState) -> Void)? = nil) {
         self.countryCode = countryCode
@@ -145,22 +118,18 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
     }
 
     // MARK: – UITextFieldDelegate
-    
+
     public func textFieldDidBeginEditing(_ tf: UITextField) {
-        // Ensure prefix
-        if tf.text?.hasPrefix(prefix) == false {
-            tf.text = prefix
-        }
-        tf.setCursorPosition(offset: prefix.count)
+        ensurePrefix(in: tf)
         notifyCompletionState(for: tf.text ?? "")
     }
 
     public func textField(_ tf: UITextField,
                           shouldChangeCharactersIn range: NSRange,
                           replacementString string: String) -> Bool {
-
         guard let full = tf.text else { return false }
-        // Prevent crashes when text shorter than prefix
+
+        // Ensure prefix always present
         guard full.utf16.count >= prefix.utf16.count else {
             tf.text = prefix
             tf.setCursorPosition(offset: prefix.count)
@@ -169,14 +138,12 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
         }
 
         // Extract body safely
-        let bodyStart = full.index(full.startIndex, offsetBy: prefix.count)
-        var body = String(full[bodyStart...])
+        let bodyStartIdx = full.index(full.startIndex, offsetBy: prefix.count)
+        var body = String(full[bodyStartIdx...])
         var digits = body.filter(\.isNumber)
 
         // Block edits inside prefix
-        if range.location < prefix.count {
-            return false
-        }
+        if range.location < prefix.count { return false }
 
         // DELETE
         if string.isEmpty {
@@ -184,12 +151,11 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
             while delBodyIdx > 0 && !body[body.index(body.startIndex, offsetBy: delBodyIdx)].isNumber {
                 delBodyIdx -= 1
             }
-            let digitPos = Self.digitPositions(in: body)
-            guard let delDigitIdx = digitPos.firstIndex(of: delBodyIdx) else {
+            let digitPositions = Self.digitPositions(in: body)
+            guard let delDigitIdx = digitPositions.firstIndex(of: delBodyIdx) else {
                 return false
             }
-            let rmIndex = digits.index(digits.startIndex, offsetBy: delDigitIdx)
-            digits.remove(at: rmIndex)
+            digits.remove(at: digits.index(digits.startIndex, offsetBy: delDigitIdx))
 
             let formatted = format(digits)
             body = formatted.body
@@ -212,30 +178,57 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
         guard !ins.isEmpty else { return false }
 
         let caretInBody = range.location - prefix.count
-        let digitPos = Self.digitPositions(in: body)
-        let idxInDigits = digitPos.filter { $0 < caretInBody }.count
+        let digitPositions = Self.digitPositions(in: body)
+        let idxInDigits = digitPositions.filter { $0 < caretInBody }.count
 
-        let room = max(0, 10 - digits.count)
-        let fragment = ins.prefix(room)
-        let insPt = digits.index(digits.startIndex, offsetBy: idxInDigits)
-        digits.insert(contentsOf: fragment, at: insPt)
+        // Cap at 10 digits
+        let space = max(0, 10 - digits.count)
+        let fragment = ins.prefix(space)
+        let insertIdx = digits.index(digits.startIndex, offsetBy: idxInDigits)
+        digits.insert(contentsOf: fragment, at: insertIdx)
 
         let formatted = format(digits)
         body = formatted.body
         tf.text = prefix + body
 
-        let lastIdx = idxInDigits + fragment.count - 1
-        let caretDig = lastIdx + 1
-        let caretOff = caretDig < formatted.digitPos.count
-            ? formatted.digitPos[caretDig]
+        let lastDigitIdx = idxInDigits + fragment.count - 1
+        let caretDigit = lastDigitIdx + 1
+        let caretOffset = caretDigit < formatted.digitPos.count
+            ? formatted.digitPos[caretDigit]
             : body.count
-        tf.setCursorPosition(offset: prefix.count + caretOff)
+        tf.setCursorPosition(offset: prefix.count + caretOffset)
 
         notifyCompletionState(for: tf.text ?? "")
         return false
     }
 
+    // MARK: – Public helper
+
+    /// Call when the country code changes to reapply mask and prefix.
+    public func updateCountryCode(to newCode: String, in textField: UITextField) {
+        // 1) Update the countryCode property
+        self.countryCode = newCode
+
+        // 2) Set the text to the new prefix only
+        textField.text = prefix
+
+        // 3) Move the caret to the end of the prefix
+        textField.setCursorPosition(offset: prefix.count)
+
+        // 4) Notify about empty/incomplete state
+        notifyCompletionState(for: textField.text ?? "")
+    }
+
+
+
     // MARK: – Private helpers
+
+    private func ensurePrefix(in tf: UITextField) {
+        if tf.text?.hasPrefix(prefix) != true {
+            tf.text = prefix
+        }
+        tf.setCursorPosition(offset: prefix.count)
+    }
 
     private func format(_ digits: String) -> (body: String, digitPos: [Int]) {
         countryCode == "90" ? Self.formatTR(digits) : (digits, Array(0..<digits.count))
@@ -261,33 +254,22 @@ public final class IRPhoneMaskedInputFieldDelegate: NSObject, UITextFieldDelegat
     }
 
     private func notifyCompletionState(for fullText: String) {
-        let bodyText: String
-        if fullText.hasPrefix(prefix) {
-            bodyText = String(fullText.dropFirst(prefix.count))
-        } else {
-            bodyText = fullText
-        }
+        let bodyText: String = fullText.hasPrefix(prefix)
+            ? String(fullText.dropFirst(prefix.count))
+            : fullText
         let digitCount = bodyText.filter(\.isNumber).count
         let required = 10
         let state: IRMaskCompletionState
         switch digitCount {
-        case 0:
-            state = .empty
-        case 1..<required:
-            state = .incomplete
-        default:
-            state = .complete
+        case 0:                   state = .empty
+        case 1..<required:        state = .incomplete
+        default:                  state = .complete
         }
         onCompletionStateChanged?(state)
     }
 }
 
-
 // Mini helpers
-
-private extension String {
-    var digitsOnly: String { filter(\.isNumber) }
-}
 
 private extension UITextField {
     func setCursorPosition(offset: Int) {
