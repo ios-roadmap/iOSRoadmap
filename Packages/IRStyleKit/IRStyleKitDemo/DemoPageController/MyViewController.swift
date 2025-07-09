@@ -7,54 +7,66 @@
 
 import UIKit
 
-// MARK: - UITextFieldDelegate that never reveals a digit
+// MARK: - SecureNumberDelegate
+/// Masks every digit instantly with ● and keeps the real value.
 final class SecureNumberDelegate: NSObject, UITextFieldDelegate {
 
-    /// Raw numeric value exactly as the user typed it.
-    private(set) var value = ""
+    private(set) var value = ""           // raw digits
+    private let bullet = "\u{25CF}"       // big bullet symbol ●
 
+    // Block copy / cut / paste / drag
+    func textField(_ textField: UITextField,
+                   canPerformAction action: Selector,
+                   withSender sender: Any?) -> Bool { false }
+
+    // Disable caret + drag-and-drop loupe
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        textField.textDragInteraction?.isEnabled = false
+        textField.tintColor = .clear
+        return true
+    }
+
+    // Intercept every keystroke
     func textField(_ textField: UITextField,
                    shouldChangeCharactersIn range: NSRange,
                    replacementString string: String) -> Bool {
 
-        guard
-            let current = textField.text,
-            let swiftRange = Range(range, in: current)
-        else { return false }
+        // Allow only digits or back-space
+        guard string.isEmpty || string.allSatisfy(\.isNumber) else { return false }
 
-        // Reject anything that isn’t a decimal digit or back-space
-        if !string.isEmpty,
-           !string.unicodeScalars.allSatisfy(CharacterSet.decimalDigits.contains) {
-            return false
+        // Update stored digits
+        if let swiftRange = Range(range, in: textField.text ?? "") {
+            value.replaceSubrange(swiftRange, with: string)
         }
 
-        // Update the stored value exactly as the user edited
-        value.replaceSubrange(swiftRange, with: string)
-
-        // Draw the same number of • symbols so nothing is ever revealed
-        textField.text = String(repeating: "•", count: value.count)
-        return false           // we handled the visual change ourselves
+        // Show only bullets (no flash)
+        textField.text = String(repeating: bullet, count: value.count)
+        return false                                // we handled the UI
     }
 }
 
-// MARK: - View controller that uses the delegate
+// MARK: - MyViewController
 final class MyViewController: UIViewController, ShowcaseListViewControllerProtocol {
 
     private let secureDelegate = SecureNumberDelegate()
 
+    // Secure PIN input field (UITextField)
     private lazy var pinField: UITextField = {
-        let field = UITextField()
-        field.translatesAutoresizingMaskIntoConstraints = false
-        field.placeholder           = "Enter PIN"
-        field.borderStyle           = .roundedRect
-        field.keyboardType          = .numberPad
-        field.isSecureTextEntry     = true          // keep system safeguards
-        field.autocorrectionType    = .no
-        field.spellCheckingType     = .no
-        field.delegate              = secureDelegate
-        return field
+        let tf = UITextField()
+        tf.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout constraints
+        tf.placeholder        = "Enter PIN"   // Gray hint text shown when the field is empty
+        tf.borderStyle        = .roundedRect  // Default rounded rectangle border style
+        tf.keyboardType       = .numberPad    // Display number pad keyboard
+        tf.isSecureTextEntry  = true          // Obscure text input (e.g., ••••)
+        tf.autocorrectionType = .no           // Disable autocorrection
+        tf.smartQuotesType    = .no           // Disable smart quotes (keeps raw digits)
+        tf.smartDashesType    = .no           // Disable smart dashes
+        tf.spellCheckingType  = .no           // Disable spell checking
+        tf.delegate           = secureDelegate // Assign delegate (for custom logic or validation)
+        return tf
     }()
 
+    // Simple submit button
     private lazy var submitButton: UIButton = {
         let btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
@@ -63,7 +75,7 @@ final class MyViewController: UIViewController, ShowcaseListViewControllerProtoc
         return btn
     }()
 
-    // MARK: – Lifecycle
+    // Basic view setup
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -71,6 +83,7 @@ final class MyViewController: UIViewController, ShowcaseListViewControllerProtoc
         view.addSubview(pinField)
         view.addSubview(submitButton)
 
+        // Auto-layout constraints
         NSLayoutConstraint.activate([
             pinField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             pinField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -81,10 +94,9 @@ final class MyViewController: UIViewController, ShowcaseListViewControllerProtoc
         ])
     }
 
-    // MARK: – Actions
+    // Read the masked value
     @objc private func handleSubmit() {
-        let pin = secureDelegate.value
-        // Handle `pin` securely (hash, send to backend, etc.)
-        print("Entered PIN:", pin)
+        let pin = secureDelegate.value        // full PIN is here
+        print("PIN:", pin)                    // replace with secure handling
     }
 }
