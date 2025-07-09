@@ -5,148 +5,80 @@
 //  Created by Ömer Faruk Öztürk on 28.02.2025.
 //
 
+// ViewController.swift
 import UIKit
 
-public class IRMaskedInputFieldDelegate: NSObject, UITextFieldDelegate {
-    private let maskDefinition: IRMaskPatternType
-    private var lastCursorOffset: Int = 0
-    
-    public var onCompletionStateChanged: ((IRMaskCompletionState) -> Void)?
+/// Masks every digit input with • and keeps the real value internally.
+class SecureNumberDelegate: NSObject, UITextFieldDelegate {
+    private(set) var realText = ""
 
-    public var placeholder: String {
-        return maskDefinition.format(raw: "")
-    }
-    
-    private var allowedIndexes: [Int] {
-        return maskDefinition.format.indices(for: "n")
-    }
-    
-    public init(
-        maskDefinition: IRMaskPatternType,
-        onCompletionStateChanged: ((IRMaskCompletionState) -> Void)? = nil
-    ) {
-        self.maskDefinition = maskDefinition
-        self.onCompletionStateChanged = onCompletionStateChanged
-    }
-    
-    // MARK: - UITextFieldDelegate Methods
-    public func textFieldDidBeginEditing(_ textField: UITextField) {
-        textField.tintColor = .clear
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            if let firstIndex = allowedIndexes.first {
-                lastCursorOffset = firstIndex
-                textField.setCursorPosition(offset: firstIndex)
-            }
-            textField.tintColor = .label
-        }
-    }
-
-    public func textField(_ textField: UITextField,
-                          shouldChangeCharactersIn range: NSRange,
-                          replacementString string: String) -> Bool {
-        guard let currentText = textField.text else { return false }
-
+    func textField(_ textField: UITextField,
+                   shouldChangeCharactersIn range: NSRange,
+                   replacementString string: String) -> Bool {
         if string.isEmpty {
-            return handleBackspace(in: textField, range: range)
-        }
-        
-        guard !string.containsEmoji else { return false }
-        
-        guard CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: string)) else {
-            return false
-        }
-        
-        let cleanDigits = currentText.onlyDigits()
-        let maxDigits = maskDefinition.format.filter { $0 == "n" }.count
-        if cleanDigits.count >= maxDigits { return false }
-        
-        let updatedText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        textField.text = maskDefinition.format(raw: updatedText)
-
-        if string.count > 1 {
-            lastCursorOffset = lastInsertedNIndex(in: textField.text ?? "")
+            // Deletion
+            if !realText.isEmpty {
+                realText.removeLast()
+            }
         } else {
-            updateCursorPosition(in: textField, range: range, replacementString: string)
+            // Only allow digits
+            guard CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: string)) else {
+                return false
+            }
+            realText.append(string)
         }
-        
-        textField.setCursorPosition(offset: lastCursorOffset)
-        
-        notifyCompletionState(text: textField.text ?? "")
-        
+        // Always show bullets only
+        textField.text = String(repeating: "•", count: realText.count)
         return false
-    }
-
-    public func textFieldDidChangeSelection(_ textField: UITextField) {
-        textField.setCursorPosition(offset: lastCursorOffset)
     }
 }
 
-// MARK: - MaskedTextFieldDelegate Helpers
+class MyViewController: UIViewController {
+    private let secureDelegate = SecureNumberDelegate()
 
-extension IRMaskedInputFieldDelegate {
-    func handleBackspace(in textField: UITextField, range: NSRange) -> Bool {
-        guard var text = textField.text, !text.onlyDigits().isEmpty else {
-            notifyCompletionState(text: textField.text ?? "")
-            return false
-        }
-        guard let indexToRemove = text.lastDigitIndex() else { return false }
-        
-        text.remove(at: text.index(text.startIndex, offsetBy: indexToRemove))
-        textField.text = maskDefinition.format(raw: text)
-        lastCursorOffset = min(indexToRemove, textField.text?.count ?? 0)
-        textField.setCursorPosition(offset: lastCursorOffset)
-        
-        notifyCompletionState(text: textField.text ?? "")
-        
-        return false
-    }
-    
-    func updateCursorPosition(in textField: UITextField,
-                              range: NSRange,
-                              replacementString string: String) {
-        let pattern = maskDefinition.format
-        var newOffset = range.location + string.count
-        
-        if string.isEmpty {
-            while newOffset > 0 {
-                if allowedIndexes.contains(newOffset - 1) { break }
-                newOffset -= 1
-            }
-        } else {
-            while newOffset < pattern.count {
-                if allowedIndexes.contains(newOffset) { break }
-                newOffset += 1
-            }
-        }
-        lastCursorOffset = newOffset
-    }
-    
-    private func lastInsertedNIndex(in text: String) -> Int {
-        let digitIndexes = allowedIndexes.filter { $0 < text.count }
-        
-        for index in digitIndexes.reversed() {
-            if text[text.index(text.startIndex, offsetBy: index)].isNumber {
-                return index + 1
-            }
-        }
-        
-        return allowedIndexes.first ?? text.count
+    private let pinField: UITextField = {
+        let tf = UITextField()
+        tf.translatesAutoresizingMaskIntoConstraints = false
+        tf.placeholder = "Enter PIN"
+        tf.borderStyle = .roundedRect
+        tf.keyboardType = .numberPad
+        tf.autocorrectionType = .no
+        tf.spellCheckingType = .no
+        // We're handling masking ourselves:
+        tf.isSecureTextEntry = false
+        return tf
+    }()
+
+    private let submitButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.setTitle("Submit", for: .normal)
+        return btn
+    }()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+
+        view.addSubview(pinField)
+        view.addSubview(submitButton)
+
+        pinField.delegate = secureDelegate
+        submitButton.addTarget(self, action: #selector(handleSubmit), for: .touchUpInside)
+
+        NSLayoutConstraint.activate([
+            pinField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            pinField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            pinField.widthAnchor.constraint(equalToConstant: 200),
+
+            submitButton.topAnchor.constraint(equalTo: pinField.bottomAnchor, constant: 20),
+            submitButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        ])
     }
 
-    private func notifyCompletionState(text: String) {
-        let digitCount = text.onlyDigits().count
-        let requiredDigits = maskDefinition.format.filter { $0 == "n" }.count
-        
-        let state: IRMaskCompletionState
-        if digitCount == 0 {
-            state = .empty
-        } else if digitCount < requiredDigits {
-            state = .incomplete
-        } else {
-            state = .complete
-        }
-        
-        onCompletionStateChanged?(state)
+    @objc private func handleSubmit() {
+        let enteredPIN = secureDelegate.realText
+        print("Entered PIN:", enteredPIN)
+        // …use the PIN securely…
     }
-} 
+}
