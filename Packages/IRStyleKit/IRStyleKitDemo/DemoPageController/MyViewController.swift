@@ -8,145 +8,169 @@
 import UIKit
 import ObjectiveC.runtime
 
-// MARK: - UITextField + SecureMask
-extension UITextField {
+// MARK: - Non-secure metni saklama
+private extension UITextField {
+    private struct Key { static var clear = "nonSecureText" }
 
-    // MARK: Public API --------------------------------------------------------
-
-    /// The user’s real, unmasked input.
-    public var realText: String {
-        get { objc_getAssociatedObject(self, &AssociatedKeys.realText) as? String ?? "" }
+    var nonSecureText: String {
+        get { objc_getAssociatedObject(self, &Key.clear) as? String ?? "" }
         set { objc_setAssociatedObject(self,
-                                       &AssociatedKeys.realText,
+                                       &Key.clear,
                                        newValue as NSString,
                                        .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
+}
 
-    /// Call this once (e.g. in viewDidLoad) to start with masking ON.
-    public func enableSecureMask() {
-        isSecureTextEntry = true              // shows ●●●●
-        delegate          = masker            // activates masking
-        addMaskToggle()                       // optional eye-button
-    }
+// MARK: - VC
+import UIKit
 
-    /// Flip between masked and plain modes.
-    @objc public func toggleMask() {
-        isSecureTextEntry.toggle()            // UIKit redraws the field
-        delegate = isSecureTextEntry ? masker : nil
-
-        // --- keep cursor position & text intact -----------------------------
-        let current = text                    // bullets or plain text right now
-        text?.removeAll()
-        text = isSecureTextEntry ? String(repeating: bullet, count: realText.count) : realText
-        becomeFirstResponder()
-    }
-
-    // MARK: Private -----------------------------------------------------------
-
-    private struct AssociatedKeys {
-        static var masker   = "masker"
-        static var realText = "realText"
-    }
-
-    /// One shared masker per field (lazily created).
-    private var masker: MaskerDelegate {
-        if let m = objc_getAssociatedObject(self, &AssociatedKeys.masker) as? MaskerDelegate {
-            return m
+final class MyViewController: UIViewController, UITextFieldDelegate, ShowcaseListViewControllerProtocol {
+    // MARK: – UI
+    
+    private let passwordTextField: UITextField = {
+        let tf = UITextField()
+        tf.borderStyle = .roundedRect
+        tf.isSecureTextEntry = true
+        tf.translatesAutoresizingMaskIntoConstraints = false
+        
+        let eyeButton = UIButton(type: .custom)
+        eyeButton.setImage(UIImage(systemName: "eye.slash"), for: .normal)
+        tf.rightView = eyeButton
+        tf.rightViewMode = .always
+        
+        return tf
+    }()
+    
+    // MARK: – Masking
+    
+    private let bullet = "\u{25CF}"
+    private let masker  = MaskedDelegate()                          // your masking interceptor
+    private lazy var proxy = Proxy(interceptor: masker, primary: self)
+    
+    // MARK: – Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        
+        // add & layout
+        view.addSubview(passwordTextField)
+        NSLayoutConstraint.activate([
+            passwordTextField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            passwordTextField.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            passwordTextField.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            passwordTextField.heightAnchor.constraint(equalToConstant: 44)
+        ])
+        
+        // delegate chain
+        passwordTextField.delegate = proxy
+        
+        // eye action
+        if let eyeButton = passwordTextField.rightView as? UIButton {
+            eyeButton.addTarget(self, action: #selector(toggleSecure), for: .touchUpInside)
         }
-        let m = MaskerDelegate(owner: self)
-        objc_setAssociatedObject(self, &AssociatedKeys.masker, m, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        return m
     }
-
-    /// The bullet symbol (●)
-    private var bullet: String { "\u{25CF}" }
-
-    /// Adds a right-view eye button that calls `toggleMask()`.
-    private func addMaskToggle() {
-        let eye = UIButton(type: .custom)
-        eye.setImage(UIImage(systemName: "eye.slash"), for: .normal)
-        eye.tintColor = .secondaryLabel
-        eye.addTarget(self, action: #selector(toggleMask), for: .touchUpInside)
-        rightView     = eye
-        rightViewMode = .always
-
-        // Update icon when the caller flips `isSecureTextEntry` directly
-        addTarget(self, action: #selector(updateEyeIcon), for: .editingDidBegin)
+    
+    // MARK: – Toggle Secure / Mask
+    
+    @objc private func toggleSecure() {
+        let willSecure = !passwordTextField.isSecureTextEntry
+        passwordTextField.isSecureTextEntry = willSecure
+        
+        if willSecure {
+            proxy.interceptor = masker
+            passwordTextField.text = String(repeating: bullet, count: passwordTextField.nonSecureText.count)
+            (passwordTextField.rightView as? UIButton)?
+                .setImage(UIImage(systemName: "eye.slash"), for: .normal)
+        } else {
+            proxy.interceptor = nil
+            passwordTextField.text = passwordTextField.nonSecureText
+            (passwordTextField.rightView as? UIButton)?
+                .setImage(UIImage(systemName: "eye"), for: .normal)
+        }
+        
+        // fix cursor position
+        DispatchQueue.main.async { [weak self] in
+            guard let tf = self?.passwordTextField else { return }
+            let end = tf.endOfDocument
+            tf.selectedTextRange = tf.textRange(from: end, to: end)
+        }
     }
-
-    @objc private func updateEyeIcon() {
-        let name = isSecureTextEntry ? "eye.slash" : "eye"
-        (rightView as? UIButton)?
-            .setImage(UIImage(systemName: name), for: .normal)
+    
+    // MARK: – UITextFieldDelegate
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        print("Submitted: \(textField.nonSecureText)")
+        textField.resignFirstResponder()
+        return true
     }
 }
 
-// MARK: - Masking delegate (private helper)
-private final class MaskerDelegate: NSObject, UITextFieldDelegate {
 
-    init(owner: UITextField) { self.owner = owner }
-    private weak var owner: UITextField?
-    private let bullet = "\u{25CF}"          // ●
+// MARK: - Maskeyi uygulayan delegate
+private final class MaskedDelegate: NSObject, UITextFieldDelegate {
+    private let bullet = "\u{25CF}"
 
     func textField(_ tf: UITextField,
                    shouldChangeCharactersIn range: NSRange,
                    replacementString string: String) -> Bool {
 
-        guard let tfOwner = owner else { return false }
-
-        // 1. Update stored real text
-        if let current = tfOwner.realText as NSString? {
-            tfOwner.realText = current.replacingCharacters(in: range, with: string)
+        // 1. nonSecureText’i güncelle
+        if let current = tf.nonSecureText as NSString? {
+            tf.nonSecureText = current.replacingCharacters(in: range, with: string)
         } else {
-            tfOwner.realText = string
+            tf.nonSecureText = string
         }
 
-        // 2. Show bullets
-        tf.text = String(repeating: bullet, count: tfOwner.realText.count)
+        // 2. ●●● göster
+        tf.text = String(repeating: bullet, count: tf.nonSecureText.count)
 
-        // 3. Keep observers happy
+        // 3. caret pozisyonunu koru
+        let cursor = range.location + string.utf16.count
+        tf.setCursor(offset: cursor)
+
+        // 4. editingChanged event’i
         tf.sendActions(for: .editingChanged)
 
-        // 4. Prevent UIKit from inserting the actual characters
-        return false
+        return false        // UIKit gerçek karakterleri eklemesin
     }
 }
 
-final class MyViewController: UIViewController, ShowcaseListViewControllerProtocol {
+// MARK: - Proxy iki delegate’i birleştirir
+private final class Proxy: NSObject, UITextFieldDelegate {
+    var interceptor: UITextFieldDelegate?
+    private weak var primary: UITextFieldDelegate?
 
-    private let passwordField = UITextField()
-    private let submit        = UIButton(type: .system)
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-
-        // Configure field
-        passwordField.placeholder = "Password"
-        passwordField.borderStyle = .roundedRect
-        passwordField.autocorrectionType = .no
-        passwordField.keyboardType = .asciiCapable
-        passwordField.enableSecureMask()           // ← one-liner
-
-        // Configure button
-        submit.setTitle("Submit", for: .normal)
-        submit.addTarget(self, action: #selector(handleSubmit), for: .touchUpInside)
-
-        // Layout
-        let stack = UIStackView(arrangedSubviews: [passwordField, submit])
-        stack.axis = .vertical
-        stack.spacing = 20
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stack)
-
-        NSLayoutConstraint.activate([
-            stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stack.widthAnchor .constraint(equalToConstant: 260)
-        ])
+    init(interceptor: UITextFieldDelegate, primary: UITextFieldDelegate?) {
+        self.interceptor = interceptor
+        self.primary     = primary
     }
 
-    @objc private func handleSubmit() {
-        print("Real password: \(passwordField.realText)")
+    override func responds(to sel: Selector!) -> Bool {
+        super.responds(to: sel) ||
+        (interceptor?.responds(to: sel) ?? false) ||
+        (primary?.responds(to: sel)     ?? false)
+    }
+
+    override func forwardingTarget(for sel: Selector!) -> Any? {
+        (interceptor?.responds(to: sel) == true) ? interceptor : primary
+    }
+
+    // Return-value metotlarını elle yönlendir
+    func textField(_ tf: UITextField,
+                   shouldChangeCharactersIn r: NSRange,
+                   replacementString s: String) -> Bool {
+        let iOK = interceptor?.textField?(tf, shouldChangeCharactersIn: r, replacementString: s) ?? true
+        let pOK = primary?.textField?(tf, shouldChangeCharactersIn: r, replacementString: s) ?? true
+        return iOK && pOK
+    }
+}
+
+// MARK: - Cursor helper (isteğe bağlı)
+private extension UITextField {
+    func setCursor(offset: Int) {
+        if let pos = position(from: beginningOfDocument, offset: offset) {
+            selectedTextRange = textRange(from: pos, to: pos)
+        }
     }
 }
