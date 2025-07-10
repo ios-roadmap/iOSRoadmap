@@ -7,96 +7,99 @@
 
 import UIKit
 
-// MARK: - SecureNumberDelegate
-/// Masks every digit instantly with ● and keeps the real value.
-final class SecureNumberDelegate: NSObject, UITextFieldDelegate {
-
-    private(set) var value = ""           // raw digits
-    private let bullet = "\u{25CF}"       // big bullet symbol ●
-
-    // Block copy / cut / paste / drag
-    func textField(_ textField: UITextField,
-                   canPerformAction action: Selector,
-                   withSender sender: Any?) -> Bool { false }
-
-    // Disable caret + drag-and-drop loupe
-    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        textField.textDragInteraction?.isEnabled = false
-        textField.tintColor = .clear
-        return true
-    }
-
-    // Intercept every keystroke
-    func textField(_ textField: UITextField,
+// MARK: - Proxy delegate
+final class SecureFieldProxy: NSObject, UITextFieldDelegate {
+    
+    /// Stores the real text the user typed
+    private(set) var plainText = ""
+    
+    /// Forward everything we don’t override to another delegate (optional)
+    weak var forward: UITextFieldDelegate?
+    
+    // Intercept every keystroke _before_ UIKit commits it
+    func textField(_ tf: UITextField,
                    shouldChangeCharactersIn range: NSRange,
                    replacementString string: String) -> Bool {
-
-        // Allow only digits or back-space
-        guard string.isEmpty || string.allSatisfy(\.isNumber) else { return false }
-
-        // Update stored digits
-        if let swiftRange = Range(range, in: textField.text ?? "") {
-            value.replaceSubrange(swiftRange, with: string)
+        
+        // 1. Compute what the new string would be
+        if let current = tf.text as NSString? {
+            plainText = current.replacingCharacters(in: range, with: string)
+        } else {
+            plainText = string
         }
-
-        // Show only bullets (no flash)
-        textField.text = String(repeating: bullet, count: value.count)
-        return false                                // we handled the UI
+        
+        // 2. Replace the field’s visible text with bullets immediately
+        tf.text = String(repeating: "•", count: plainText.count)
+        
+        // 3. Send the usual editingChanged control event so observers still fire
+        tf.sendActions(for: .editingChanged)
+        
+        // 4. Tell UIKit _not_ to insert the real character it was about to show
+        return false
     }
+    
+    // ----------  Boiler-plate forwarding ----------
+    override func responds(to sel: Selector!) -> Bool {
+        super.responds(to: sel) || (forward?.responds(to: sel) ?? false)
+    }
+    override func forwardingTarget(for sel: Selector!) -> Any? { forward }
 }
+//---------------------------------------------------
 
-// MARK: - MyViewController
 final class MyViewController: UIViewController, ShowcaseListViewControllerProtocol {
-
-    private let secureDelegate = SecureNumberDelegate()
-
-    // Secure PIN input field (UITextField)
-    private lazy var pinField: UITextField = {
-        let tf = UITextField()
-        tf.translatesAutoresizingMaskIntoConstraints = false // Use Auto Layout constraints
-        tf.placeholder        = "Enter PIN"   // Gray hint text shown when the field is empty
-        tf.borderStyle        = .roundedRect  // Default rounded rectangle border style
-        tf.keyboardType       = .numberPad    // Display number pad keyboard
-        tf.isSecureTextEntry  = true          // Obscure text input (e.g., ••••)
-        tf.autocorrectionType = .no           // Disable autocorrection
-        tf.smartQuotesType    = .no           // Disable smart quotes (keeps raw digits)
-        tf.smartDashesType    = .no           // Disable smart dashes
-        tf.spellCheckingType  = .no           // Disable spell checking
-        tf.delegate           = secureDelegate // Assign delegate (for custom logic or validation)
-        return tf
-    }()
-
-    // Simple submit button
-    private lazy var submitButton: UIButton = {
-        let btn = UIButton(type: .system)
-        btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.setTitle("Submit", for: .normal)
-        btn.addTarget(self, action: #selector(handleSubmit), for: .touchUpInside)
-        return btn
-    }()
-
-    // Basic view setup
+    
+    private let passwordField      = UITextField()
+    private let secondSecureField  = UITextField()
+    private let proxy              = SecureFieldProxy()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-
-        view.addSubview(pinField)
-        view.addSubview(submitButton)
-
-        // Auto-layout constraints
+        
+        // ------------ first field (proxy) ------------
+        configure(textField: passwordField,
+                  placeholder: "Proxy-masked password",
+                  usesProxy: true)
+        
+        // ------------ second field (normal secure) ------------
+        configure(textField: secondSecureField,
+                  placeholder: "Native isSecureTextEntry",
+                  usesProxy: false)
+        
+        // ------------ layout ------------
+        let stack = UIStackView(arrangedSubviews: [passwordField,
+                                                   secondSecureField])
+        stack.axis         = .vertical
+        stack.spacing      = 16
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(stack)
+        
         NSLayoutConstraint.activate([
-            pinField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            pinField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            pinField.widthAnchor.constraint(equalToConstant: 200),
-
-            submitButton.topAnchor.constraint(equalTo: pinField.bottomAnchor, constant: 24),
-            submitButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            stack.widthAnchor .constraint(equalToConstant: 240)
         ])
     }
-
-    // Read the masked value
-    @objc private func handleSubmit() {
-        let pin = secureDelegate.value        // full PIN is here
-        print("PIN:", pin)                    // replace with secure handling
+    
+    // MARK: helper
+    private func configure(textField: UITextField,
+                           placeholder: String,
+                           usesProxy: Bool) {
+        
+        textField.placeholder              = placeholder
+        textField.isSecureTextEntry        = true          // always set
+        textField.textContentType          = .password
+        textField.autocapitalizationType   = .none
+        textField.autocorrectionType       = .no
+        textField.spellCheckingType        = .no
+        textField.keyboardType             = .asciiCapable
+        textField.enablesReturnKeyAutomatically = true
+        textField.borderStyle              = .roundedRect
+        
+        if usesProxy {
+            textField.delegate = proxy
+            textField.clearsOnBeginEditing = true
+            textField.clearsOnInsertion = true
+        }
     }
 }
