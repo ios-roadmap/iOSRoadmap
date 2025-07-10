@@ -1,112 +1,152 @@
 //
 //  MyViewController.swift
-//  IRStyleKit
+//  SecureMaskDemo
 //
-//  Created by Ömer Faruk Öztürk on 9.07.2025.
+//  Created by Omer on 10.07.2025.
 //
 
 import UIKit
+import ObjectiveC.runtime
 
-// MARK: - Proxy delegate
-final class SecureFieldProxy: NSObject, UITextFieldDelegate {
-    
-    /// The user’s real input (digits, characters, etc.)
-    private(set) var value = ""
-    
-    /// The symbol used to mask each character
-    private let bullet = "\u{25CF}"  // ●
-    
-    /// Optional real delegate to forward unhandled calls to
-    weak var forward: UITextFieldDelegate?
-    
-    func textField(_ tf: UITextField,
-                   shouldChangeCharactersIn range: NSRange,
-                   replacementString string: String) -> Bool {
-        
-        // 1. Compute the new raw value
-        if let current = tf.text as NSString? {
-            value = current.replacingCharacters(in: range, with: string)
-        } else {
-            value = string
+// MARK: - UITextField + SecureMask
+extension UITextField {
+
+    // MARK: Public API --------------------------------------------------------
+
+    /// The user’s real, unmasked input.
+    public var realText: String {
+        get { objc_getAssociatedObject(self, &AssociatedKeys.realText) as? String ?? "" }
+        set { objc_setAssociatedObject(self,
+                                       &AssociatedKeys.realText,
+                                       newValue as NSString,
+                                       .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+    }
+
+    /// Call this once (e.g. in viewDidLoad) to start with masking ON.
+    public func enableSecureMask() {
+        isSecureTextEntry = true              // shows ●●●●
+        delegate          = masker            // activates masking
+        addMaskToggle()                       // optional eye-button
+    }
+
+    /// Flip between masked and plain modes.
+    @objc public func toggleMask() {
+        isSecureTextEntry.toggle()            // UIKit redraws the field
+        delegate = isSecureTextEntry ? masker : nil
+
+        // --- keep cursor position & text intact -----------------------------
+        let current = text                    // bullets or plain text right now
+        text?.removeAll()
+        text = isSecureTextEntry ? String(repeating: bullet, count: realText.count) : realText
+        becomeFirstResponder()
+    }
+
+    // MARK: Private -----------------------------------------------------------
+
+    private struct AssociatedKeys {
+        static var masker   = "masker"
+        static var realText = "realText"
+    }
+
+    /// One shared masker per field (lazily created).
+    private var masker: MaskerDelegate {
+        if let m = objc_getAssociatedObject(self, &AssociatedKeys.masker) as? MaskerDelegate {
+            return m
         }
-        
-        // 2. Update the visible text with bullets
-        tf.text = String(repeating: bullet, count: value.count)
-        
-        // 3. Fire editingChanged so observers still work
-        tf.sendActions(for: .editingChanged)
-        
-        // 4. Prevent UIKit from inserting the real text
-        return false
+        let m = MaskerDelegate(owner: self)
+        objc_setAssociatedObject(self, &AssociatedKeys.masker, m, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        return m
     }
-    
-    // MARK: - Boilerplate for forwarding other delegate methods
-    
-    override func responds(to sel: Selector!) -> Bool {
-        return super.responds(to: sel) || (forward?.responds(to: sel) ?? false)
+
+    /// The bullet symbol (●)
+    private var bullet: String { "\u{25CF}" }
+
+    /// Adds a right-view eye button that calls `toggleMask()`.
+    private func addMaskToggle() {
+        let eye = UIButton(type: .custom)
+        eye.setImage(UIImage(systemName: "eye.slash"), for: .normal)
+        eye.tintColor = .secondaryLabel
+        eye.addTarget(self, action: #selector(toggleMask), for: .touchUpInside)
+        rightView     = eye
+        rightViewMode = .always
+
+        // Update icon when the caller flips `isSecureTextEntry` directly
+        addTarget(self, action: #selector(updateEyeIcon), for: .editingDidBegin)
     }
-    
-    override func forwardingTarget(for sel: Selector!) -> Any? {
-        return forward
+
+    @objc private func updateEyeIcon() {
+        let name = isSecureTextEntry ? "eye.slash" : "eye"
+        (rightView as? UIButton)?
+            .setImage(UIImage(systemName: name), for: .normal)
     }
 }
 
-//---------------------------------------------------
+// MARK: - Masking delegate (private helper)
+private final class MaskerDelegate: NSObject, UITextFieldDelegate {
+
+    init(owner: UITextField) { self.owner = owner }
+    private weak var owner: UITextField?
+    private let bullet = "\u{25CF}"          // ●
+
+    func textField(_ tf: UITextField,
+                   shouldChangeCharactersIn range: NSRange,
+                   replacementString string: String) -> Bool {
+
+        guard let tfOwner = owner else { return false }
+
+        // 1. Update stored real text
+        if let current = tfOwner.realText as NSString? {
+            tfOwner.realText = current.replacingCharacters(in: range, with: string)
+        } else {
+            tfOwner.realText = string
+        }
+
+        // 2. Show bullets
+        tf.text = String(repeating: bullet, count: tfOwner.realText.count)
+
+        // 3. Keep observers happy
+        tf.sendActions(for: .editingChanged)
+
+        // 4. Prevent UIKit from inserting the actual characters
+        return false
+    }
+}
 
 final class MyViewController: UIViewController, ShowcaseListViewControllerProtocol {
-    
-    private let passwordField      = UITextField()
-    private let secondSecureField  = UITextField()
-    private let proxy              = SecureFieldProxy()
-    
+
+    private let passwordField = UITextField()
+    private let submit        = UIButton(type: .system)
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        
-        // ------------ first field (proxy) ------------
-        configure(textField: passwordField,
-                  placeholder: "Proxy-masked password",
-                  usesProxy: true)
-        
-        // ------------ second field (normal secure) ------------
-        configure(textField: secondSecureField,
-                  placeholder: "Native isSecureTextEntry",
-                  usesProxy: false)
-        
-        // ------------ layout ------------
-        let stack = UIStackView(arrangedSubviews: [passwordField,
-                                                   secondSecureField])
-        stack.axis         = .vertical
-        stack.spacing      = 16
+
+        // Configure field
+        passwordField.placeholder = "Password"
+        passwordField.borderStyle = .roundedRect
+        passwordField.autocorrectionType = .no
+        passwordField.keyboardType = .asciiCapable
+        passwordField.enableSecureMask()           // ← one-liner
+
+        // Configure button
+        submit.setTitle("Submit", for: .normal)
+        submit.addTarget(self, action: #selector(handleSubmit), for: .touchUpInside)
+
+        // Layout
+        let stack = UIStackView(arrangedSubviews: [passwordField, submit])
+        stack.axis = .vertical
+        stack.spacing = 20
         stack.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(stack)
-        
+
         NSLayoutConstraint.activate([
             stack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             stack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stack.widthAnchor .constraint(equalToConstant: 240)
+            stack.widthAnchor .constraint(equalToConstant: 260)
         ])
     }
-    
-    // MARK: helper
-    private func configure(textField: UITextField,
-                           placeholder: String,
-                           usesProxy: Bool) {
-        
-        textField.placeholder              = placeholder
-        textField.isSecureTextEntry        = true          // always set
-        textField.textContentType          = .password
-        textField.autocapitalizationType   = .none
-        textField.autocorrectionType       = .no
-        textField.spellCheckingType        = .no
-        textField.keyboardType             = .asciiCapable
-        textField.enablesReturnKeyAutomatically = true
-        textField.borderStyle              = .roundedRect
-        
-        if usesProxy {
-            textField.delegate = proxy
-            textField.clearsOnBeginEditing = true
-            textField.clearsOnInsertion = true
-        }
+
+    @objc private func handleSubmit() {
+        print("Real password: \(passwordField.realText)")
     }
 }
