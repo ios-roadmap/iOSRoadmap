@@ -10,40 +10,47 @@ import UIKit
 // MARK: - Proxy delegate
 final class SecureFieldProxy: NSObject, UITextFieldDelegate {
     
-    /// Stores the real text the user typed
-    private(set) var plainText = ""
+    /// The user’s real input (digits, characters, etc.)
+    private(set) var value = ""
     
-    /// Forward everything we don’t override to another delegate (optional)
+    /// The symbol used to mask each character
+    private let bullet = "\u{25CF}"  // ●
+    
+    /// Optional real delegate to forward unhandled calls to
     weak var forward: UITextFieldDelegate?
     
-    // Intercept every keystroke _before_ UIKit commits it
     func textField(_ tf: UITextField,
                    shouldChangeCharactersIn range: NSRange,
                    replacementString string: String) -> Bool {
         
-        // 1. Compute what the new string would be
+        // 1. Compute the new raw value
         if let current = tf.text as NSString? {
-            plainText = current.replacingCharacters(in: range, with: string)
+            value = current.replacingCharacters(in: range, with: string)
         } else {
-            plainText = string
+            value = string
         }
         
-        // 2. Replace the field’s visible text with bullets immediately
-        tf.text = String(repeating: "•", count: plainText.count)
+        // 2. Update the visible text with bullets
+        tf.text = String(repeating: bullet, count: value.count)
         
-        // 3. Send the usual editingChanged control event so observers still fire
+        // 3. Fire editingChanged so observers still work
         tf.sendActions(for: .editingChanged)
         
-        // 4. Tell UIKit _not_ to insert the real character it was about to show
+        // 4. Prevent UIKit from inserting the real text
         return false
     }
     
-    // ----------  Boiler-plate forwarding ----------
+    // MARK: - Boilerplate for forwarding other delegate methods
+    
     override func responds(to sel: Selector!) -> Bool {
-        super.responds(to: sel) || (forward?.responds(to: sel) ?? false)
+        return super.responds(to: sel) || (forward?.responds(to: sel) ?? false)
     }
-    override func forwardingTarget(for sel: Selector!) -> Any? { forward }
+    
+    override func forwardingTarget(for sel: Selector!) -> Any? {
+        return forward
+    }
 }
+
 //---------------------------------------------------
 
 final class MyViewController: UIViewController, ShowcaseListViewControllerProtocol {
