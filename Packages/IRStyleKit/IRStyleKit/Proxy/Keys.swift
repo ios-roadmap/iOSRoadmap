@@ -41,75 +41,38 @@
 //        interceptor?.handleMaskCompletionState(didChangeMaskState)
 //        return newProxy
 //    }
+//    
+//    //  MARK: - Detach by interceptor INSTANCE
+//    func detachMaskedDelegate(interceptor target: CRMaskedInputFieldDelegate) {
+//        // 1. zincirin en üstündeki delegate’ten başla
+//        guard var current = delegate as? CRTextFieldDelegateProxy else { return }
+//        var previous: CRTextFieldDelegateProxy? = nil
 //
-//    // MARK: - Detach helpers
-//
-//    /// Pops ONLY the outer‑most proxy (LIFO behaviour).
-//    func detachMaskedDelegate() {
-//        guard let top = currentMaskedProxy else { return }
-//        replace(topProxy: top, with: top.primary)
-//    }
-//
-//    /// Detaches a *specific* proxy instance, wherever it is in the chain.
-//    /// - Parameter proxyToRemove: The proxy instance you received from `attachMaskedDelegate`.
-//    func detachMaskedDelegate(_ proxyToRemove: CRTextFieldDelegateProxy) {
-//        detachProxy(where: { $0 === proxyToRemove })
-//    }
-//
-//    /// Detaches the first proxy whose *interceptor instance* equals the one provided.
-//    /// Useful when you hold on to the masked delegate rather than the proxy.
-//    func detachMaskedDelegate(interceptor instance: CRMaskedInputFieldDelegate) {
-//        detachProxy { $0.interceptor === instance }
-//    }
-//
-//    /// Detaches the first proxy whose interceptor is of a given TYPE (e.g. `CRSecureMaskedDelegate.self`).
-//    func detachMaskedDelegate<Masked: CRMaskedInputFieldDelegate>(ofType type: Masked.Type) {
-//        detachProxy { $0.interceptor is Masked }
-//    }
-//
-//    // MARK: - nonSecureText mirror
-//
-//    /// Stores and retrieves clear‑text when `.isSecureTextEntry` is enabled.
-//    var nonSecureText: String {
-//        get { objc_getAssociatedObject(self, &Keys.clear) as? String ?? "" }
-//        set { objc_setAssociatedObject(self, &Keys.clear, newValue as NSString, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
-//    }
-//
-//    // MARK: - Private helpers
-//
-//    /// Traverses the proxy chain and removes the first proxy matching `matcher`.
-//    private func detachProxy(where matcher: (CRTextFieldDelegateProxy) -> Bool) {
-//        guard let head = currentMaskedProxy else { return }
-//
-//        // Special‑case: the head matches
-//        if matcher(head) {
-//            replace(topProxy: head, with: head.primary)
-//            return
-//        }
-//
-//        // Walk the chain looking for a match deeper down.
-//        var previous: CRTextFieldDelegateProxy = head
-//        var current = head.primary as? CRTextFieldDelegateProxy
-//        while let cur = current {
-//            if matcher(cur) {
-//                // Bypass `cur` → link `previous` directly to whatever `cur` was wrapping.
-//                previous.primary = cur.primary
-//                return
+//        while true {
+//            /// Bulduk mu?
+//            if let masked = current.interceptor, masked === target {
+//                // A) Kaldırılacak katman EN ÜST katmansa
+//                if previous == nil {
+//                    delegate = current.primary        // top’u atla
+//                    //  delegate’nin yeni değeri hâlâ proxy ise sakla, değilse temizle
+//                    if delegate is CRTextFieldDelegateProxy {
+//                        objc_setAssociatedObject(self, &Keys.proxy, delegate, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+//                    } else {
+//                        objc_setAssociatedObject(self, &Keys.proxy, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+//                    }
+//                }
+//                // B) Aradaki (middle) katmansa
+//                else if let prev = previous {
+//                    prev.primary = current.primary    // zinciri yeniden bağla
+//                }
+//                return                                // sadece bir eşleşme sökülür
 //            }
-//            previous = cur
-//            current = cur.primary as? CRTextFieldDelegateProxy
+//
+//            // Sonraki halkaya in
+//            guard let next = current.primary as? CRTextFieldDelegateProxy else { return }
+//            previous = current
+//            current  = next
 //        }
 //    }
 //
-//    /// Replaces the *stored* top proxy if the original top is being removed.
-//    private func replace(topProxy: CRTextFieldDelegateProxy, with newDelegate: UITextFieldDelegate?) {
-//        delegate = newDelegate // put the new delegate (proxy or real) on the UITextField
-//
-//        // Update the associated object: if newDelegate is another proxy keep it, else clear.
-//        if let nextProxy = newDelegate as? CRTextFieldDelegateProxy {
-//            objc_setAssociatedObject(self, &Keys.proxy, nextProxy, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-//        } else {
-//            objc_setAssociatedObject(self, &Keys.proxy, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-//        }
-//    }
 //}
