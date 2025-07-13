@@ -3,12 +3,12 @@
 //  SecureMaskDemo
 //
 //  Created by Omer on 13.07.2025.
+//  Updated to eliminate caret flicker when toggling mask.
 //
-//  A clean, self-contained example that starts with a plain UITextField and toggles
+//  A clean, self‑contained example that starts with a plain UITextField and toggles
 //  masking on/off through an external button while keeping an eye icon inside the
-//  field.  Minimum deployment: iOS 14, UIKit-only.
+//  field.  Minimum deployment: iOS 14, UIKit‑only.
 //
-
 import UIKit
 import ObjectiveC.runtime
 
@@ -26,7 +26,6 @@ public final class CRTextFieldDelegateProxy: NSObject, UITextFieldDelegate {
         super.init()
     }
 
-    // Dynamically report methods of both delegates
     public override func responds(to sel: Selector!) -> Bool {
         super.responds(to: sel) ||
         interceptor?.responds(to: sel) == true ||
@@ -39,7 +38,7 @@ public final class CRTextFieldDelegateProxy: NSObject, UITextFieldDelegate {
         return nil
     }
 
-    // Manually forward boolean return-value delegate calls
+    // Forward the single boolean‑returning delegate we need
     public func textField(_ tf: UITextField,
                           shouldChangeCharactersIn r: NSRange,
                           replacementString s: String) -> Bool {
@@ -48,13 +47,13 @@ public final class CRTextFieldDelegateProxy: NSObject, UITextFieldDelegate {
         return iOK && pOK
     }
 
-    // Expose stored primary delegate so we can restore it
     public var primaryDelegate: UITextFieldDelegate? { primary }
 }
 
 // MARK: ––––– UITextField + Proxy helpers –––––
 
 public extension UITextField {
+
     private struct Keys {
         static var proxy = "cr_proxy_key"
         static var clear = "cr_non_secure"
@@ -80,16 +79,17 @@ public extension UITextField {
         objc_getAssociatedObject(self, &Keys.proxy) as? CRTextFieldDelegateProxy
     }
 
-    // MARK: – Stored clear-text mirror
+    // MARK: – Stored clear‑text mirror
     var nonSecureText: String {
         get { objc_getAssociatedObject(self, &Keys.clear) as? String ?? "" }
         set { objc_setAssociatedObject(self, &Keys.clear, newValue as NSString, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
 }
 
-// MARK: –––– Cursor convenience ––––
+// MARK: –––– Cursor helpers ––––
 
 private extension UITextField {
+
     /// Move caret to explicit offset.
     func setCursor(offset: Int) {
         if let pos = position(from: beginningOfDocument, offset: offset) {
@@ -103,12 +103,12 @@ private extension UITextField {
                to: selectedTextRange?.start ?? endOfDocument)
     }
 
-    /// Restore caret to given offset (clamped to text length).
+    /// Restore caret to given offset (clamped) **without animation**.
     func restoreCaret(to offset: Int) {
-        DispatchQueue.main.async {
-            let max = (self.text ?? "").utf16.count
-            let clamped = min(offset, max)
-            if let pos = self.position(from: self.beginningOfDocument, offset: clamped) {
+        let max = (text ?? "").utf16.count
+        let clamped = min(offset, max)
+        if let pos = position(from: beginningOfDocument, offset: clamped) {
+            UIView.performWithoutAnimation {
                 self.selectedTextRange = self.textRange(from: pos, to: pos)
             }
         }
@@ -124,11 +124,11 @@ final class MaskedInterceptor: NSObject, CRTextFieldInterceptor {
     func textField(_ tf: UITextField,
                    shouldChangeCharactersIn range: NSRange,
                    replacementString string: String) -> Bool {
-        // 1 – Update mirror clear value
+        // 1 – update mirror clear value
         let clear = (tf.nonSecureText as NSString).replacingCharacters(in: range, with: string)
         tf.nonSecureText = clear
 
-        // 2 – Mask-on: draw bullets manually & stop UIKit insertion
+        // 2 – mask‑on: draw bullets manually & stop UIKit insertion
         if isMaskingEnabled {
             tf.text = String(repeating: bullet, count: clear.count)
             let cursor = range.location + string.utf16.count
@@ -137,7 +137,7 @@ final class MaskedInterceptor: NSObject, CRTextFieldInterceptor {
             return false
         }
 
-        // 3 – Mask-off: let UIKit handle normally
+        // 3 – mask‑off: let UIKit handle normally
         return true
     }
 }
@@ -150,7 +150,7 @@ final class MyViewController: UIViewController, ShowcaseListViewControllerProtoc
     private let passwordTextField: UITextField = {
         let tf = UITextField()
         tf.borderStyle = .roundedRect
-        tf.isSecureTextEntry = false        // ← starts **plain text**
+        tf.isSecureTextEntry = false          // ← starts **plain text**
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
     }()
@@ -204,7 +204,7 @@ final class MyViewController: UIViewController, ShowcaseListViewControllerProtoc
         secureToggleButton.addTarget(self, action: #selector(toggleSecure), for: .touchUpInside)
         eyeButton.addTarget(self, action: #selector(toggleSecure), for: .touchUpInside)
 
-        // Observe any future changes to isSecureTextEntry (KVO is safe on iOS 14+)
+        // Observe changes to isSecureTextEntry
         secureObserver = passwordTextField.observe(\.isSecureTextEntry, options: [.initial, .new]) { [weak self] tf, _ in
             self?.secureFlagDidChange(for: tf)
         }
@@ -219,7 +219,7 @@ final class MyViewController: UIViewController, ShowcaseListViewControllerProtoc
     // MARK: – Secure/plain mode switch (caret preserved)
 
     private func secureFlagDidChange(for tf: UITextField) {
-        let offset = tf.caretOffset               // 1. remember caret position
+        let offset = tf.caretOffset        // 1. remember caret position
 
         if tf.isSecureTextEntry {
             // — Going secure —
@@ -241,6 +241,6 @@ final class MyViewController: UIViewController, ShowcaseListViewControllerProtoc
             eyeButton.setImage(UIImage(systemName: "eye"), for: .normal)
         }
 
-        tf.restoreCaret(to: offset)               // 2. put caret back
+        tf.restoreCaret(to: offset)        // 2. restore caret instantly (no flicker)
     }
 }
