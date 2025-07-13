@@ -1,66 +1,115 @@
-////
-////  Keys.swift
-////  IRStyleKit
-////
-////  Created by Ömer Faruk Öztürk on 14.07.2025.
-////
-//
-//
 //import UIKit
 //import ObjectiveC
-//
+//import CRCore
 //
 //public extension UITextField {
+//    // MARK: - Associated‑object keys
 //    private struct Keys {
-//        static var proxy = 0
-//        static var clear = 1
+//        static var proxy = 0   // holds the outer‑most CRTextFieldDelegateProxy
+//        static var clear = 1   // mirrors clear text when using secure entry
 //    }
 //
-//    /// Returns the current (outermost) mask-delegate proxy, if any
+//    // MARK: - Convenience getters
+//
+//    /// Returns the outer‑most `CRTextFieldDelegateProxy`, if any
 //    var currentMaskedProxy: CRTextFieldDelegateProxy? {
 //        objc_getAssociatedObject(self, &Keys.proxy) as? CRTextFieldDelegateProxy
 //    }
 //
-//    /// Attaches a new mask-delegate proxy, wrapping the existing delegate.
+//    // MARK: - Attach
+//
+//    /// Wraps the existing `delegate` in a new `CRTextFieldDelegateProxy`.
+//    /// The new proxy sits on top of any previous proxies, so you can "stack" them.
 //    /// - Parameters:
-//    ///   - interceptor: The CRMaskedInputFieldDelegate & UITextFieldDelegate to intercept text changes
-//    ///   - didChangeMaskState: Closure notifying about mask completion state changes
-//    /// - Returns: The proxy that was just installed
+//    ///   - interceptor: The concrete `CRMaskedInputFieldDelegate` (e.g. `CRSecureMaskedDelegate`)‑
+//    ///                  which *also* conforms to `UITextFieldDelegate`.
+//    ///   - didChangeMaskState:  Optional callback fired when the mask completion state changes.
+//    /// - Returns: The proxy just created. Keep it if you want to detach by *reference* later.
 //    @discardableResult
 //    func attachMaskedDelegate(
-//        interceptor: CRMaskedInputFieldDelegate?,
+//        interceptor: (CRMaskedInputFieldDelegate & UITextFieldDelegate)?,
 //        didChangeMaskState: CRGenericClosure<CRMaskModels.MaskCompletionState>? = nil
 //    ) -> CRTextFieldDelegateProxy? {
 //        interceptor?.didChangeMaskState = didChangeMaskState
+//
 //        let newProxy = CRTextFieldDelegateProxy(interceptor: interceptor, primary: delegate)
 //        text = interceptor?.initialText
 //        delegate = newProxy
 //
+//        // persist outer‑most proxy
 //        objc_setAssociatedObject(self, &Keys.proxy, newProxy, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
 //        interceptor?.handleMaskCompletionState(didChangeMaskState)
 //        return newProxy
 //    }
 //
-//    /// Detaches only the topmost proxy and restores the next delegate in the chain.
+//    // MARK: - Detach helpers
+//
+//    /// Pops ONLY the outer‑most proxy (LIFO behaviour).
 //    func detachMaskedDelegate() {
 //        guard let top = currentMaskedProxy else { return }
-//        let underneath = top.primary
-//        delegate = underneath
+//        replace(topProxy: top, with: top.primary)
+//    }
 //
-//        if let nextProxy = underneath as? CRTextFieldDelegateProxy {
-//            objc_setAssociatedObject(self, &Keys.proxy, nextProxy, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-//        } else {
-//            objc_setAssociatedObject(self, &Keys.proxy, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+//    /// Detaches a *specific* proxy instance, wherever it is in the chain.
+//    /// - Parameter proxyToRemove: The proxy instance you received from `attachMaskedDelegate`.
+//    func detachMaskedDelegate(_ proxyToRemove: CRTextFieldDelegateProxy) {
+//        detachProxy(where: { $0 === proxyToRemove })
+//    }
+//
+//    /// Detaches the first proxy whose *interceptor instance* equals the one provided.
+//    /// Useful when you hold on to the masked delegate rather than the proxy.
+//    func detachMaskedDelegate(interceptor instance: CRMaskedInputFieldDelegate) {
+//        detachProxy { $0.interceptor === instance }
+//    }
+//
+//    /// Detaches the first proxy whose interceptor is of a given TYPE (e.g. `CRSecureMaskedDelegate.self`).
+//    func detachMaskedDelegate<Masked: CRMaskedInputFieldDelegate>(ofType type: Masked.Type) {
+//        detachProxy { $0.interceptor is Masked }
+//    }
+//
+//    // MARK: - nonSecureText mirror
+//
+//    /// Stores and retrieves clear‑text when `.isSecureTextEntry` is enabled.
+//    var nonSecureText: String {
+//        get { objc_getAssociatedObject(self, &Keys.clear) as? String ?? "" }
+//        set { objc_setAssociatedObject(self, &Keys.clear, newValue as NSString, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+//    }
+//
+//    // MARK: - Private helpers
+//
+//    /// Traverses the proxy chain and removes the first proxy matching `matcher`.
+//    private func detachProxy(where matcher: (CRTextFieldDelegateProxy) -> Bool) {
+//        guard let head = currentMaskedProxy else { return }
+//
+//        // Special‑case: the head matches
+//        if matcher(head) {
+//            replace(topProxy: head, with: head.primary)
+//            return
+//        }
+//
+//        // Walk the chain looking for a match deeper down.
+//        var previous: CRTextFieldDelegateProxy = head
+//        var current = head.primary as? CRTextFieldDelegateProxy
+//        while let cur = current {
+//            if matcher(cur) {
+//                // Bypass `cur` → link `previous` directly to whatever `cur` was wrapping.
+//                previous.primary = cur.primary
+//                return
+//            }
+//            previous = cur
+//            current = cur.primary as? CRTextFieldDelegateProxy
 //        }
 //    }
 //
-//    /// Stores and retrieves the clear-text value when using secure text entry
-//    var nonSecureText: String {
-//        get {
-//            objc_getAssociatedObject(self, &Keys.clear) as? String ?? ""
-//        }
-//        set {
-//            objc_setAssociatedObject(self, &Keys.clear, newValue as NSString, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+//    /// Replaces the *stored* top proxy if the original top is being removed.
+//    private func replace(topProxy: CRTextFieldDelegateProxy, with newDelegate: UITextFieldDelegate?) {
+//        delegate = newDelegate // put the new delegate (proxy or real) on the UITextField
+//
+//        // Update the associated object: if newDelegate is another proxy keep it, else clear.
+//        if let nextProxy = newDelegate as? CRTextFieldDelegateProxy {
+//            objc_setAssociatedObject(self, &Keys.proxy, nextProxy, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+//        } else {
+//            objc_setAssociatedObject(self, &Keys.proxy, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
 //        }
 //    }
 //}
