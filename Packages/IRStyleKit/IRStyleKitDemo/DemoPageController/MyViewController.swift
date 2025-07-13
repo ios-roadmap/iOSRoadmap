@@ -4,15 +4,15 @@
 //
 //  Created by Omer on 13.07.2025.
 //
-//  A clean, self‑contained example that starts with a plain UITextField and toggles
+//  A clean, self-contained example that starts with a plain UITextField and toggles
 //  masking on/off through an external button while keeping an eye icon inside the
-//  field.  Minimum deployment: iOS 14, UIKit‑only.
+//  field.  Minimum deployment: iOS 14, UIKit-only.
 //
 
 import UIKit
 import ObjectiveC.runtime
 
-// MARK: ––––– Delegate Proxy –––––
+// MARK: ––––– Delegate Proxy –––––
 
 public protocol CRTextFieldInterceptor: AnyObject, UITextFieldDelegate {}
 
@@ -39,7 +39,7 @@ public final class CRTextFieldDelegateProxy: NSObject, UITextFieldDelegate {
         return nil
     }
 
-    // Manually forward boolean return‑value delegate calls
+    // Manually forward boolean return-value delegate calls
     public func textField(_ tf: UITextField,
                           shouldChangeCharactersIn r: NSRange,
                           replacementString s: String) -> Bool {
@@ -52,7 +52,7 @@ public final class CRTextFieldDelegateProxy: NSObject, UITextFieldDelegate {
     public var primaryDelegate: UITextFieldDelegate? { primary }
 }
 
-// MARK: ––––– UITextField + Proxy helpers –––––
+// MARK: ––––– UITextField + Proxy helpers –––––
 
 public extension UITextField {
     private struct Keys {
@@ -80,14 +80,14 @@ public extension UITextField {
         objc_getAssociatedObject(self, &Keys.proxy) as? CRTextFieldDelegateProxy
     }
 
-    // MARK: – Stored clear‑text mirror
+    // MARK: – Stored clear-text mirror
     var nonSecureText: String {
         get { objc_getAssociatedObject(self, &Keys.clear) as? String ?? "" }
         set { objc_setAssociatedObject(self, &Keys.clear, newValue as NSString, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
 }
 
-// MARK: ––––– Masking Interceptor –––––
+// MARK: ––––– Masking Interceptor –––––
 
 final class MaskedInterceptor: NSObject, CRTextFieldInterceptor {
     private let bullet = "\u{25CF}"
@@ -96,11 +96,11 @@ final class MaskedInterceptor: NSObject, CRTextFieldInterceptor {
     func textField(_ tf: UITextField,
                    shouldChangeCharactersIn range: NSRange,
                    replacementString string: String) -> Bool {
-        // 1 – Update mirror clear value
+        // 1 – Update mirror clear value
         let clear = (tf.nonSecureText as NSString).replacingCharacters(in: range, with: string)
         tf.nonSecureText = clear
 
-        // 2 – Mask‑on: draw bullets manually & stop UIKit insertion
+        // 2 – Mask-on: draw bullets manually & stop UIKit insertion
         if isMaskingEnabled {
             tf.text = String(repeating: bullet, count: clear.count)
             let cursor = range.location + string.utf16.count
@@ -109,7 +109,7 @@ final class MaskedInterceptor: NSObject, CRTextFieldInterceptor {
             return false
         }
 
-        // 3 – Mask‑off: let UIKit handle normally
+        // 3 – Mask-off: let UIKit handle normally
         return true
     }
 }
@@ -124,11 +124,11 @@ private extension UITextField {
     }
 }
 
-// MARK: ––––– View Controller Demo –––––
+// MARK: ––––– View Controller Demo –––––
 
 final class MyViewController: UIViewController, ShowcaseListViewControllerProtocol {
 
-    // ••• UI Elements •••
+    // ••• UI Elements •••
     private let passwordTextField: UITextField = {
         let tf = UITextField()
         tf.borderStyle = .roundedRect
@@ -186,7 +186,7 @@ final class MyViewController: UIViewController, ShowcaseListViewControllerProtoc
         secureToggleButton.addTarget(self, action: #selector(toggleSecure), for: .touchUpInside)
         eyeButton.addTarget(self, action: #selector(toggleSecure), for: .touchUpInside)
 
-        // Observe any future changes to isSecureTextEntry (KVO is safe on iOS 14+)
+        // Observe any future changes to isSecureTextEntry (KVO is safe on iOS 14+)
         secureObserver = passwordTextField.observe(\.isSecureTextEntry, options: [.initial, .new]) { [weak self] tf, _ in
             self?.secureFlagDidChange(for: tf)
         }
@@ -198,29 +198,53 @@ final class MyViewController: UIViewController, ShowcaseListViewControllerProtoc
         passwordTextField.isSecureTextEntry.toggle()   // KVO callback updates UI
     }
 
+    // MARK: – Secure/plain mode dispatcher (short)
+
     private func secureFlagDidChange(for tf: UITextField) {
+        // 1  – Capture current caret position
+        let currentOffset = tf.offset(from: tf.beginningOfDocument,
+                                      to: tf.selectedTextRange?.start ?? tf.endOfDocument)
+
+        // 2  – Apply the appropriate mode
         if tf.isSecureTextEntry {
-            // --- Going secure ---
-            let plain = tf.text ?? ""            // capture what user already typed
-            tf.nonSecureText = plain              // mirror clear text
-            tf.attachProxy(interceptor: interceptor)
-            interceptor.isMaskingEnabled = true
-            tf.text = String(repeating: bullet, count: plain.count)
-            secureToggleButton.setTitle("Disable Mask", for: .normal)
-            eyeButton.setImage(UIImage(systemName: "eye.slash"), for: .normal)
+            applySecureMode(to: tf)
         } else {
-            // --- Going plain ---
-            tf.detachProxy()
-            interceptor.isMaskingEnabled = false
-            tf.text = tf.nonSecureText
-            secureToggleButton.setTitle("Enable Mask", for: .normal)
-            eyeButton.setImage(UIImage(systemName: "eye"), for: .normal)
+            applyPlainMode(to: tf)
         }
 
-        // Keep caret at end for smoother UX
+        // 3  – Restore the caret (clamp if text is now shorter)
+        restoreCaret(tf, to: currentOffset)
+    }
+
+    // MARK: – Mode helpers
+
+    private func applySecureMode(to tf: UITextField) {
+        let plain = tf.text ?? ""
+        tf.nonSecureText = plain
+        tf.attachProxy(interceptor: interceptor)
+        interceptor.isMaskingEnabled = true
+        tf.text = String(repeating: bullet, count: plain.count)
+
+        secureToggleButton.setTitle("Disable Mask", for: .normal)
+        eyeButton.setImage(UIImage(systemName: "eye.slash"), for: .normal)
+    }
+
+    private func applyPlainMode(to tf: UITextField) {
+        tf.detachProxy()
+        interceptor.isMaskingEnabled = false
+        tf.text = tf.nonSecureText
+
+        secureToggleButton.setTitle("Enable Mask", for: .normal)
+        eyeButton.setImage(UIImage(systemName: "eye"), for: .normal)
+    }
+
+    private func restoreCaret(_ tf: UITextField, to offset: Int) {
         DispatchQueue.main.async {
-            let end = tf.endOfDocument
-            tf.selectedTextRange = tf.textRange(from: end, to: end)
+            let length = (tf.text ?? "").utf16.count
+            let clamped = min(offset, length)
+            if let pos = tf.position(from: tf.beginningOfDocument, offset: clamped) {
+                tf.selectedTextRange = tf.textRange(from: pos, to: pos)
+            }
         }
     }
 }
