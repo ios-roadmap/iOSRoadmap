@@ -87,6 +87,34 @@ public extension UITextField {
     }
 }
 
+// MARK: –––– Cursor convenience ––––
+
+private extension UITextField {
+    /// Move caret to explicit offset.
+    func setCursor(offset: Int) {
+        if let pos = position(from: beginningOfDocument, offset: offset) {
+            selectedTextRange = textRange(from: pos, to: pos)
+        }
+    }
+
+    /// Current caret index (0…text.count).
+    var caretOffset: Int {
+        offset(from: beginningOfDocument,
+               to: selectedTextRange?.start ?? endOfDocument)
+    }
+
+    /// Restore caret to given offset (clamped to text length).
+    func restoreCaret(to offset: Int) {
+        DispatchQueue.main.async {
+            let max = (self.text ?? "").utf16.count
+            let clamped = min(offset, max)
+            if let pos = self.position(from: self.beginningOfDocument, offset: clamped) {
+                self.selectedTextRange = self.textRange(from: pos, to: pos)
+            }
+        }
+    }
+}
+
 // MARK: ––––– Masking Interceptor –––––
 
 final class MaskedInterceptor: NSObject, CRTextFieldInterceptor {
@@ -111,16 +139,6 @@ final class MaskedInterceptor: NSObject, CRTextFieldInterceptor {
 
         // 3 – Mask-off: let UIKit handle normally
         return true
-    }
-}
-
-// MARK: –––– Cursor convenience ––––
-
-private extension UITextField {
-    func setCursor(offset: Int) {
-        if let pos = position(from: beginningOfDocument, offset: offset) {
-            selectedTextRange = textRange(from: pos, to: pos)
-        }
     }
 }
 
@@ -198,53 +216,31 @@ final class MyViewController: UIViewController, ShowcaseListViewControllerProtoc
         passwordTextField.isSecureTextEntry.toggle()   // KVO callback updates UI
     }
 
-    // MARK: – Secure/plain mode dispatcher (short)
+    // MARK: – Secure/plain mode switch (caret preserved)
 
     private func secureFlagDidChange(for tf: UITextField) {
-        // 1  – Capture current caret position
-        let currentOffset = tf.offset(from: tf.beginningOfDocument,
-                                      to: tf.selectedTextRange?.start ?? tf.endOfDocument)
+        let offset = tf.caretOffset               // 1. remember caret position
 
-        // 2  – Apply the appropriate mode
         if tf.isSecureTextEntry {
-            applySecureMode(to: tf)
+            // — Going secure —
+            let plain = tf.text ?? ""
+            tf.nonSecureText = plain
+            tf.attachProxy(interceptor: interceptor)
+            interceptor.isMaskingEnabled = true
+            tf.text = String(repeating: bullet, count: plain.count)
+
+            secureToggleButton.setTitle("Disable Mask", for: .normal)
+            eyeButton.setImage(UIImage(systemName: "eye.slash"), for: .normal)
         } else {
-            applyPlainMode(to: tf)
+            // — Going plain —
+            tf.detachProxy()
+            interceptor.isMaskingEnabled = false
+            tf.text = tf.nonSecureText
+
+            secureToggleButton.setTitle("Enable Mask", for: .normal)
+            eyeButton.setImage(UIImage(systemName: "eye"), for: .normal)
         }
 
-        // 3  – Restore the caret (clamp if text is now shorter)
-        restoreCaret(tf, to: currentOffset)
-    }
-
-    // MARK: – Mode helpers
-
-    private func applySecureMode(to tf: UITextField) {
-        let plain = tf.text ?? ""
-        tf.nonSecureText = plain
-        tf.attachProxy(interceptor: interceptor)
-        interceptor.isMaskingEnabled = true
-        tf.text = String(repeating: bullet, count: plain.count)
-
-        secureToggleButton.setTitle("Disable Mask", for: .normal)
-        eyeButton.setImage(UIImage(systemName: "eye.slash"), for: .normal)
-    }
-
-    private func applyPlainMode(to tf: UITextField) {
-        tf.detachProxy()
-        interceptor.isMaskingEnabled = false
-        tf.text = tf.nonSecureText
-
-        secureToggleButton.setTitle("Enable Mask", for: .normal)
-        eyeButton.setImage(UIImage(systemName: "eye"), for: .normal)
-    }
-
-    private func restoreCaret(_ tf: UITextField, to offset: Int) {
-        DispatchQueue.main.async {
-            let length = (tf.text ?? "").utf16.count
-            let clamped = min(offset, length)
-            if let pos = tf.position(from: tf.beginningOfDocument, offset: clamped) {
-                tf.selectedTextRange = tf.textRange(from: pos, to: pos)
-            }
-        }
+        tf.restoreCaret(to: offset)               // 2. put caret back
     }
 }
