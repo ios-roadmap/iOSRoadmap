@@ -1,7 +1,7 @@
 # iOS Roadmap   
  
 ## Project Notes
-
+ 
 - We should avoid using external libraries as much as possible. However, in certain cases, we can **temporarily** integrate some libraries into the project.
 - The goal should not be to make the library a dependency, but to add the useful parts of it to the project.   
 
