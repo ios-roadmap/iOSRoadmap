@@ -8,11 +8,25 @@
 import UIKit
 import IRStyleKit
 
-// 1) Sola hizalayan flow layout
+// MARK: - Axis
+enum Axis {
+    case vertical
+    case horizontal
+}
+
+// MARK: - FlowLayout
 final class LeftAlignedFlowLayout: UICollectionViewFlowLayout {
-    override init() {
+    private let axis: Axis
+    
+    init(axis: Axis) {
+        self.axis = axis
         super.init()
-        scrollDirection = .vertical
+        switch axis {
+        case .vertical:
+            scrollDirection = .vertical
+        case .horizontal:
+            scrollDirection = .horizontal
+        }
         minimumInteritemSpacing = 8
         minimumLineSpacing = 8
         sectionInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
@@ -22,37 +36,74 @@ final class LeftAlignedFlowLayout: UICollectionViewFlowLayout {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        // Apple’ın özniteliklerini kopyala (mutation-safe)
         guard let attrs = super.layoutAttributesForElements(in: rect)?.map({ $0.copy() as! UICollectionViewLayoutAttributes }) else {
             return nil
         }
-        // Satır satır sola hizala
-        var left = sectionInset.left
-        var currentRowY: CGFloat = -CGFloat.greatestFiniteMagnitude
-        let rowThreshold: CGFloat = 1.0 // satır değişimini algılamak için tolerans
         
-        for a in attrs where a.representedElementCategory == .cell {
-            // Yeni satır mı?
-            if abs(a.frame.origin.y - currentRowY) > rowThreshold {
-                currentRowY = a.frame.origin.y
-                left = sectionInset.left
+        switch axis {
+        case .vertical:
+            // Satır satır sola hizala
+            var left = sectionInset.left
+            var currentRowY: CGFloat = -CGFloat.greatestFiniteMagnitude
+            let rowThreshold: CGFloat = 1.0
+            
+            for a in attrs where a.representedElementCategory == .cell {
+                if abs(a.frame.origin.y - currentRowY) > rowThreshold {
+                    currentRowY = a.frame.origin.y
+                    left = sectionInset.left
+                }
+                var f = a.frame
+                f.origin.x = left
+                a.frame = f
+                left = f.maxX + minimumInteritemSpacing
             }
-            var f = a.frame
-            f.origin.x = left
-            a.frame = f
-            left = f.maxX + minimumInteritemSpacing
+            
+        case .horizontal:
+            // Tek satır: tüm hücreler aynı y’de, x soldan birikir
+            var left = sectionInset.left
+            let y = sectionInset.top
+            for a in attrs where a.representedElementCategory == .cell {
+                var f = a.frame
+                f.origin.y = y
+                f.origin.x = left
+                a.frame = f
+                left = f.maxX + minimumInteritemSpacing
+            }
         }
         return attrs
     }
     
-    // Self-sizing sonrası atlamaları azaltmak için
+    // Self-sizing değişimlerinde yeniden düzenlemek için
     override func shouldInvalidateLayout(forPreferredLayoutAttributes preferredAttributes: UICollectionViewLayoutAttributes,
                                          withOriginalAttributes originalAttributes: UICollectionViewLayoutAttributes) -> Bool {
         true
     }
+    
+    // Scroll sırasında boyut değişimlerinde yeniden düzenlemek için
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+        true
+    }
+    
+    // Yatay modda contentSize yüksekliğini tek satıra sabitle
+    override var collectionViewContentSize: CGSize {
+        let size = super.collectionViewContentSize
+        guard axis == .horizontal, let cv = collectionView else { return size }
+        
+        var maxHeight: CGFloat = 0
+        if let attrs = super.layoutAttributesForElements(
+            in: CGRect(origin: .zero,
+                       size: CGSize(width: .greatestFiniteMagnitude, height: cv.bounds.height))) {
+            for a in attrs where a.representedElementCategory == .cell {
+                maxHeight = max(maxHeight, a.frame.height)
+            }
+        }
+        let singleRowHeight = sectionInset.top + maxHeight + sectionInset.bottom
+        // Genişliği super'dan al, yüksekliği tek satıra sabitle.
+        return CGSize(width: size.width, height: singleRowHeight)
+    }
 }
 
-// 2) İçerik view (örnek)
+// MARK: - İçerik View
 final class TagView: UIView {
     private let label = UILabel()
     
@@ -61,6 +112,7 @@ final class TagView: UIView {
         label.text = text
         label.font = .systemFont(ofSize: 14)
         label.numberOfLines = 1
+        label.lineBreakMode = .byClipping
         backgroundColor = .systemGray6
         layer.cornerRadius = 8
         directionalLayoutMargins = .init(top: 6, leading: 10, bottom: 6, trailing: 10)
@@ -74,14 +126,13 @@ final class TagView: UIView {
             label.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor)
         ])
         
-        // Self-sizing için önemli: genişlikte kırpılmayı engelle
         setContentCompressionResistancePriority(.required, for: .horizontal)
         setContentHuggingPriority(.required, for: .horizontal)
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 }
 
-// 3) Hücre
+// MARK: - Hücre
 final class TagCell: UICollectionViewCell {
     static let reuseID = "TagCell"
     private var hostedView: UIView?
@@ -103,32 +154,54 @@ final class TagCell: UICollectionViewCell {
             view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
         ])
-        // İçeriğin boyut hesaplamasını doğru yapması için:
         contentView.setContentCompressionResistancePriority(.required, for: .horizontal)
         contentView.setContentHuggingPriority(.required, for: .horizontal)
     }
 }
 
-// 4) VC
+// MARK: - VC
 final class HStackDemoViewController: IRViewController, ShowcaseListViewControllerProtocol, UICollectionViewDataSource {
+    private let axis: Axis
     private let items = [
         "UIKit","Auto Layout","UICollectionView","FlowLayout","Self-Sizing",
         "LongText-Örnek-1234567890","Tag","iOS","Swift","CustomView","Wrap","Satır Kırma"
     ]
     
     private lazy var collectionView: UICollectionView = {
-        let layout = LeftAlignedFlowLayout()
+        let layout = LeftAlignedFlowLayout(axis: axis)
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.backgroundColor = .systemBackground
         cv.dataSource = self
-        cv.alwaysBounceVertical = true
         cv.register(TagCell.self, forCellWithReuseIdentifier: TagCell.reuseID)
+        switch axis {
+        case .vertical:
+            cv.alwaysBounceVertical = true
+            cv.alwaysBounceHorizontal = false
+            cv.showsVerticalScrollIndicator = true
+            cv.showsHorizontalScrollIndicator = false
+        case .horizontal:
+            cv.alwaysBounceVertical = false
+            cv.alwaysBounceHorizontal = true
+            cv.showsVerticalScrollIndicator = false
+            cv.showsHorizontalScrollIndicator = true
+        }
         return cv
     }()
     
+    // Varsayılanı yatay tek satır
+    init(axis: Axis = .horizontal) {
+        self.axis = axis
+        super.init(nibName: nil, bundle: nil)
+    }
+    // ShowcaseListViewController tarafından type.init() ile çağrılabilsin
+    convenience init() {
+        self.init(axis: .horizontal)
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Wrapping Views"
+        title = axis == .vertical ? "Wrapping Views" : "HStack (Single Row)"
         view.addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
