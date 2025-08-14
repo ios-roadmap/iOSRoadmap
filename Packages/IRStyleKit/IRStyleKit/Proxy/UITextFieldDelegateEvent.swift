@@ -8,90 +8,6 @@
 
 import UIKit
 
-// MARK: - Proxy Class
-public final class UITextFieldDelegateProxy: NSObject, UITextFieldDelegate {
-    var interceptor: UITextFieldDelegate?
-    var primary: UITextFieldDelegate?
-    
-    init(interceptor: UITextFieldDelegate? = nil, primary: UITextFieldDelegate? = nil) {
-        self.interceptor = interceptor
-        self.primary = primary
-    }
-    
-    // MARK: - UITextFieldDelegate Methods
-    
-    public func textFieldDidChangeSelection(_ textField: UITextField) {
-        interceptor?.textFieldDidChangeSelection?(textField)
-        primary?.textFieldDidChangeSelection?(textField)
-    }
-    
-    public func textFieldDidBeginEditing(_ textField: UITextField) {
-        interceptor?.textFieldDidBeginEditing?(textField)
-        primary?.textFieldDidBeginEditing?(textField)
-    }
-    
-    public func textFieldDidEndEditing(_ textField: UITextField) {
-        interceptor?.textFieldDidEndEditing?(textField)
-        primary?.textFieldDidEndEditing?(textField)
-    }
-    
-    // MARK: - Message Forwarding
-    
-    public override func responds(to sel: Selector!) -> Bool {
-        super.responds(to: sel) || (interceptor?.responds(to: sel) ?? false) || (primary?.responds(to: sel) ?? false)
-    }
-    
-    public override func forwardingTarget(for sel: Selector!) -> Any? {
-        interceptor?.responds(to: sel) == true ? interceptor : primary
-    }
-}
-
-//public extension UITextField {
-//    private struct Keys {
-//        static var proxy = 0
-//        static var clear = 1
-//    }
-//
-//    /// Returns the current (outermost) mask-delegate proxy, if any
-//    var currentMaskedProxy: UITextFieldDelegateProxy? {
-//        objc_getAssociatedObject(self, &Keys.proxy) as? UITextFieldDelegateProxy
-//    }
-//
-//    @discardableResult
-//    func attachMaskedDelegate(
-//        interceptor: TextFieldInterceptor?
-//    ) -> UITextFieldDelegateProxy? {
-//        let newProxy = UITextFieldDelegateProxy(interceptor: interceptor, primary: delegate)
-//        delegate = newProxy
-//
-//        objc_setAssociatedObject(self, &Keys.proxy, newProxy, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-//        return newProxy
-//    }
-//
-//    /// Detaches only the topmost proxy and restores the next delegate in the chain.
-//    func detachMaskedDelegate() {
-//        guard let top = currentMaskedProxy else { return }
-//        let underneath = top.primary
-//        delegate = underneath
-//
-//        if let nextProxy = underneath as? UITextFieldDelegateProxy {
-//            objc_setAssociatedObject(self, &Keys.proxy, nextProxy, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-//        } else {
-//            objc_setAssociatedObject(self, &Keys.proxy, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-//        }
-//    }
-//
-//    /// Stores and retrieves the clear-text value when using secure text entry
-//    var nonSecureText: String {
-//        get {
-//            objc_getAssociatedObject(self, &Keys.clear) as? String ?? ""
-//        }
-//        set {
-//            objc_setAssociatedObject(self, &Keys.clear, newValue as NSString, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-//        }
-//    }
-//}
-
 public protocol TextFieldInterceptor: AnyObject, UITextFieldDelegate {}
 
 final class PhoneMaskedInputFieldDelegate: NSObject, TextFieldInterceptor {
@@ -196,15 +112,3 @@ public extension UITextField {
     }
 }
 
-/*
-let phone    = PhoneMaskedInputFieldInterceptor()
-let cc       = CreditCardMaskedInputFieldInterceptor()
-let password = PasswordMaskedInputFieldInterceptor()
-
-textField.attach(phone)
-textField.attach(cc)
-textField.attach(password)
-
-// …later on
-textField.detach(cc)          // removes only the credit-card interceptor
-*/

@@ -29,3 +29,4 @@ extension IRJPHCoordinator: NavigationLogic {
         vc.navigationController?.pushViewController(detailVC, animated: true)
     }
 }
+z
