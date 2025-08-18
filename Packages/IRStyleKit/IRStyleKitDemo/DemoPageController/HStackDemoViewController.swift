@@ -9,36 +9,101 @@
 import UIKit
 import IRStyleKit
 
-// MARK: - TagView
+// MARK: - TagView (temiz yapı)
 final class TagView: UIView {
-    private let label = UILabel()
 
-    init(text: String) {
-        super.init(frame: .zero)
+    // MARK: Public API
+    /// Dokunma callback'i. Dokunulan TagView örneğini döner.
+    var onTappedView: ((TagView) -> Void)?
+
+    /// Etiket metni
+    var text: String {
+        get { label.text ?? "" }
+        set {
+            label.text = newValue
+            accessibilityLabel = newValue
+        }
+    }
+
+    // MARK: Private UI
+    private let label: UILabel = {
+        let l = UILabel()
+        l.font = .systemFont(ofSize: 14)
+        l.numberOfLines = 1
+        l.setContentCompressionResistancePriority(.required, for: .horizontal)
+        l.setContentHuggingPriority(.required, for: .horizontal)
+        return l
+    }()
+
+    // MARK: Init
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        commonInit()
+    }
+
+    convenience init(text: String) {
+        self.init(frame: .zero)
+        self.text = text
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        commonInit()
+    }
+
+    // MARK: Setup
+    private func commonInit() {
+        setupAppearance()
+        buildHierarchy()
+        setupConstraints()
+        setupGestures()
+        setupAccessibility()
+    }
+
+    private func setupAppearance() {
         backgroundColor = .systemGray6
         layer.cornerRadius = 8
         directionalLayoutMargins = .init(top: 6, leading: 10, bottom: 6, trailing: 10)
+        setContentCompressionResistancePriority(.required, for: .horizontal)
+        setContentHuggingPriority(.required, for: .horizontal)
+    }
 
-        label.text = text
-        label.font = .systemFont(ofSize: 14)
-        label.numberOfLines = 1
-        label.setContentCompressionResistancePriority(.required, for: .horizontal)
-        label.setContentHuggingPriority(.required, for: .horizontal)
-
+    private func buildHierarchy() {
         addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
+    }
+
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
             label.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
             label.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
             label.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
             label.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor)
         ])
-
-        setContentCompressionResistancePriority(.required, for: .horizontal)
-        setContentHuggingPriority(.required, for: .horizontal)
     }
 
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    private func setupGestures() {
+        isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        tap.cancelsTouchesInView = true
+        addGestureRecognizer(tap)
+    }
+
+    private func setupAccessibility() {
+        isAccessibilityElement = true
+        accessibilityTraits = .button
+        accessibilityLabel = label.text
+    }
+
+    // MARK: Actions
+    @objc private func handleTap(_ gr: UITapGestureRecognizer) {
+        guard gr.state == .ended else { return }
+        // Basit bir dokunma geri bildirimi (isteğe bağlı)
+        UIView.animate(withDuration: 0.08, animations: { self.alpha = 0.6 }) { _ in
+            UIView.animate(withDuration: 0.12) { self.alpha = 1.0 }
+        }
+        onTappedView?(self)
+    }
 }
 
 // MARK: - WrappingFlowView (UICollectionView yok)
@@ -161,6 +226,16 @@ final class HStackDemoViewController: IRViewController, ShowcaseListViewControll
         wrappingView.itemSpacing = 8
         wrappingView.lineSpacing = 8
         wrappingView.contentInsets = .init(top: 12, left: 12, bottom: 12, right: 12)
-        wrappingView.setItems(items) { TagView(text: $0) }
+
+        wrappingView.setItems(items) {
+            let v = TagView(text: $0)
+            v.onTappedView = { [weak self] tag in
+                // Örnek kullanım
+                print("Tapped tag:", tag.text)
+                // İstenirse başka bir aksiyon tetiklenebilir
+                // self?.navigateOrUpdateUI(with: tag.text)
+            }
+            return v
+        }
     }
 }
