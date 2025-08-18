@@ -1,32 +1,19 @@
 //
-//  HStackDemoViewController.swift
+//  HStackDemoViewController.swift (Refactor)
 //  IRStyleKitDemo
 //
 //  Created by Ömer Faruk Öztürk on 14.08.2025.
+//  Updated: 18.08.2025 — VC dışarıdan bir UIView alır; collection view mantığı UIView içinde kapsüllenmiştir.
 //
 
 import UIKit
 import IRStyleKit
 
-// MARK: - Axis
-enum Axis {
-    case vertical
-    case horizontal
-}
-
-// MARK: - FlowLayout
+// MARK: - 1) Sola hizalayan flow layout
 final class LeftAlignedFlowLayout: UICollectionViewFlowLayout {
-    private let axis: Axis
-    
-    init(axis: Axis) {
-        self.axis = axis
+    override init() {
         super.init()
-        switch axis {
-        case .vertical:
-            scrollDirection = .vertical
-        case .horizontal:
-            scrollDirection = .horizontal
-        }
+        scrollDirection = .vertical
         minimumInteritemSpacing = 8
         minimumLineSpacing = 8
         sectionInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
@@ -34,89 +21,44 @@ final class LeftAlignedFlowLayout: UICollectionViewFlowLayout {
         sectionInsetReference = .fromSafeArea
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-    
+
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        guard let attrs = super.layoutAttributesForElements(in: rect)?.map({ $0.copy() as! UICollectionViewLayoutAttributes }) else {
-            return nil
-        }
-        
-        switch axis {
-        case .vertical:
-            // Satır satır sola hizala
-            var left = sectionInset.left
-            var currentRowY: CGFloat = -CGFloat.greatestFiniteMagnitude
-            let rowThreshold: CGFloat = 1.0
-            
-            for a in attrs where a.representedElementCategory == .cell {
-                if abs(a.frame.origin.y - currentRowY) > rowThreshold {
-                    currentRowY = a.frame.origin.y
-                    left = sectionInset.left
-                }
-                var f = a.frame
-                f.origin.x = left
-                a.frame = f
-                left = f.maxX + minimumInteritemSpacing
+        guard let attrs = super.layoutAttributesForElements(in: rect)?.map({ $0.copy() as! UICollectionViewLayoutAttributes }) else { return nil }
+        var left = sectionInset.left
+        var currentRowY: CGFloat = -CGFloat.greatestFiniteMagnitude
+        let rowThreshold: CGFloat = 1.0
+        for a in attrs where a.representedElementCategory == .cell {
+            if abs(a.frame.origin.y - currentRowY) > rowThreshold {
+                currentRowY = a.frame.origin.y
+                left = sectionInset.left
             }
-            
-        case .horizontal:
-            // Tek satır: tüm hücreler aynı y’de, x soldan birikir
-            var left = sectionInset.left
-            let y = sectionInset.top
-            for a in attrs where a.representedElementCategory == .cell {
-                var f = a.frame
-                f.origin.y = y
-                f.origin.x = left
-                a.frame = f
-                left = f.maxX + minimumInteritemSpacing
-            }
+            var f = a.frame
+            f.origin.x = left
+            a.frame = f
+            left = f.maxX + minimumInteritemSpacing
         }
         return attrs
     }
-    
-    // Self-sizing değişimlerinde yeniden düzenlemek için
-    override func shouldInvalidateLayout(forPreferredLayoutAttributes preferredAttributes: UICollectionViewLayoutAttributes,
-                                         withOriginalAttributes originalAttributes: UICollectionViewLayoutAttributes) -> Bool {
+
+    override func shouldInvalidateLayout(forPreferredLayoutAttributes preferred: UICollectionViewLayoutAttributes,
+                                         withOriginalAttributes original: UICollectionViewLayoutAttributes) -> Bool {
         true
-    }
-    
-    // Scroll sırasında boyut değişimlerinde yeniden düzenlemek için
-    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
-        true
-    }
-    
-    // Yatay modda contentSize yüksekliğini tek satıra sabitle
-    override var collectionViewContentSize: CGSize {
-        let size = super.collectionViewContentSize
-        guard axis == .horizontal, let cv = collectionView else { return size }
-        
-        var maxHeight: CGFloat = 0
-        if let attrs = super.layoutAttributesForElements(
-            in: CGRect(origin: .zero,
-                       size: CGSize(width: .greatestFiniteMagnitude, height: cv.bounds.height))) {
-            for a in attrs where a.representedElementCategory == .cell {
-                maxHeight = max(maxHeight, a.frame.height)
-            }
-        }
-        let singleRowHeight = sectionInset.top + maxHeight + sectionInset.bottom
-        // Genişliği super'dan al, yüksekliği tek satıra sabitle.
-        return CGSize(width: size.width, height: singleRowHeight)
     }
 }
 
-// MARK: - İçerik View
+// MARK: - 2) İçerik view (örnek)
 final class TagView: UIView {
     private let label = UILabel()
-    
+
     init(text: String) {
         super.init(frame: .zero)
         label.text = text
         label.font = .systemFont(ofSize: 14)
         label.numberOfLines = 1
-        label.lineBreakMode = .byClipping
         backgroundColor = .systemGray6
         layer.cornerRadius = 8
         directionalLayoutMargins = .init(top: 6, leading: 10, bottom: 6, trailing: 10)
-        
+
         addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -125,24 +67,24 @@ final class TagView: UIView {
             label.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
             label.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor)
         ])
-        
+
         setContentCompressionResistancePriority(.required, for: .horizontal)
         setContentHuggingPriority(.required, for: .horizontal)
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 }
 
-// MARK: - Hücre
+// MARK: - 3) Hücre
 final class TagCell: UICollectionViewCell {
     static let reuseID = "TagCell"
     private var hostedView: UIView?
-    
+
     override func prepareForReuse() {
         super.prepareForReuse()
         hostedView?.removeFromSuperview()
         hostedView = nil
     }
-    
+
     func configure(with view: UIView) {
         hostedView?.removeFromSuperview()
         hostedView = view
@@ -159,64 +101,60 @@ final class TagCell: UICollectionViewCell {
     }
 }
 
-// MARK: - VC
-final class HStackDemoViewController: IRViewController, ShowcaseListViewControllerProtocol, UICollectionViewDataSource {
-    private let axis: Axis
-    private let items = [
-        "UIKit","Auto Layout","UICollectionView","FlowLayout","Self-Sizing",
-        "LongText-Örnek-1234567890","Tag","iOS","Swift","CustomView","Wrap","Satır Kırma"
-    ]
-    
-    private lazy var collectionView: UICollectionView = {
-        let layout = LeftAlignedFlowLayout(axis: axis)
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        cv.backgroundColor = .systemBackground
-        cv.dataSource = self
-        cv.register(TagCell.self, forCellWithReuseIdentifier: TagCell.reuseID)
-        switch axis {
-        case .vertical:
-            cv.alwaysBounceVertical = true
-            cv.alwaysBounceHorizontal = false
-            cv.showsVerticalScrollIndicator = true
-            cv.showsHorizontalScrollIndicator = false
-        case .horizontal:
-            cv.alwaysBounceVertical = false
-            cv.alwaysBounceHorizontal = true
-            cv.showsVerticalScrollIndicator = false
-            cv.showsHorizontalScrollIndicator = true
-        }
-        return cv
-    }()
-    
-    // Varsayılanı yatay tek satır
-    init(axis: Axis = .horizontal) {
-        self.axis = axis
-        super.init(nibName: nil, bundle: nil)
-    }
-    // ShowcaseListViewController tarafından type.init() ile çağrılabilsin
-    convenience init() {
-        self.init(axis: .horizontal)
-    }
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        title = axis == .vertical ? "Wrapping Views" : "HStack (Single Row)"
-        view.addSubview(collectionView)
+// MARK: - 4) UIView kapsül (collection view + data source içeride)
+final class WrappingTagsView: UIView, UICollectionViewDataSource {
+    // Dışarıdan set edilebilir
+    var items: [String] { didSet { collectionView.reloadData() } }
+
+    private let collectionView: UICollectionView
+
+    init(items: [String] = []) {
+        self.items = items
+        let layout = LeftAlignedFlowLayout()
+        self.collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        super.init(frame: .zero)
+
+        collectionView.backgroundColor = .systemBackground
+        collectionView.alwaysBounceVertical = true
+        collectionView.dataSource = self
+        collectionView.register(TagCell.self, forCellWithReuseIdentifier: TagCell.reuseID)
+
+        addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
-    
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
     // MARK: DataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int { items.count }
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TagCell.reuseID, for: indexPath) as! TagCell
         cell.configure(with: TagView(text: items[indexPath.item]))
         return cell
+    }
+}
+
+// MARK: - 5) VC artık sadece bir view alır
+final class HStackDemoViewController: IRViewController, ShowcaseListViewControllerProtocol {
+    private let items = [
+        "UIKit","Auto Layout","UICollectionView","FlowLayout","Self-Sizing",
+        "LongText-Örnek-1234567890","Tag","iOS","Swift","CustomView","Wrap","Satır Kırma"
+    ]
+
+    override func loadView() {
+        // VC’nin ana view’ı doğrudan kapsül view
+        view = WrappingTagsView(items: items)
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        title = "Wrapping Views"
     }
 }
