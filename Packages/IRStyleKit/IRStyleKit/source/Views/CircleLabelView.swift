@@ -7,70 +7,55 @@
 
 import UIKit
 
-public final class CircleLabelViewModel {
+public final class CircleLabelImageViewModel {
     public let text: String
     public let textColor: UIColor
     public let font: UIFont
     public let circleColor: UIColor
+    public let size: CGSize
     
     public init(
         text: String,
         textColor: UIColor = .white,
         font: UIFont = .boldSystemFont(ofSize: 18),
-        circleColor: UIColor = .systemRed
+        circleColor: UIColor = .systemRed,
+        size: CGSize = CGSize(width: 80, height: 80)
     ) {
         self.text = text
         self.textColor = textColor
         self.font = font
         self.circleColor = circleColor
+        self.size = size
     }
 }
 
-public final class CircleLabelView: UIView {
+public final class CircleLabelImage: UIImage {
     
-    private let label = UILabel()
-    private var viewModel: CircleLabelViewModel
-    
-    // MARK: - Init
-    public init(viewModel: CircleLabelViewModel) {
-        self.viewModel = viewModel
-        super.init(frame: .zero)
-        setup()
-        applyViewModel()
-    }
-    
-    public required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: - Setup
-    private func setup() {
-        addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: centerYAnchor)
-        ])
-    }
-    
-    private func applyViewModel() {
-        label.text = viewModel.text
-        label.textColor = viewModel.textColor
-        label.font = viewModel.font
-        backgroundColor = viewModel.circleColor
-    }
-    
-    // MARK: - Update
-    public func update(viewModel: CircleLabelViewModel) {
-        self.viewModel = viewModel
-        applyViewModel()
-        setNeedsLayout()
-    }
-    
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-        layer.cornerRadius = bounds.width / 2
-        clipsToBounds = true
+    public convenience init(viewModel: CircleLabelImageViewModel) {
+        let renderer = UIGraphicsImageRenderer(size: viewModel.size)
+        let image = renderer.image { _ in
+            let rect = CGRect(origin: .zero, size: viewModel.size)
+            let path = UIBezierPath(ovalIn: rect)
+            
+            // Daire doldur
+            viewModel.circleColor.setFill()
+            path.fill()
+            
+            // Yazı çiz
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: viewModel.font,
+                .foregroundColor: viewModel.textColor
+            ]
+            
+            let textSize = viewModel.text.size(withAttributes: attributes)
+            let textRect = CGRect(
+                x: (viewModel.size.width - textSize.width) / 2,
+                y: (viewModel.size.height - textSize.height) / 2,
+                width: textSize.width,
+                height: textSize.height
+            )
+            viewModel.text.draw(in: textRect, withAttributes: attributes)
+        }
+        self.init(cgImage: image.cgImage!, scale: image.scale, orientation: image.imageOrientation)
     }
 }

@@ -13,12 +13,18 @@ final class CircleLabelViewDemoPageController: IRViewController, ShowcaseListVie
         super.viewDidLoad()
         view.backgroundColor = .white
         
-        let circleView = CircleLabelView(frame: CGRect(x: 100, y: 200, width: 80, height: 80))
-        circleView.label.text = "DKK"
-        circleView.label.textColor = .white
-        circleView.label.font = .boldSystemFont(ofSize: 20)
-        circleView.circleColor = .systemRed
+        let vm = CircleLabelImageViewModel(
+            text: "DKK",
+            textColor: .white,
+            font: .boldSystemFont(ofSize: 20),
+            circleColor: .systemRed,
+            size: CGSize(width: 80, height: 80)
+        )
         
-        view.addSubview(circleView)
+        let image = CircleLabelImage(viewModel: vm)
+        let imageView = UIImageView(image: image)
+        imageView.center = view.center
+        
+        view.addSubview(imageView)
     }
 }
