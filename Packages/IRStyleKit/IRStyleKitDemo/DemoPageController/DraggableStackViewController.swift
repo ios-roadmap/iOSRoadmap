@@ -1,17 +1,29 @@
 //
-//  DraggableStackViewController.swift
-//  IRStyleKit
+//  CRDragDropTableView.swift
+//  CRComponents
 //
-//  Created by Ömer Faruk Öztürk on 28.08.2025.
+//  Created by Omer Faruk Ozturk [Ing Teknoloji A.S.-Dijital Squad 1] on 29.08.2025.
 //
+
+public enum CRSeparatorStyle {
+    case none
+    case full
+    case withInsets(start: CGFloat, end: CGFloat)
+}
 
 import UIKit
 
+// Dış bağımlılıklar:
+// - CRSeparatorStyle: .none / .full / .withInsets(start:end:)
+// - CRColor.borderSubtle
+
 public final class CRDragDropTableViewModel {
+
     public private(set) var items: [UIView]
     public private(set) var allowReorder: Bool
     public private(set) var isScrollEnabled: Bool
     public private(set) var matchContentHeight: Bool
+    public private(set) var separatorStyle: CRSeparatorStyle
 
     public var onItemsChanged: ((_ old: [UIView], _ new: [UIView]) -> Void)?
     public var onConfigChanged: (() -> Void)?
@@ -21,12 +33,14 @@ public final class CRDragDropTableViewModel {
         items: [UIView] = [],
         allowReorder: Bool = true,
         isScrollEnabled: Bool = true,
-        matchContentHeight: Bool = true
+        matchContentHeight: Bool = true,
+        separatorStyle: CRSeparatorStyle = .none
     ) {
         self.items = items
         self.allowReorder = allowReorder
         self.isScrollEnabled = isScrollEnabled
         self.matchContentHeight = matchContentHeight
+        self.separatorStyle = separatorStyle
     }
 
     /// Öğeleri topluca değiştirir ve değişikliği `onItemsChanged` ile bildirir.
@@ -99,9 +113,16 @@ public final class CRDragDropTableViewModel {
         matchContentHeight = flag
         onConfigChanged?()
     }
+
+    /// Separator stilini değiştirir ve yapılandırma değişikliğini bildirir.
+    public func setSeparatorStyle(_ style: CRSeparatorStyle) {
+        separatorStyle = style
+        onConfigChanged?()
+    }
 }
 
 public final class CRDragDropTableView: UIView {
+
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let viewModel: CRDragDropTableViewModel
     private var heightConstraint: NSLayoutConstraint?
@@ -128,15 +149,16 @@ public final class CRDragDropTableView: UIView {
     /// Tabloyu ve kısıtlarını kurar, yükseklik kısıtını hazırlar.
     private func setupUI() {
         backgroundColor = .systemBackground
+
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
         tableView.delegate = self
         tableView.dragDelegate = self
         tableView.dropDelegate = self
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 44
-        tableView.separatorStyle = .none
+        tableView.estimatedRowHeight = 150
         tableView.register(CRWrapCell.self, forCellReuseIdentifier: CRWrapCell.identifier)
+        tableView.separatorStyle = .none
 
         addSubview(tableView)
         NSLayoutConstraint.activate([
@@ -147,7 +169,7 @@ public final class CRDragDropTableView: UIView {
         ])
 
         let hc = heightAnchor.constraint(equalToConstant: 1)
-        hc.priority = .defaultHigh
+        hc.priority = .required
         hc.isActive = true
         heightConstraint = hc
     }
@@ -168,7 +190,9 @@ public final class CRDragDropTableView: UIView {
         tableView.dragInteractionEnabled = viewModel.allowReorder
         applyHeightMode()
         tableView.reloadData()
-        updateHeight()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateHeight()
+        }
     }
 
     /// İçerik yüksekliğine uyum modunu aktif/pasif eder ve layout’u yeniler.
@@ -208,7 +232,10 @@ public final class CRDragDropTableView: UIView {
             if !inserts.isEmpty { tableView.insertRows(at: inserts, with: .automatic) }
             for m in moves { tableView.moveRow(at: m.from, to: m.to) }
         }, completion: { [weak self] _ in
-            self?.updateHeight()
+            guard let self = self else { return }
+            self.updateHeight()
+            // /// Toplu işlem sonrasında görünen satırların separator’larını tazeler.
+            self.reloadVisibleForSeparators()
         })
     }
 
@@ -233,6 +260,22 @@ public final class CRDragDropTableView: UIView {
         } else {
             return CGSize(width: UIView.noIntrinsicMetric, height: UIView.noIntrinsicMetric)
         }
+    }
+
+    /// Verilen indekslerin kendisi ve komşuları için satırları `.none` animasyonla yeniler (separator güncelleme).
+    private func reloadSeparatorsAround(indices: [Int]) {
+        let rows = Set(indices.flatMap { [$0 - 1, $0, $0 + 1] })
+            .filter { $0 >= 0 && $0 < viewModel.items.count }
+        guard !rows.isEmpty else { return }
+        let ips = rows.map { IndexPath(row: $0, section: 0) }
+        tableView.reloadRows(at: ips, with: .none)
+    }
+
+    /// /// Görünür tüm satırları separator konfigürasyonu için hızlıca yeniler.
+    private func reloadVisibleForSeparators() {
+        let visible = tableView.indexPathsForVisibleRows ?? []
+        guard !visible.isEmpty else { return }
+        tableView.reloadRows(at: visible, with: .none)
     }
 }
 
@@ -260,6 +303,16 @@ extension CRDragDropTableView: UITableViewDataSource, UITableViewDelegate {
     public func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         guard viewModel.allowReorder, sourceIndexPath != destinationIndexPath else { return }
         viewModel.moveItem(from: sourceIndexPath.row, to: destinationIndexPath.row)
+        // /// Reorder sonrası kaynak/hedef ve komşuları separator için yenile.
+        reloadSeparatorsAround(indices: [sourceIndexPath.row, destinationIndexPath.row])
+    }
+
+    /// Hücre ekrana gelmeden separator konfigürasyonunu uygular.
+    public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard let cell = cell as? CRWrapCell else { return }
+        let lastRowIndex = tableView.numberOfRows(inSection: indexPath.section) - 1
+        let isLast = (indexPath.row == lastRowIndex)
+        cell.configureSeparator(style: viewModel.separatorStyle, isLastRow: isLast)
     }
 }
 
@@ -294,9 +347,12 @@ extension CRDragDropTableView: UITableViewDragDelegate, UITableViewDropDelegate 
               let source = item.sourceIndexPath,
               let _ = item.dragItem.localObject as? UIView else { return }
 
-        let dest = coordinator.destinationIndexPath ?? IndexPath(row: viewModel.items.count - 1, section: 0)
+        let dest = coordinator.destinationIndexPath ?? IndexPath(row: max(0, viewModel.items.count - 1), section: 0)
         viewModel.moveItem(from: source.row, to: dest.row)
         coordinator.drop(item.dragItem, toRowAt: dest)
+
+        // /// Drop sonrası kaynak/hedef ve komşuları separator için yenile.
+        reloadSeparatorsAround(indices: [source.row, dest.row])
     }
 }
 
@@ -305,10 +361,30 @@ public final class CRWrapCell: UITableViewCell {
     /// Hücre kayıt/çözümlemede kullanılacak identifier.
     public static let identifier = "CRWrapCell"
 
+    private let sep = UIView()
+    private var sepLeading: NSLayoutConstraint!
+    private var sepTrailing: NSLayoutConstraint!
+
     /// Programatik başlatıcı.
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
+
+        // Dahili separator görünümü
+        sep.translatesAutoresizingMaskIntoConstraints = false
+        sep.backgroundColor = .red
+        sep.tag = 999
+        contentView.addSubview(sep)
+
+        sepLeading = sep.leadingAnchor.constraint(equalTo: contentView.leadingAnchor)
+        sepTrailing = sep.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+
+        NSLayoutConstraint.activate([
+            sep.heightAnchor.constraint(equalToConstant: 1),         // 1pt kalınlık
+            sep.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            sepLeading,
+            sepTrailing
+        ])
     }
 
     /// Storyboard/XIB başlatıcısı desteklenmez.
@@ -316,7 +392,11 @@ public final class CRWrapCell: UITableViewCell {
 
     /// Verilen UIView’i hücreye gömer ve kenarlara sabitler.
     public func embed(_ view: UIView) {
-        contentView.subviews.forEach { $0.removeFromSuperview() }
+        // Dahili separator haricindeki alt görünümleri temizle
+        contentView.subviews
+            .filter { $0 !== sep }
+            .forEach { $0.removeFromSuperview() }
+
         view.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(view)
         NSLayoutConstraint.activate([
@@ -325,113 +405,28 @@ public final class CRWrapCell: UITableViewCell {
             view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
-    }
-}
 
-import UIKit
-
-// MARK: - Minimal satır görünümleri (intrinsic yüksekliği olan)
-private func makeRow(_ text: String) -> UIView {
-    let label = UILabel()
-    label.text = text
-    label.numberOfLines = 0
-    label.font = .systemFont(ofSize: 16, weight: .medium)
-
-    let container = UIStackView(arrangedSubviews: [label])
-    container.axis = .vertical
-    container.isLayoutMarginsRelativeArrangement = true
-    container.layoutMargins = .init(top: 12, left: 16, bottom: 12, right: 16)
-    container.backgroundColor = .secondarySystemBackground
-    container.layer.cornerRadius = 8
-    return container
-}
-
-// MARK: - CRDragDropTableView’i kullanan kompakt UIView
-final class CompactTableHostView: UIView {
-
-    private let tableHost: CRDragDropTableView
-    private let viewModel: CRDragDropTableViewModel
-
-    init(items: [UIView]) {
-        // Scroll kapalı -> yükseklik her zaman içerik kadar
-        self.viewModel = CRDragDropTableViewModel(items: items,
-                                                  allowReorder: true,
-                                                  isScrollEnabled: false,
-                                                  matchContentHeight: true)
-        self.tableHost = CRDragDropTableView(viewModel: viewModel)
-        super.init(frame: .zero)
-        setup()
+        // Separator en önde kalsın
+        contentView.bringSubviewToFront(sep)
     }
 
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-    private func setup() {
-        backgroundColor = .clear
-
-        tableHost.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(tableHost)
-
-        // Kenarlara pinle. Yükseklik için EK kısıt verme; tableHost intrinsic + kendi heightConstraint’i yeterli.
-        NSLayoutConstraint.activate([
-            tableHost.topAnchor.constraint(equalTo: topAnchor),
-            tableHost.leadingAnchor.constraint(equalTo: leadingAnchor),
-            tableHost.trailingAnchor.constraint(equalTo: trailingAnchor),
-            tableHost.bottomAnchor.constraint(equalTo: bottomAnchor)
-        ])
-
-        // Üst hiyerarşide şişmemesi için hugging/compression öncelikleri
-        setContentHuggingPriority(.required, for: .vertical)
-        setContentCompressionResistancePriority(.required, for: .vertical)
-        tableHost.setContentHuggingPriority(.required, for: .vertical)
-        tableHost.setContentCompressionResistancePriority(.required, for: .vertical)
-    }
-
-    // Dışarıdan içerik güncellemek istersen:
-    func setItems(_ views: [UIView]) {
-        viewModel.setItems(views)
-    }
-}
-
-// MARK: - Örnek kullanım (mock UI minimum)
-final class UsageExampleViewController: UIViewController, ShowcaseListViewControllerProtocol {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-
-        // Mock data (az ve anlaşılır)
-        let rows = [
-            makeRow("Birinci satır"),
-            makeRow("İkinci satır • daha uzun bir açıklama ile\nİkinci satır devam"),
-            makeRow("Üçüncü satır")
-        ]
-
-        let compactTable = CompactTableHostView(items: rows)
-
-        // StackView içinde: tablo sadece item yüksekliği kadar yer kaplar
-        let stack = UIStackView(arrangedSubviews: [
-            sectionHeader("Üst Başlık"),
-            compactTable,
-            sectionHeader("Alt İçerik (tablo tüm sayfayı kaplamaz)")
-        ])
-        stack.axis = .vertical
-        stack.spacing = 12
-
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stack)
-
-        NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
-            // Alt kenarı sabitlemek şart değil; içerik kadar yükseklikle biter.
-        ])
-    }
-
-    private func sectionHeader(_ text: String) -> UIView {
-        let label = UILabel()
-        label.text = text
-        label.font = .systemFont(ofSize: 18, weight: .semibold)
-        return label
+    /// Hücre separator’ını stil ve "son satır mı" bilgisine göre konfigüre eder.
+    public func configureSeparator(style: CRSeparatorStyle, isLastRow: Bool) {
+//        if isLastRow || style == .none {
+//            sep.isHidden = true
+//            return
+//        }
+        sep.isHidden = false
+        switch style {
+        case .none:
+            sep.isHidden = true
+        case .full:
+            sepLeading.constant = 0
+            sepTrailing.constant = 0
+        case .withInsets(let insets):
+            sepLeading.constant = insets.start
+            sepTrailing.constant = -insets.end
+        }
+        setNeedsLayout()
     }
 }
