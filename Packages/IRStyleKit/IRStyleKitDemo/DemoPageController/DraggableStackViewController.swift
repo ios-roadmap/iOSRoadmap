@@ -6,40 +6,30 @@
 //
 
 import UIKit
-import IRStyleKit
 
-/// CRDragDropTableViewModel:
-/// - CRDragDropTableView için veri kaynağını ve konfigürasyon durumunu yönetir.
-/// - items: Tabloda görüntülenecek UIView listesi.
-/// - allowReorder: Sürükle-bırak ile yeniden sıralama izni.
-/// - isScrollEnabled: Tablo kaydırma izni.
-/// - onItemsChanged: İçerik değiştiğinde tabloya bildirim göndermek için callback.
-/// - onConfigChanged: Konfigürasyon değiştiğinde tabloya bildirim göndermek için callback.
 public final class CRDragDropTableViewModel {
-    
-    /// Tabloya gömülecek UIView listesi.
     public private(set) var items: [UIView]
-    /// Yeniden sıralama izni.
     public private(set) var allowReorder: Bool
-    /// Kaydırma izni.
     public private(set) var isScrollEnabled: Bool
+    public private(set) var matchContentHeight: Bool
 
-    /// İçerik değişiminde (eski ve yeni öğelerle) tetiklenen callback.
     public var onItemsChanged: ((_ old: [UIView], _ new: [UIView]) -> Void)?
-    /// Konfigürasyon değişiminde tetiklenen callback.
     public var onConfigChanged: (() -> Void)?
 
-    /// Başlatıcı — başlangıç öğeleri ve konfigürasyon alınır.
-    public init(items: [UIView] = [], allowReorder: Bool = true, isScrollEnabled: Bool = true) {
+    /// Modeli verilen öğe listesi ve yapılandırma bayraklarıyla başlatır.
+    public init(
+        items: [UIView] = [],
+        allowReorder: Bool = true,
+        isScrollEnabled: Bool = true,
+        matchContentHeight: Bool = true
+    ) {
         self.items = items
         self.allowReorder = allowReorder
         self.isScrollEnabled = isScrollEnabled
+        self.matchContentHeight = matchContentHeight
     }
 
-    // MARK: - Public API — içerik yönetimi
-
-    /// Öğeleri topluca günceller.
-    /// - Callback ile eski ve yeni listeyi bildirir.
+    /// Öğeleri topluca değiştirir ve değişikliği `onItemsChanged` ile bildirir.
     @discardableResult
     public func setItems(_ newItems: [UIView]) -> Self {
         let old = items
@@ -48,14 +38,14 @@ public final class CRDragDropTableViewModel {
         return self
     }
 
-    /// Liste sonuna yeni öğe ekler.
+    /// Listenin sonuna bir UIView ekler ve değişikliği bildirir.
     public func append(_ view: UIView) {
         let old = items
         items.append(view)
         onItemsChanged?(old, items)
     }
 
-    /// Belirtilen index’e yeni öğe ekler (sınır dışıysa uygun aralığa sıkıştırılır).
+    /// Belirtilen indekse bir UIView ekler (taşma/kısmayı güvenli hale getirir) ve değişikliği bildirir.
     public func insert(_ view: UIView, at index: Int) {
         let old = items
         let idx = max(0, min(index, items.count))
@@ -63,8 +53,7 @@ public final class CRDragDropTableViewModel {
         onItemsChanged?(old, items)
     }
 
-    /// Son öğeyi siler ve döner.
-    /// - Liste boşsa nil döner.
+    /// Listedeki son UIView’i kaldırır, kaldırılan öğeyi döndürür ve değişikliği bildirir.
     @discardableResult
     public func removeLast() -> UIView? {
         guard !items.isEmpty else { return nil }
@@ -74,7 +63,7 @@ public final class CRDragDropTableViewModel {
         return removed
     }
 
-    /// Belirtilen index’teki öğeyi siler.
+    /// Verilen indeksteki UIView’i kaldırır ve değişikliği bildirir.
     public func remove(at index: Int) {
         guard items.indices.contains(index) else { return }
         let old = items
@@ -82,72 +71,61 @@ public final class CRDragDropTableViewModel {
         onItemsChanged?(old, items)
     }
 
-    /// Bir öğeyi verilen kaynaktan hedef index’e taşır.
-    /// - Index sınırları kontrol edilir.
-    /// - Aynı pozisyona taşınıyorsa işlem yapılmaz.
+    /// Bir öğeyi kaynak indeksten hedef indekse taşır ve değişikliği bildirir.
     public func moveItem(from source: Int, to destination: Int) {
         guard items.indices.contains(source) else { return }
-        var target = destination
-        target = max(0, min(target, items.count - 1))
+        var target = max(0, min(destination, items.count - 1))
         if source == target { return }
         let old = items
-        let view = items.remove(at: source)
-        items.insert(view, at: target)
+        let v = items.remove(at: source)
+        items.insert(v, at: target)
         onItemsChanged?(old, items)
     }
 
-    // MARK: - Public API — konfigürasyon
-
-    /// Yeniden sıralama iznini değiştirir ve callback tetikler.
+    /// Yeniden sıralamayı açıp kapatır ve yapılandırma değişikliğini bildirir.
     public func setAllowReorder(_ flag: Bool) {
         allowReorder = flag
         onConfigChanged?()
     }
 
-    /// Kaydırma iznini değiştirir ve callback tetikler.
+    /// Tablo kaydırmasını açıp kapatır ve yapılandırma değişikliğini bildirir.
     public func setScrollEnabled(_ flag: Bool) {
         isScrollEnabled = flag
         onConfigChanged?()
     }
+
+    /// İçerik yüksekliğine uyumu açıp kapatır ve yapılandırma değişikliğini bildirir.
+    public func setMatchContentHeight(_ flag: Bool) {
+        matchContentHeight = flag
+        onConfigChanged?()
+    }
 }
 
-// MARK: - View
-/// CRDragDropTableView:
-/// - UITableView tabanlı, sürükle-bırak ile yeniden sıralamayı destekleyen kapsayıcı UIView.
-/// - Görünüm (tableView) ve durum (viewModel) ayrımı vardır.
-/// - viewModel sinyalleri ile tablo içeriği ve konfigürasyonu güncellenir.
 public final class CRDragDropTableView: UIView {
-    
-    /// İçteki tablo görünümü (plain stil).
     private let tableView = UITableView(frame: .zero, style: .plain)
-    /// İçerik listesi, konfigürasyon ve geri çağrıları yöneten model.
     private let viewModel: CRDragDropTableViewModel
+    private var heightConstraint: NSLayoutConstraint?
 
-    /// Geçerli içerik yüksekliği (layoutIfNeeded ile güncel contentSize).
+    /// Tablo içerik yüksekliğini hesaplayıp döndürür.
     public var contentHeight: CGFloat {
         tableView.layoutIfNeeded()
         return tableView.contentSize.height
     }
 
-    /// Başlatıcı: ViewModel alınır, UI kurulur, bağlar yapılır, konfigürasyon uygulanır.
+    /// Görünümü verilen viewModel ile kurar, UI’ı hazırlar ve bağları oluşturur.
     public init(viewModel: CRDragDropTableViewModel) {
         self.viewModel = viewModel
         super.init(frame: .zero)
         setupUI()
         bindViewModel()
         applyConfig()
+        updateHeight()
     }
 
-    /// Interface Builder kullanılmadığı için zorunlu başlatıcı devre dışı.
+    /// Storyboard/XIB başlatıcısı desteklenmez.
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    /// UI kurulumu:
-    /// - Arka plan rengi
-    /// - tableView temel özellikler (delegate/dataSource/drag/drop)
-    /// - Otomatik boyutlanan satırlar
-    /// - Ayırıcılar kapalı
-    /// - Hücre kaydı
-    /// - Kenarlara pinlenen Auto Layout kısıtları
+    /// Tabloyu ve kısıtlarını kurar, yükseklik kısıtını hazırlar.
     private func setupUI() {
         backgroundColor = .systemBackground
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -159,6 +137,7 @@ public final class CRDragDropTableView: UIView {
         tableView.estimatedRowHeight = 44
         tableView.separatorStyle = .none
         tableView.register(CRWrapCell.self, forCellReuseIdentifier: CRWrapCell.identifier)
+
         addSubview(tableView)
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: topAnchor),
@@ -166,11 +145,14 @@ public final class CRDragDropTableView: UIView {
             tableView.trailingAnchor.constraint(equalTo: trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+
+        let hc = heightAnchor.constraint(equalToConstant: 1)
+        hc.priority = .defaultHigh
+        hc.isActive = true
+        heightConstraint = hc
     }
 
-    /// ViewModel bağlama:
-    /// - onItemsChanged: eski ve yeni öğe listesine göre tabloyu minimal değişikliklerle günceller.
-    /// - onConfigChanged: scroll/drag gibi konfigürasyonları yeniden uygular.
+    /// ViewModel olaylarına abone olur.
     private func bindViewModel() {
         viewModel.onItemsChanged = { [weak self] old, new in
             self?.applyItemsChange(old: old, new: new)
@@ -180,216 +162,163 @@ public final class CRDragDropTableView: UIView {
         }
     }
 
-    /// Konfigürasyon uygulama:
-    /// - Kaydırma izni
-    /// - Drag etkileşimi (reorder için)
-    /// - Tam yeniden yükleme (basitliği/tek kaynaktan doğruluğu tercih eder)
+    /// Yapılandırmayı tabloya uygular, yüksekliği günceller.
     private func applyConfig() {
         tableView.isScrollEnabled = viewModel.isScrollEnabled
         tableView.dragInteractionEnabled = viewModel.allowReorder
+        applyHeightMode()
         tableView.reloadData()
+        updateHeight()
     }
 
-    /// Öğeler değiştiğinde farklılıkları hesaplayıp toplu tablo güncellemesi yapar.
-    /// - Kimlik belirleme: UIView için ObjectIdentifier kullanılır (referans eşitliği).
-    /// - Çıktı: silmeler, eklemeler, taşımalar.
-    /// - performBatchUpdates: UI senkron ve animasyonlu güncellenir.
+    /// İçerik yüksekliğine uyum modunu aktif/pasif eder ve layout’u yeniler.
+    private func applyHeightMode() {
+        heightConstraint?.isActive = viewModel.matchContentHeight
+        invalidateIntrinsicContentSize()
+        superview?.setNeedsLayout()
+        superview?.layoutIfNeeded()
+    }
+
+    /// Eski ve yeni öğe listelerini karşılaştırıp ekleme/silme/taşıma animasyonlarını uygular.
     private func applyItemsChange(old: [UIView], new: [UIView]) {
-        /// Eski/Yeni kimlik listeleri.
         let oldIds = old.map { ObjectIdentifier($0) }
         let newIds = new.map { ObjectIdentifier($0) }
 
-        /// Fark kümeleri.
         var deletes: [IndexPath] = []
         var inserts: [IndexPath] = []
         var moves: [(from: IndexPath, to: IndexPath)] = []
 
-        /// Hızlı indeks erişimi için sözlükler (id -> index).
         let oldIndexById = Dictionary(uniqueKeysWithValues: oldIds.enumerated().map { ($1, $0) })
         let newIndexById = Dictionary(uniqueKeysWithValues: newIds.enumerated().map { ($1, $0) })
 
-        /// Silinecekler: eski listede olup yeni listede olmayanlar.
         for (idx, id) in oldIds.enumerated() where newIndexById[id] == nil {
             deletes.append(IndexPath(row: idx, section: 0))
         }
-
-        /// Eklenecekler: yeni listede olup eski listede olmayanlar.
         for (idx, id) in newIds.enumerated() where oldIndexById[id] == nil {
             inserts.append(IndexPath(row: idx, section: 0))
         }
-
-        /// Taşınacaklar: her iki listede de bulunan ama index’i değişmiş olanlar.
         for (oldIdx, id) in oldIds.enumerated() {
             if let newIdx = newIndexById[id], newIdx != oldIdx {
                 moves.append((IndexPath(row: oldIdx, section: 0), IndexPath(row: newIdx, section: 0)))
             }
         }
 
-        /// Toplu güncelleme: sil, ekle ve satır taşıma animasyonları.
         tableView.performBatchUpdates({
             if !deletes.isEmpty { tableView.deleteRows(at: deletes, with: .automatic) }
             if !inserts.isEmpty { tableView.insertRows(at: inserts, with: .automatic) }
             for m in moves { tableView.moveRow(at: m.from, to: m.to) }
-        }, completion: nil)
+        }, completion: { [weak self] _ in
+            self?.updateHeight()
+        })
+    }
+
+    /// Tablo içerik yüksekliğine göre görünüm yüksekliğini günceller.
+    private func updateHeight() {
+        tableView.layoutIfNeeded()
+        guard viewModel.matchContentHeight else {
+            invalidateIntrinsicContentSize()
+            return
+        }
+        heightConstraint?.constant = max(1, tableView.contentSize.height)
+        invalidateIntrinsicContentSize()
+        superview?.setNeedsLayout()
+        superview?.layoutIfNeeded()
+    }
+
+    /// Auto Layout için içsel boyutu içerik yüksekliğine göre sağlar.
+    public override var intrinsicContentSize: CGSize {
+        tableView.layoutIfNeeded()
+        if viewModel.matchContentHeight {
+            return CGSize(width: UIView.noIntrinsicMetric, height: max(1, tableView.contentSize.height))
+        } else {
+            return CGSize(width: UIView.noIntrinsicMetric, height: UIView.noIntrinsicMetric)
+        }
     }
 }
 
-// MARK: - DataSource / Delegate
-/// UITableView veri kaynağı ve etkileşimlerini yöneten uzantı.
-/// Hücreleri CRWrapCell ile oluşturur ve viewModel.items içeriğini gösterir.
-/// Yeniden sıralama (reorder) izni viewModel.allowReorder ile kontrol edilir.
 extension CRDragDropTableView: UITableViewDataSource, UITableViewDelegate {
-
-    /// Bölümde kaç satır olacağını belirtir.
-    /// - Dönen değer: viewModel.items.count (mevcut öğe sayısı)
+    /// Satır sayısını döndürür.
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel.items.count
     }
 
-    /// Belirtilen indexPath için hücre oluşturur/yeniden kullanır ve içerik gömer.
-    /// - Hücre tipi: CRWrapCell
-    /// - İçerik: viewModel.items[indexPath.row] içindeki UIView
+    /// İlgili indexPath için hücre döndürür ve hedef UIView’i gömer.
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CRWrapCell.identifier, for: indexPath) as? CRWrapCell else {
             return UITableViewCell()
         }
-        let view = viewModel.items[indexPath.row]
-        /// CRWrapCell içinde verilen UIView'ı hiyerarşiye ekler/yerleştirir.
-        cell.embed(view)
+        cell.embed(viewModel.items[indexPath.row])
         return cell
     }
 
-    /// İlgili satırın hareket ettirilebilir (reorder) olup olmadığını bildirir.
-    /// - Koşul: Sadece viewModel.allowReorder true ise taşınabilir.
+    /// Satırın taşınabilir olup olmadığını belirtir.
     public func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         viewModel.allowReorder
     }
 
-    /// Bir satır farklı bir konuma taşındığında veri kaynağını günceller.
-    /// - Amaç: Modeldeki öğeyi eski konumdan yeni konuma taşımak.
-    /// - Not: Aynı konuma taşınma veya izin yoksa işlem yapılmaz.
+    /// Bir satır başka bir konuma taşındığında modeldeki sırayı günceller.
     public func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         guard viewModel.allowReorder, sourceIndexPath != destinationIndexPath else { return }
         viewModel.moveItem(from: sourceIndexPath.row, to: destinationIndexPath.row)
     }
 }
 
-// MARK: - Drag & Drop
-/// UITableView için drag & drop davranışlarını yöneten delegate uzantısı.
-/// Sadece yerel (aynı uygulama içi) sürüklemeye ve yeniden sıralamaya izin verir.
-/// viewModel.allowReorder false ise tüm işlemler engellenir.
 extension CRDragDropTableView: UITableViewDragDelegate, UITableViewDropDelegate {
-
-    /// Kullanıcı bir satırı sürüklemeye başladığında çağrılır.
-    /// - Amaç: Sürüklemeye konu olacak veriyi (UIDragItem) üretmek.
-    /// - Eğer yeniden sıralama kapalıysa boş dizi döner ve sürükleme başlamaz.
-    /// - localObject: Satırın model nesnesini yerel taşıma için ekler (cross-app değil).
-    public func tableView(
-        _ tableView: UITableView,
-        itemsForBeginning session: UIDragSession,
-        at indexPath: IndexPath
-    ) -> [UIDragItem] {
-        /// Yeniden sıralama izni yoksa sürükleme başlatma.
-        guard viewModel.allowReorder else {
-            return []
-        }
-
-        /// iOS drag & drop API’si bir NSItemProvider ister; yerel kullanımda içeriği doldurmak şart değil.
+    /// Sürükleme başlangıcında tek bir yerel öğe üretir.
+    public func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        guard viewModel.allowReorder else { return [] }
         let provider = NSItemProvider()
-        let dragItem = UIDragItem(itemProvider: provider)
-
-        /// Yerel taşıma için asıl veriyi localObject ile taşırız.
-        dragItem.localObject = viewModel.items[indexPath.row]
-        return [dragItem]
+        let item = UIDragItem(itemProvider: provider)
+        item.localObject = viewModel.items[indexPath.row]
+        return [item]
     }
 
-    /// Bu drop oturumunun işlenip işlenemeyeceğini belirtir.
-    /// - Sadece yerel sürükleme (aynı app içinde) ve yeniden sıralama açıksa true döner.
+    /// Yalnızca yerel sürüklemeleri ve yeniden sıralama iznini kabul eder.
     public func tableView(_ tableView: UITableView, canHandle session: UIDropSession) -> Bool {
         session.localDragSession != nil && viewModel.allowReorder
     }
 
-    /// Sürükleme hedefi üzerinde her konum güncellendiğinde çağrılır.
-    /// - Amaç: Hangi işlem türüne (move/cancel) ve niyete (insertAtDestinationIndexPath) izin verileceğini bildirmek.
-    /// - Kısıt: Yalnızca tek bir öğe ve yerel sürükleme kabul edilir; aksi halde iptal.
-    public func tableView(
-        _ tableView: UITableView,
-        dropSessionDidUpdate session: UIDropSession,
-        withDestinationIndexPath destinationIndexPath: IndexPath?
-    ) -> UITableViewDropProposal {
+    /// Geçerli durumda taşımaya izin veren bir drop önerisi döndürür.
+    public func tableView(_ tableView: UITableView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UITableViewDropProposal {
         guard session.items.count == 1, session.localDragSession != nil, viewModel.allowReorder else {
             return UITableViewDropProposal(operation: .cancel)
         }
-        /// insertAtDestinationIndexPath: Satırı hedef indexPath’e yerleştir.
-        return UITableViewDropProposal(
-            operation: .move,
-            intent: .insertAtDestinationIndexPath
-        )
+        return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
     }
 
-    /// Bırakma işlemi gerçekleştiğinde çağrılır.
-    /// - Amaç: Veri kaynağını (viewModel) ve tablo görünümünü senkron şekilde güncellemek ve drop’u tamamlamak.
-    public func tableView(
-        _ tableView: UITableView,
-        performDropWith coordinator: UITableViewDropCoordinator
-    ) {
-        /// Yalnızca move işlemini ve izin açık durumunu kabul et.
-        /// sourceIndexPath: Sürüklenen satırın eski konumu.
-        /// localObject tür kontrolü: Yalnızca beklenen tipte yerel sürüklemeleri işlemek için örnek kontrolü.
+    /// Bırakma işlemini gerçekleştirir ve modeli yeni sıraya göre günceller.
+    public func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
         guard coordinator.proposal.operation == .move,
               viewModel.allowReorder,
               let item = coordinator.items.first,
-              let sourceIndexPath = item.sourceIndexPath,
+              let source = item.sourceIndexPath,
               let _ = item.dragItem.localObject as? UIView else { return }
 
-        /// Hedef indexPath yoksa (ör. listenin altına bırakma) son satırı hedefle.
         let dest = coordinator.destinationIndexPath ?? IndexPath(row: viewModel.items.count - 1, section: 0)
-
-        /// Hem veri modelini hem de tabloyu atomik şekilde güncelle.
-        tableView.performBatchUpdates({
-            /// Önce modelde öğeyi yeni konuma taşı.
-            viewModel.moveItem(from: sourceIndexPath.row, to: dest.row)
-            /// Sonra tabloda satırı görsel olarak taşı.
-            tableView.moveRow(at: sourceIndexPath, to: dest)
-        }, completion: nil)
-
-        /// UIKit’e drop’un satır hedefinde tamamlandığını bildir (animasyon/senkronizasyon için).
+        viewModel.moveItem(from: source.row, to: dest.row)
         coordinator.drop(item.dragItem, toRowAt: dest)
     }
 }
 
-// MARK: - Wrap Cell
-/// CRWrapCell:
-/// - UITableViewCell içinde herhangi bir UIView’i sarmalayarak göstermek için kullanılır.
-/// - Yeniden kullanılabilir hücre kimliği `identifier`
-/// - selectionStyle = .none (satır seçildiğinde highlight edilmez)
 public final class CRWrapCell: UITableViewCell {
-    
-    /// Hücre kayıt/çözümlemede kullanılacak identifier
+
+    /// Hücre kayıt/çözümlemede kullanılacak identifier.
     public static let identifier = "CRWrapCell"
-    
-    /// Başlatıcı (programatik kullanım için)
+
+    /// Programatik başlatıcı.
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        /// Satır seçildiğinde highlight olmaması için
         selectionStyle = .none
     }
-    
-    /// Storyboard/XIB kullanılmadığı için devre dışı
+
+    /// Storyboard/XIB başlatıcısı desteklenmez.
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-    
-    /// Verilen UIView’i hücreye gömer.
-    /// - Önce contentView içindeki tüm alt görünümler kaldırılır.
-    /// - Sonra yeni view eklenir ve kenarlara pinlenir.
+
+    /// Verilen UIView’i hücreye gömer ve kenarlara sabitler.
     public func embed(_ view: UIView) {
-        /// Öncekileri temizle
-        contentView.subviews.forEach {
-            $0.removeFromSuperview()
-        }
-        /// Auto Layout için hazırlık
+        contentView.subviews.forEach { $0.removeFromSuperview() }
         view.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(view)
-        /// Dört kenara pinleme
         NSLayoutConstraint.activate([
             view.topAnchor.constraint(equalTo: contentView.topAnchor),
             view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -399,69 +328,110 @@ public final class CRWrapCell: UITableViewCell {
     }
 }
 
+import UIKit
 
-// MARK: - ViewController Example
+// MARK: - Minimal satır görünümleri (intrinsic yüksekliği olan)
+private func makeRow(_ text: String) -> UIView {
+    let label = UILabel()
+    label.text = text
+    label.numberOfLines = 0
+    label.font = .systemFont(ofSize: 16, weight: .medium)
+
+    let container = UIStackView(arrangedSubviews: [label])
+    container.axis = .vertical
+    container.isLayoutMarginsRelativeArrangement = true
+    container.layoutMargins = .init(top: 12, left: 16, bottom: 12, right: 16)
+    container.backgroundColor = .secondarySystemBackground
+    container.layer.cornerRadius = 8
+    return container
+}
+
+// MARK: - CRDragDropTableView’i kullanan kompakt UIView
+final class CompactTableHostView: UIView {
+
+    private let tableHost: CRDragDropTableView
+    private let viewModel: CRDragDropTableViewModel
+
+    init(items: [UIView]) {
+        // Scroll kapalı -> yükseklik her zaman içerik kadar
+        self.viewModel = CRDragDropTableViewModel(items: items,
+                                                  allowReorder: true,
+                                                  isScrollEnabled: false,
+                                                  matchContentHeight: true)
+        self.tableHost = CRDragDropTableView(viewModel: viewModel)
+        super.init(frame: .zero)
+        setup()
+    }
+
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    private func setup() {
+        backgroundColor = .clear
+
+        tableHost.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(tableHost)
+
+        // Kenarlara pinle. Yükseklik için EK kısıt verme; tableHost intrinsic + kendi heightConstraint’i yeterli.
+        NSLayoutConstraint.activate([
+            tableHost.topAnchor.constraint(equalTo: topAnchor),
+            tableHost.leadingAnchor.constraint(equalTo: leadingAnchor),
+            tableHost.trailingAnchor.constraint(equalTo: trailingAnchor),
+            tableHost.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+
+        // Üst hiyerarşide şişmemesi için hugging/compression öncelikleri
+        setContentHuggingPriority(.required, for: .vertical)
+        setContentCompressionResistancePriority(.required, for: .vertical)
+        tableHost.setContentHuggingPriority(.required, for: .vertical)
+        tableHost.setContentCompressionResistancePriority(.required, for: .vertical)
+    }
+
+    // Dışarıdan içerik güncellemek istersen:
+    func setItems(_ views: [UIView]) {
+        viewModel.setItems(views)
+    }
+}
+
+// MARK: - Örnek kullanım (mock UI minimum)
 final class UsageExampleViewController: UIViewController, ShowcaseListViewControllerProtocol {
-    private var dragDropView: CRDragDropTableView!
-    private var viewModel: CRDragDropTableViewModel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
 
-        // Örnek içerik: Label + Button
-        let v1 = makeLabel("Item 1")
-        let v2 = makeLabel("Item 2")
-        let v3 = makeButton("Tap Me")
-
-        viewModel = CRDragDropTableViewModel(items: [v1, v2, v3], allowReorder: true, isScrollEnabled: true)
-        dragDropView = CRDragDropTableView(viewModel: viewModel)
-        dragDropView.translatesAutoresizingMaskIntoConstraints = false
-
-        view.addSubview(dragDropView)
-        NSLayoutConstraint.activate([
-            dragDropView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            dragDropView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            dragDropView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            dragDropView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-
-        setupNavigationBar()
-    }
-
-    private func setupNavigationBar() {
-        navigationItem.rightBarButtonItems = [
-            UIBarButtonItem(title: "Add", style: .plain, target: self, action: #selector(addItem)),
-            UIBarButtonItem(title: "Toggle Scroll", style: .plain, target: self, action: #selector(toggleScroll))
+        // Mock data (az ve anlaşılır)
+        let rows = [
+            makeRow("Birinci satır"),
+            makeRow("İkinci satır • daha uzun bir açıklama ile\nİkinci satır devam"),
+            makeRow("Üçüncü satır")
         ]
+
+        let compactTable = CompactTableHostView(items: rows)
+
+        // StackView içinde: tablo sadece item yüksekliği kadar yer kaplar
+        let stack = UIStackView(arrangedSubviews: [
+            sectionHeader("Üst Başlık"),
+            compactTable,
+            sectionHeader("Alt İçerik (tablo tüm sayfayı kaplamaz)")
+        ])
+        stack.axis = .vertical
+        stack.spacing = 12
+
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(stack)
+
+        NSLayoutConstraint.activate([
+            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+            // Alt kenarı sabitlemek şart değil; içerik kadar yükseklikle biter.
+        ])
     }
 
-    @objc private func addItem() {
-        let newView = makeLabel("Item \(viewModel.items.count + 1)")
-        viewModel.append(newView)
-    }
-
-    @objc private func toggleScroll() {
-        viewModel.setScrollEnabled(!viewModel.isScrollEnabled)
-    }
-
-    // Helpers
-    private func makeLabel(_ text: String) -> UIView {
+    private func sectionHeader(_ text: String) -> UIView {
         let label = UILabel()
         label.text = text
-        label.textAlignment = .center
-        label.backgroundColor = .secondarySystemBackground
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
         return label
-    }
-
-    private func makeButton(_ title: String) -> UIView {
-        let button = UIButton(type: .system)
-        button.setTitle(title, for: .normal)
-        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        return button
-    }
-
-    @objc private func buttonTapped() {
-        print("Button tapped!")
     }
 }
