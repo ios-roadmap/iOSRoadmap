@@ -5,17 +5,36 @@
 //  Created by Omer Faruk Ozturk [Ing Teknoloji A.S.-Dijital Squad 1] on 29.08.2025.
 //
 
-public enum CRSeparatorStyle {
-    case none
-    case full
-    case withInsets(start: CGFloat, end: CGFloat)
-}
-
 import UIKit
 
-// Dış bağımlılıklar:
-// - CRSeparatorStyle: .none / .full / .withInsets(start:end:)
-// - CRColor.borderSubtle
+// MARK: - Eksik Tipler (Tamamlandı)
+
+/// Separator çizgisi stili.
+public enum CRSeparatorStyle: Equatable {
+    case none
+    case full
+    case withInsets(CRSeparatorInsets)
+}
+
+/// Separator iç/dış boşlukları.
+public struct CRSeparatorInsets: Equatable {
+    public let start: CGFloat
+    public let end: CGFloat
+    public init(start: CGFloat, end: CGFloat) {
+        self.start = start
+        self.end = end
+    }
+}
+
+/// Tasarım renkleri (gerekirse kendi paletinize uyarlayın).
+public enum CRColor {
+    public static let borderSubtle: UIColor = {
+        if #available(iOS 13.0, *) { return .separator } // Tema uyumlu ince çizgi
+        return UIColor(white: 0.85, alpha: 1.0)
+    }()
+}
+
+// MARK: - ViewModel
 
 public final class CRDragDropTableViewModel {
 
@@ -88,11 +107,11 @@ public final class CRDragDropTableViewModel {
     /// Bir öğeyi kaynak indeksten hedef indekse taşır ve değişikliği bildirir.
     public func moveItem(from source: Int, to destination: Int) {
         guard items.indices.contains(source) else { return }
-        var target = max(0, min(destination, items.count - 1))
-        if source == target { return }
+        let boundedDest = max(0, min(destination, items.count - 1))
+        if source == boundedDest { return }
         let old = items
         let v = items.remove(at: source)
-        items.insert(v, at: target)
+        items.insert(v, at: boundedDest)
         onItemsChanged?(old, items)
     }
 
@@ -114,12 +133,14 @@ public final class CRDragDropTableViewModel {
         onConfigChanged?()
     }
 
-    /// Separator stilini değiştirir ve yapılandırma değişikliğini bildirir.
+    /// /// Separator stilini değiştirir ve yapılandırma değişikliğini bildirir.
     public func setSeparatorStyle(_ style: CRSeparatorStyle) {
         separatorStyle = style
         onConfigChanged?()
     }
 }
+
+// MARK: - View
 
 public final class CRDragDropTableView: UIView {
 
@@ -262,12 +283,13 @@ public final class CRDragDropTableView: UIView {
         }
     }
 
-    /// Verilen indekslerin kendisi ve komşuları için satırları `.none` animasyonla yeniler (separator güncelleme).
+    /// /// Verilen indekslerin kendisi ve komşuları için satırları `.none` animasyonla yeniler (separator güncelleme).
     private func reloadSeparatorsAround(indices: [Int]) {
         let rows = Set(indices.flatMap { [$0 - 1, $0, $0 + 1] })
             .filter { $0 >= 0 && $0 < viewModel.items.count }
         guard !rows.isEmpty else { return }
-        let ips = rows.map { IndexPath(row: $0, section: 0) }
+        let ips = rows.sorted().map { IndexPath(row: $0, section: 0) }
+        // `beginUpdates/endUpdates` gerekmiyor; .none animasyon güvenli.
         tableView.reloadRows(at: ips, with: .none)
     }
 
@@ -278,6 +300,8 @@ public final class CRDragDropTableView: UIView {
         tableView.reloadRows(at: visible, with: .none)
     }
 }
+
+// MARK: - UITableViewDataSource & UITableViewDelegate
 
 extension CRDragDropTableView: UITableViewDataSource, UITableViewDelegate {
     /// Satır sayısını döndürür.
@@ -302,6 +326,7 @@ extension CRDragDropTableView: UITableViewDataSource, UITableViewDelegate {
     /// Bir satır başka bir konuma taşındığında modeldeki sırayı günceller.
     public func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         guard viewModel.allowReorder, sourceIndexPath != destinationIndexPath else { return }
+        // UIKit satırı görsel olarak taşır; modelimizi senkronize edelim.
         viewModel.moveItem(from: sourceIndexPath.row, to: destinationIndexPath.row)
         // /// Reorder sonrası kaynak/hedef ve komşuları separator için yenile.
         reloadSeparatorsAround(indices: [sourceIndexPath.row, destinationIndexPath.row])
@@ -310,16 +335,18 @@ extension CRDragDropTableView: UITableViewDataSource, UITableViewDelegate {
     /// Hücre ekrana gelmeden separator konfigürasyonunu uygular.
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard let cell = cell as? CRWrapCell else { return }
-        let lastRowIndex = tableView.numberOfRows(inSection: indexPath.section) - 1
+        let lastRowIndex = max(0, tableView.numberOfRows(inSection: indexPath.section) - 1)
         let isLast = (indexPath.row == lastRowIndex)
         cell.configureSeparator(style: viewModel.separatorStyle, isLastRow: isLast)
     }
 }
 
+// MARK: - Drag & Drop
+
 extension CRDragDropTableView: UITableViewDragDelegate, UITableViewDropDelegate {
     /// Sürükleme başlangıcında tek bir yerel öğe üretir.
     public func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        guard viewModel.allowReorder else { return [] }
+        guard viewModel.allowReorder, viewModel.items.indices.contains(indexPath.row) else { return [] }
         let provider = NSItemProvider()
         let item = UIDragItem(itemProvider: provider)
         item.localObject = viewModel.items[indexPath.row]
@@ -345,16 +372,28 @@ extension CRDragDropTableView: UITableViewDragDelegate, UITableViewDropDelegate 
               viewModel.allowReorder,
               let item = coordinator.items.first,
               let source = item.sourceIndexPath,
-              let _ = item.dragItem.localObject as? UIView else { return }
+              viewModel.items.indices.contains(source.row)
+        else { return }
 
-        let dest = coordinator.destinationIndexPath ?? IndexPath(row: max(0, viewModel.items.count - 1), section: 0)
-        viewModel.moveItem(from: source.row, to: dest.row)
-        coordinator.drop(item.dragItem, toRowAt: dest)
+        // Hedef indexPath yoksa son sıraya taşı; güvenle sınırla.
+        let fallbackRow = max(0, viewModel.items.count - 1)
+        let destIP = coordinator.destinationIndexPath ?? IndexPath(row: fallbackRow, section: 0)
+
+        let boundedDestRow = max(0, min(destIP.row, max(0, viewModel.items.count - 1)))
+        let boundedDest = IndexPath(row: boundedDestRow, section: 0)
+
+        // Modeli güncelle
+        viewModel.moveItem(from: source.row, to: boundedDest.row)
+
+        // UITableView'a bırakmayı bildir (görsel senkron)
+        coordinator.drop(item.dragItem, toRowAt: boundedDest)
 
         // /// Drop sonrası kaynak/hedef ve komşuları separator için yenile.
-        reloadSeparatorsAround(indices: [source.row, dest.row])
+        reloadSeparatorsAround(indices: [source.row, boundedDest.row])
     }
 }
+
+// MARK: - CRWrapCell
 
 public final class CRWrapCell: UITableViewCell {
 
@@ -372,7 +411,7 @@ public final class CRWrapCell: UITableViewCell {
 
         // Dahili separator görünümü
         sep.translatesAutoresizingMaskIntoConstraints = false
-        sep.backgroundColor = .red
+        sep.backgroundColor = CRColor.borderSubtle
         sep.tag = 999
         contentView.addSubview(sep)
 
@@ -410,12 +449,12 @@ public final class CRWrapCell: UITableViewCell {
         contentView.bringSubviewToFront(sep)
     }
 
-    /// Hücre separator’ını stil ve "son satır mı" bilgisine göre konfigüre eder.
+    /// /// Hücre separator’ını stil ve "son satır mı" bilgisine göre konfigüre eder.
     public func configureSeparator(style: CRSeparatorStyle, isLastRow: Bool) {
-//        if isLastRow || style == .none {
-//            sep.isHidden = true
-//            return
-//        }
+        if isLastRow || style == .none {
+            sep.isHidden = true
+            return
+        }
         sep.isHidden = false
         switch style {
         case .none:
