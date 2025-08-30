@@ -7,7 +7,7 @@
 
 import UIKit
 
-// MARK: - Eksik Tipler (Tamamlandı)
+// MARK: - Tamamlayıcı Tipler
 
 /// Separator çizgisi stili.
 public enum CRSeparatorStyle: Equatable {
@@ -26,10 +26,10 @@ public struct CRSeparatorInsets: Equatable {
     }
 }
 
-/// Tasarım renkleri (gerekirse kendi paletinize uyarlayın).
+/// Basit renk paleti.
 public enum CRColor {
     public static let borderSubtle: UIColor = {
-        if #available(iOS 13.0, *) { return .separator } // Tema uyumlu ince çizgi
+        if #available(iOS 13.0, *) { return .separator }
         return UIColor(white: 0.85, alpha: 1.0)
     }()
 }
@@ -107,11 +107,11 @@ public final class CRDragDropTableViewModel {
     /// Bir öğeyi kaynak indeksten hedef indekse taşır ve değişikliği bildirir.
     public func moveItem(from source: Int, to destination: Int) {
         guard items.indices.contains(source) else { return }
-        let boundedDest = max(0, min(destination, items.count - 1))
-        if source == boundedDest { return }
+        var target = max(0, min(destination, items.count - 1))
+        if source == target { return }
         let old = items
         let v = items.remove(at: source)
-        items.insert(v, at: boundedDest)
+        items.insert(v, at: target)
         onItemsChanged?(old, items)
     }
 
@@ -132,15 +132,9 @@ public final class CRDragDropTableViewModel {
         matchContentHeight = flag
         onConfigChanged?()
     }
-
-    /// /// Separator stilini değiştirir ve yapılandırma değişikliğini bildirir.
-    public func setSeparatorStyle(_ style: CRSeparatorStyle) {
-        separatorStyle = style
-        onConfigChanged?()
-    }
 }
 
-// MARK: - View
+// MARK: - CRDragDropTableView
 
 public final class CRDragDropTableView: UIView {
 
@@ -170,7 +164,6 @@ public final class CRDragDropTableView: UIView {
     /// Tabloyu ve kısıtlarını kurar, yükseklik kısıtını hazırlar.
     private func setupUI() {
         backgroundColor = .systemBackground
-
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
         tableView.delegate = self
@@ -179,7 +172,7 @@ public final class CRDragDropTableView: UIView {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 150
         tableView.register(CRWrapCell.self, forCellReuseIdentifier: CRWrapCell.identifier)
-        tableView.separatorStyle = .none
+        tableView.separatorStyle = .none // manuel separator kullanılacak
 
         addSubview(tableView)
         NSLayoutConstraint.activate([
@@ -212,6 +205,7 @@ public final class CRDragDropTableView: UIView {
         applyHeightMode()
         tableView.reloadData()
         DispatchQueue.main.async { [weak self] in
+            self?.refreshSeparators()
             self?.updateHeight()
         }
     }
@@ -253,11 +247,34 @@ public final class CRDragDropTableView: UIView {
             if !inserts.isEmpty { tableView.insertRows(at: inserts, with: .automatic) }
             for m in moves { tableView.moveRow(at: m.from, to: m.to) }
         }, completion: { [weak self] _ in
-            guard let self = self else { return }
-            self.updateHeight()
-            // /// Toplu işlem sonrasında görünen satırların separator’larını tazeler.
-            self.reloadVisibleForSeparators()
+            self?.refreshSeparators()
+            self?.updateHeight()
         })
+    }
+
+    /// Görünür hücrelerin separator durumunu günceller (drag/drop veya move sonrası tekrar çizim).
+    private func refreshSeparators() {
+        let rows = tableView.numberOfRows(inSection: 0)
+        guard rows > 0 else { return }
+
+        for cell in tableView.visibleCells {
+            // Eski çizgileri temizle
+            cell.contentView.subviews
+                .filter { $0.tag == 999 }
+                .forEach { $0.removeFromSuperview() }
+
+            guard let ip = tableView.indexPath(for: cell),
+                  ip.row < rows - 1 else { continue } // son satır için çizme
+
+            switch viewModel.separatorStyle {
+            case .none:
+                break
+            case .full:
+                addSeparator(to: cell, start: 0, end: 0)
+            case .withInsets(let insets):
+                addSeparator(to: cell, start: insets.start, end: insets.end)
+            }
+        }
     }
 
     /// Tablo içerik yüksekliğine göre görünüm yüksekliğini günceller.
@@ -281,23 +298,6 @@ public final class CRDragDropTableView: UIView {
         } else {
             return CGSize(width: UIView.noIntrinsicMetric, height: UIView.noIntrinsicMetric)
         }
-    }
-
-    /// /// Verilen indekslerin kendisi ve komşuları için satırları `.none` animasyonla yeniler (separator güncelleme).
-    private func reloadSeparatorsAround(indices: [Int]) {
-        let rows = Set(indices.flatMap { [$0 - 1, $0, $0 + 1] })
-            .filter { $0 >= 0 && $0 < viewModel.items.count }
-        guard !rows.isEmpty else { return }
-        let ips = rows.sorted().map { IndexPath(row: $0, section: 0) }
-        // `beginUpdates/endUpdates` gerekmiyor; .none animasyon güvenli.
-        tableView.reloadRows(at: ips, with: .none)
-    }
-
-    /// /// Görünür tüm satırları separator konfigürasyonu için hızlıca yeniler.
-    private func reloadVisibleForSeparators() {
-        let visible = tableView.indexPathsForVisibleRows ?? []
-        guard !visible.isEmpty else { return }
-        tableView.reloadRows(at: visible, with: .none)
     }
 }
 
@@ -326,18 +326,51 @@ extension CRDragDropTableView: UITableViewDataSource, UITableViewDelegate {
     /// Bir satır başka bir konuma taşındığında modeldeki sırayı günceller.
     public func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         guard viewModel.allowReorder, sourceIndexPath != destinationIndexPath else { return }
-        // UIKit satırı görsel olarak taşır; modelimizi senkronize edelim.
         viewModel.moveItem(from: sourceIndexPath.row, to: destinationIndexPath.row)
-        // /// Reorder sonrası kaynak/hedef ve komşuları separator için yenile.
-        reloadSeparatorsAround(indices: [sourceIndexPath.row, destinationIndexPath.row])
+        // Görünürken hareket ediyorsa willDisplay tetiklenmeyebilir; separator'ları yenile
+        DispatchQueue.main.async { [weak self] in self?.refreshSeparators() }
     }
 
-    /// Hücre ekrana gelmeden separator konfigürasyonunu uygular.
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let cell = cell as? CRWrapCell else { return }
-        let lastRowIndex = max(0, tableView.numberOfRows(inSection: indexPath.section) - 1)
-        let isLast = (indexPath.row == lastRowIndex)
-        cell.configureSeparator(style: viewModel.separatorStyle, isLastRow: isLast)
+        tableView.separatorStyle = .none
+
+        let lastRowIndex = tableView.numberOfRows(inSection: indexPath.section) - 1
+        guard indexPath.row != lastRowIndex else {
+            // Son hücrede separator ekleme
+            cell.contentView.subviews
+                .filter { $0.tag == 999 }
+                .forEach { $0.removeFromSuperview() }
+            return
+        }
+
+        switch viewModel.separatorStyle {
+        case .none:
+            break
+        case .full:
+            addSeparator(to: cell, start: 0, end: 0)
+        case .withInsets(let insets):
+            addSeparator(to: cell, start: insets.start, end: insets.end)
+        }
+    }
+
+    private func addSeparator(to cell: UITableViewCell, start: CGFloat, end: CGFloat) {
+        // Önce varsa eski separator'ı temizle
+        cell.contentView.subviews
+            .filter { $0.tag == 999 }
+            .forEach { $0.removeFromSuperview() }
+
+        let line = UIView()
+        line.backgroundColor = CRColor.borderSubtle
+        line.tag = 999
+        cell.contentView.addSubview(line)
+        line.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            line.heightAnchor.constraint(equalToConstant: 1), // 1pt kalınlık
+            line.leadingAnchor.constraint(equalTo: cell.contentView.leadingAnchor, constant: start),
+            line.trailingAnchor.constraint(equalTo: cell.contentView.trailingAnchor, constant: -end),
+            line.bottomAnchor.constraint(equalTo: cell.contentView.bottomAnchor)
+        ])
     }
 }
 
@@ -346,7 +379,7 @@ extension CRDragDropTableView: UITableViewDataSource, UITableViewDelegate {
 extension CRDragDropTableView: UITableViewDragDelegate, UITableViewDropDelegate {
     /// Sürükleme başlangıcında tek bir yerel öğe üretir.
     public func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        guard viewModel.allowReorder, viewModel.items.indices.contains(indexPath.row) else { return [] }
+        guard viewModel.allowReorder else { return [] }
         let provider = NSItemProvider()
         let item = UIDragItem(itemProvider: provider)
         item.localObject = viewModel.items[indexPath.row]
@@ -372,24 +405,14 @@ extension CRDragDropTableView: UITableViewDragDelegate, UITableViewDropDelegate 
               viewModel.allowReorder,
               let item = coordinator.items.first,
               let source = item.sourceIndexPath,
-              viewModel.items.indices.contains(source.row)
-        else { return }
+              let _ = item.dragItem.localObject as? UIView else { return }
 
-        // Hedef indexPath yoksa son sıraya taşı; güvenle sınırla.
-        let fallbackRow = max(0, viewModel.items.count - 1)
-        let destIP = coordinator.destinationIndexPath ?? IndexPath(row: fallbackRow, section: 0)
+        let dest = coordinator.destinationIndexPath ?? IndexPath(row: viewModel.items.count - 1, section: 0)
+        viewModel.moveItem(from: source.row, to: dest.row)
+        coordinator.drop(item.dragItem, toRowAt: dest)
 
-        let boundedDestRow = max(0, min(destIP.row, max(0, viewModel.items.count - 1)))
-        let boundedDest = IndexPath(row: boundedDestRow, section: 0)
-
-        // Modeli güncelle
-        viewModel.moveItem(from: source.row, to: boundedDest.row)
-
-        // UITableView'a bırakmayı bildir (görsel senkron)
-        coordinator.drop(item.dragItem, toRowAt: boundedDest)
-
-        // /// Drop sonrası kaynak/hedef ve komşuları separator için yenile.
-        reloadSeparatorsAround(indices: [source.row, boundedDest.row])
+        // Drop sonrası separator durumunu yenile
+        DispatchQueue.main.async { [weak self] in self?.refreshSeparators() }
     }
 }
 
@@ -400,42 +423,24 @@ public final class CRWrapCell: UITableViewCell {
     /// Hücre kayıt/çözümlemede kullanılacak identifier.
     public static let identifier = "CRWrapCell"
 
-    private let sep = UIView()
-    private var sepLeading: NSLayoutConstraint!
-    private var sepTrailing: NSLayoutConstraint!
-
     /// Programatik başlatıcı.
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
-
-        // Dahili separator görünümü
-        sep.translatesAutoresizingMaskIntoConstraints = false
-        sep.backgroundColor = CRColor.borderSubtle
-        sep.tag = 999
-        contentView.addSubview(sep)
-
-        sepLeading = sep.leadingAnchor.constraint(equalTo: contentView.leadingAnchor)
-        sepTrailing = sep.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
-
-        NSLayoutConstraint.activate([
-            sep.heightAnchor.constraint(equalToConstant: 1),         // 1pt kalınlık
-            sep.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            sepLeading,
-            sepTrailing
-        ])
     }
 
     /// Storyboard/XIB başlatıcısı desteklenmez.
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
+    /// Reuse öncesi varsa manuel separator'ı temizle.
+    public override func prepareForReuse() {
+        super.prepareForReuse()
+        contentView.subviews.filter { $0.tag == 999 }.forEach { $0.removeFromSuperview() }
+    }
+
     /// Verilen UIView’i hücreye gömer ve kenarlara sabitler.
     public func embed(_ view: UIView) {
-        // Dahili separator haricindeki alt görünümleri temizle
-        contentView.subviews
-            .filter { $0 !== sep }
-            .forEach { $0.removeFromSuperview() }
-
+        contentView.subviews.forEach { $0.removeFromSuperview() }
         view.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(view)
         NSLayoutConstraint.activate([
@@ -444,28 +449,71 @@ public final class CRWrapCell: UITableViewCell {
             view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
+    }
+}
 
-        // Separator en önde kalsın
-        contentView.bringSubviewToFront(sep)
+// MARK: - Usage Example
+
+final class UsageExampleViewController: UIViewController, ShowcaseListViewControllerProtocol {
+
+    private var dragDropView: CRDragDropTableView!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+
+        // Örnek içerik: 3 label
+        let views: [UIView] = [
+            makeRow(text: "Birinci Satır"),
+            makeRow(text: "İkinci Satır"),
+            makeRow(text: "Üçüncü Satır")
+        ]
+
+        // ViewModel: separator style with insets
+        let vm = CRDragDropTableViewModel(
+            items: views,
+            allowReorder: true,
+            isScrollEnabled: true,
+            matchContentHeight: true,
+            separatorStyle: .withInsets(CRSeparatorInsets(start: 16, end: 16))
+        )
+
+        dragDropView = CRDragDropTableView(viewModel: vm)
+        dragDropView.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(dragDropView)
+
+        NSLayoutConstraint.activate([
+            dragDropView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            dragDropView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            dragDropView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+            // yükseklik matchContentHeight olduğu için otomatik ayarlanır
+        ])
     }
 
-    /// /// Hücre separator’ını stil ve "son satır mı" bilgisine göre konfigüre eder.
-    public func configureSeparator(style: CRSeparatorStyle, isLastRow: Bool) {
-        if isLastRow || style == .none {
-            sep.isHidden = true
-            return
-        }
-        sep.isHidden = false
-        switch style {
-        case .none:
-            sep.isHidden = true
-        case .full:
-            sepLeading.constant = 0
-            sepTrailing.constant = 0
-        case .withInsets(let insets):
-            sepLeading.constant = insets.start
-            sepTrailing.constant = -insets.end
-        }
-        setNeedsLayout()
+    /// Basit label içeren satır view
+    private func makeRow(text: String) -> UIView {
+        let label = UILabel()
+        label.text = text
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .label
+        label.backgroundColor = UIColor.secondarySystemBackground
+        label.textAlignment = .left
+        label.numberOfLines = 0
+        label.layer.cornerRadius = 8
+        label.layer.masksToBounds = true
+        label.setContentHuggingPriority(.required, for: .vertical)
+        label.setContentCompressionResistancePriority(.required, for: .vertical)
+
+        let container = UIView()
+        container.addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: container.topAnchor, constant: 8),
+            label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -8),
+            label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
+            label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12)
+        ])
+        return container
     }
 }
