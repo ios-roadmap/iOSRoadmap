@@ -107,7 +107,7 @@ public final class CRDragDropTableViewModel {
     /// Bir öğeyi kaynak indeksten hedef indekse taşır ve değişikliği bildirir.
     public func moveItem(from source: Int, to destination: Int) {
         guard items.indices.contains(source) else { return }
-        var target = max(0, min(destination, items.count - 1))
+        let target = max(0, min(destination, items.count - 1))
         if source == target { return }
         let old = items
         let v = items.remove(at: source)
@@ -452,68 +452,175 @@ public final class CRWrapCell: UITableViewCell {
     }
 }
 
-// MARK: - Usage Example
+//MARK: -------------------------------------------------------
 
-final class UsageExampleViewController: UIViewController, ShowcaseListViewControllerProtocol {
+//
+//  ExampleViewController.swift
+//  CRComponents_Example
+//
+//  Created by Omer Faruk Ozturk [Ing Teknoloji A.S.-Dijital Squad 1] on 2.10.2025.
+//
 
-    private var dragDropView: CRDragDropTableView!
+import UIKit
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+final class ExampleViewController: UIViewController, ShowcaseListViewControllerProtocol {
 
-        // Örnek içerik: 3 label
-        let views: [UIView] = [
-            makeRow(text: "Birinci Satır"),
-            makeRow(text: "İkinci Satır"),
-            makeRow(text: "Üçüncü Satır")
-        ]
+    // MARK: - Properties
+    
+    private var topTableView: CRDragDropTableView!
+    private var bottomTableView: CRDragDropTableView!
 
-        // ViewModel: separator style with insets
-        let vm = CRDragDropTableViewModel(
-            items: views,
-            allowReorder: true,
-            isScrollEnabled: true,
-            matchContentHeight: true,
-            separatorStyle: .withInsets(CRSeparatorInsets(start: 16, end: 16))
-        )
-
-        dragDropView = CRDragDropTableView(viewModel: vm)
-        dragDropView.translatesAutoresizingMaskIntoConstraints = false
-
-        view.addSubview(dragDropView)
-
-        NSLayoutConstraint.activate([
-            dragDropView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            dragDropView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            dragDropView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
-            // yükseklik matchContentHeight olduğu için otomatik ayarlanır
-        ])
+    // MARK: - UI Configuration Constants
+    
+    /// Kodun daha okunabilir olması için sabit değerleri tek bir yerde topluyoruz.
+    private enum UIConfig {
+        static let totalViewCount = 15
+        static let topViewCount = 2
+        
+        static let itemHeight: CGFloat = 80
+        static let itemCornerRadius: CGFloat = 8
+        static let horizontalPadding: CGFloat = 16
+        static let verticalPadding: CGFloat = 8
+        
+        static let labelFontSize: CGFloat = 17
+        static let spacingBetweenTables: CGFloat = 12
     }
 
-    /// Basit label içeren satır view
-    private func makeRow(text: String) -> UIView {
-        let label = UILabel()
-        label.text = text
-        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        label.textColor = .label
-        label.backgroundColor = UIColor.secondarySystemBackground
-        label.textAlignment = .left
-        label.numberOfLines = 0
-        label.layer.cornerRadius = 8
-        label.layer.masksToBounds = true
-        label.setContentHuggingPriority(.required, for: .vertical)
-        label.setContentCompressionResistancePriority(.required, for: .vertical)
+    // MARK: - Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupViewController()
+        
+        // 1. Veri ve Görünümleri Hazırla
+        let allSampleViews = createSampleViews()
+        let topViews = Array(allSampleViews.prefix(UIConfig.topViewCount))
+        let bottomViews = Array(allSampleViews.suffix(from: UIConfig.topViewCount))
+        
+        // 2. ViewModel'ları Oluştur
+        let topViewModel = createTopViewModel(with: topViews)
+        let bottomViewModel = createBottomViewModel(with: bottomViews)
+        
+        // 3. TableView'leri ViewModel'lar ile Başlat
+        topTableView = CRDragDropTableView(viewModel: topViewModel)
+        bottomTableView = CRDragDropTableView(viewModel: bottomViewModel)
+        
+        // 4. Arayüzü Yerleştir
+        setupLayout()
+    }
+    
+    // MARK: - ViewModel Creation
+    
+    private func createTopViewModel(with views: [UIView]) -> CRDragDropTableViewModel {
+        return CRDragDropTableViewModel(
+            items: views,
+            allowReorder: true,
+            isScrollEnabled: false, // Az eleman olduğu için kaydırma gereksiz
+            matchContentHeight: true, // Yüksekliği içeriğe göre ayarlanacak
+            separatorStyle: .withInsets(.init(start: UIConfig.horizontalPadding, end: 0))
+        )
+    }
+    
+    private func createBottomViewModel(with views: [UIView]) -> CRDragDropTableViewModel {
+        return CRDragDropTableViewModel(
+            items: views,
+            allowReorder: true,
+            isScrollEnabled: true, // Çok eleman olduğu için kaydırma gerekli
+            matchContentHeight: false, // Ekranın kalanını dolduracak
+            separatorStyle: .full
+        )
+    }
 
-        let container = UIView()
-        container.addSubview(label)
+    // MARK: - Sample View Creation
+    
+    /// Belirtilen sayıda örnek görünüm oluşturur ve bir dizi olarak döndürür.
+    private func createSampleViews() -> [UIView] {
+        // (1...15).map { createSampleView(for: $0) }
+        // Yukarıdaki satır, aşağıdaki döngünün daha fonksiyonel bir yazım şeklidir.
+        var views: [UIView] = []
+        for i in 1...UIConfig.totalViewCount {
+            views.append(createSampleView(for: i))
+        }
+        return views
+    }
+    
+    /// Tek bir sıralanabilir öğenin görünüm hiyerarşisini oluşturur.
+    /// Bu fonksiyon, view oluşturma karmaşıklığını döngüden ayırır.
+    /// - Parameter index: Öğenin sıra numarası (metin ve renk için kullanılır).
+    /// - Returns: Padding uygulanmış ve stillendirilmiş bir `UIView`.
+    private func createSampleView(for index: Int) -> UIView {
+        // İçerik (Renkli ve köşeleri yuvarlak kart)
+        let containerView = UIView()
+        containerView.layer.cornerRadius = UIConfig.itemCornerRadius
+        
+        // Renk tonunu (hue) indekse göre dinamik olarak hesapla
+        let hue = CGFloat(index) / CGFloat(UIConfig.totalViewCount)
+        containerView.backgroundColor = UIColor(hue: hue, saturation: 0.7, brightness: 0.95, alpha: 1.0)
+        
+        // Etiket
+        let label = UILabel()
+        label.text = "Sıralanabilir Öğe \(index)"
+        label.textColor = .label
+        label.font = .systemFont(ofSize: UIConfig.labelFontSize, weight: .medium)
+        
+        // Görünümleri hiyerarşiye ekle
+        containerView.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Dış sarmalayıcı (Padding/kenar boşlukları için)
+        let wrapperView = UIView()
+        wrapperView.addSubview(containerView)
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Auto Layout Kısıtları
         NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: container.topAnchor, constant: 8),
-            label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -8),
-            label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
-            label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12)
+            // İçerik kartının yüksekliği
+            containerView.heightAnchor.constraint(equalToConstant: UIConfig.itemHeight),
+            
+            // Etiketin konumu (kartın içinde)
+            label.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: UIConfig.horizontalPadding),
+            label.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            
+            // İçerik kartının konumu (dış sarmalayıcı içinde, padding oluşturur)
+            containerView.topAnchor.constraint(equalTo: wrapperView.topAnchor, constant: UIConfig.verticalPadding),
+            containerView.bottomAnchor.constraint(equalTo: wrapperView.bottomAnchor, constant: -UIConfig.verticalPadding),
+            containerView.leadingAnchor.constraint(equalTo: wrapperView.leadingAnchor, constant: UIConfig.horizontalPadding),
+            containerView.trailingAnchor.constraint(equalTo: wrapperView.trailingAnchor, constant: -UIConfig.horizontalPadding),
         ])
-        return container
+        
+        return wrapperView
+    }
+    
+    // MARK: - UI Setup
+    
+    private func setupViewController() {
+        view.backgroundColor = .systemGroupedBackground
+        title = "Drag & Drop List (Clean)"
+    }
+    
+    /// TableView'leri view hiyerarşisine ekler ve Auto Layout ile konumlandırır.
+    private func setupLayout() {
+        topTableView.translatesAutoresizingMaskIntoConstraints = false
+        bottomTableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(topTableView)
+        view.addSubview(bottomTableView)
+        
+        let guide = view.safeAreaLayoutGuide
+        
+        // Üstteki TableView için kısıtlar
+        NSLayoutConstraint.activate([
+            topTableView.topAnchor.constraint(equalTo: guide.topAnchor),
+            topTableView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
+            topTableView.trailingAnchor.constraint(equalTo: guide.trailingAnchor)
+        ])
+        
+        // Alttaki TableView için kısıtlar
+        NSLayoutConstraint.activate([
+            bottomTableView.topAnchor.constraint(equalTo: topTableView.bottomAnchor, constant: UIConfig.spacingBetweenTables),
+            bottomTableView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
+            bottomTableView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+            bottomTableView.bottomAnchor.constraint(equalTo: guide.bottomAnchor)
+        ])
     }
 }

@@ -9,6 +9,9 @@ import UIKit
 import IRStyleKit
 
 final class CircleLabelViewDemoPageController: IRViewController, ShowcaseListViewControllerProtocol {
+    
+    var viewModel: ViewModel?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -26,5 +29,19 @@ final class CircleLabelViewDemoPageController: IRViewController, ShowcaseListVie
         imageView.center = view.center
         
         view.addSubview(imageView)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel = ViewModel(view: self)
+    }
+}
+
+final class ViewModel {
+    
+    let view: UIViewController
+    
+    init(view: UIViewController) {
+        self.view = view
     }
 }

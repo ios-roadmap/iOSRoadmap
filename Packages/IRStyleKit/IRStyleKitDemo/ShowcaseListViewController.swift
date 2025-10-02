@@ -21,7 +21,7 @@ extension ShowcaseListViewControllerProtocol {
 final class ShowcaseListViewController: IRViewController {
     private let demoPages: [ShowcaseListViewControllerProtocol.Type] = [
         //TODO: Daha konulara bölünmesi gerekiliyor. Özel çalışma yapılması lazım.
-        UsageExampleViewController.self,
+        ExampleViewController.self,
         CircleLabelViewDemoPageController.self,
         HStackDemoViewController.self,
         KeyValuePageViewController.self,
